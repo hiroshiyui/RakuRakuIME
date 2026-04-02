@@ -1,7 +1,7 @@
 # Credits and Licensing
 
-## ezbig.cin.zip
-The dictionary file `ezbig.cin.zip` (EZ Input Method / 輕鬆輸入法) included in this project is subject to the following attribution and licensing:
+## ezbig.utf-8.cin
+The dictionary file `ezbig.utf-8.cin` (EZ Input Method / 輕鬆輸入法) included in this project is subject to the following attribution and licensing:
 
 - **Original Author:** 高衡緒
 - **Organization:** 輕鬆資訊企業社

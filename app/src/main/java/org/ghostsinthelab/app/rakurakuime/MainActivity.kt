@@ -24,9 +24,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,12 +32,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.ghostsinthelab.app.rakurakuime.data.CinParser
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
+import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
+import org.ghostsinthelab.app.rakurakuime.ui.SettingsScreen
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val userPreferences = UserPreferences(this)
+
         setContent {
             RakuRakuIMETheme {
                 var initStatus by remember { mutableStateOf("Checking dictionary...") }
@@ -60,34 +62,51 @@ class MainActivity : ComponentActivity() {
                             initStatus = "Error initializing dictionary: ${e.localizedMessage}"
                         }
                     } else {
-                        initStatus = "Dictionary ready ($count entries). Please enable RakuRaku IME in system settings."
+                        initStatus = "Dictionary ready ($count entries)."
                         isReady = true
                     }
                 }
 
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(32.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    Text(
-                        text = initStatus,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    
-                    if (isReady) {
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = "To use the keyboard, please enable RakuRakuIME in your system settings.",
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = {
-                            startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
-                        }) {
-                            Text("Enable in Settings")
+                    if (!isReady) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator()
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(text = initStatus, textAlign = TextAlign.Center)
+                            }
+                        }
+                    } else {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            // Top bar with "Enable" button
+                            Surface(
+                                tonalElevation = 4.dp,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "IME is ready",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Button(onClick = {
+                                        startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+                                    }) {
+                                        Text("Enable in Settings")
+                                    }
+                                }
+                            }
+                            
+                            SettingsScreen(
+                                userPreferences = userPreferences,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     }
                 }

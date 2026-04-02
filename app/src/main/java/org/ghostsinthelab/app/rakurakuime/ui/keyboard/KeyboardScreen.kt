@@ -45,7 +45,10 @@ fun KeyboardScreen(
     val isSelecting by viewModel.isSelecting.collectAsState()
     val inputMode by viewModel.inputMode.collectAsState()
     val isShifted by viewModel.isShifted.collectAsState()
+    val heightScale by viewModel.keyboardHeightScale.collectAsState(initial = 1.0f)
     val colors = KeyboardTheme.current
+
+    val scaledKeyHeight = KeyboardLayout.KEY_HEIGHT * heightScale
 
     Column(
         modifier = Modifier
@@ -83,6 +86,7 @@ fun KeyboardScreen(
                                     keyDef = key,
                                     isUppercase = isShifted,
                                     modifier = Modifier.weight(1f),
+                                    keyHeight = scaledKeyHeight,
                                     onSwipeUp = {
                                         onKeyPress()
                                         currentInputConnection?.commitText(key.qwertyChar.uppercase(), 1)
@@ -95,8 +99,6 @@ fun KeyboardScreen(
                                             else -> -1
                                         }
                                         
-                                        // If in Selection Mode, numbers select candidates.
-                                        // Otherwise, they are roots.
                                         if (isSelecting && pagedCandidates.isNotEmpty() && selIndex != -1 && selIndex < pagedCandidates.size) {
                                             viewModel.selectCandidate(pagedCandidates[selIndex])
                                         } else {
@@ -125,6 +127,7 @@ fun KeyboardScreen(
                                 KeyButton(
                                     keyDef = KeyDefinition(char),
                                     modifier = Modifier.weight(1f),
+                                    keyHeight = scaledKeyHeight,
                                     onClick = {
                                         onKeyPress()
                                         currentInputConnection?.commitText(char, 1)
@@ -144,11 +147,11 @@ fun KeyboardScreen(
         FunctionRow(
             inputMode = inputMode,
             isShifted = isShifted,
+            keyHeight = scaledKeyHeight,
             onBackspace = {
                 onKeyPress()
                 val handledByBuffer = viewModel.onBackspace()
                 if (!handledByBuffer) {
-                    // Send standard backspace to the text field
                     currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
                     currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
                 }
@@ -164,12 +167,10 @@ fun KeyboardScreen(
                         if (textToCommit.isNotEmpty()) {
                             currentInputConnection?.commitText(textToCommit, 1)
                         } else {
-                            // Should not happen if check passed, but fallback to sending space
                             currentInputConnection?.commitText(" ", 1)
                         }
                     }
                 } else {
-                    // Send standard space to the text field
                     currentInputConnection?.commitText(" ", 1)
                 }
             },

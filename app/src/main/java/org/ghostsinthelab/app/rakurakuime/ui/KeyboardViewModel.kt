@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
+import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
 
 enum class InputMode {
     EZ, SYMBOL, NUMBER
@@ -37,6 +38,11 @@ enum class InputMode {
 
 class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
     private val db = ImeDatabase.getDatabase(application)
+    private val userPreferences = UserPreferences(application)
+
+    val vibrationEnabled = userPreferences.vibrationEnabled
+    val vibrationIntensity = userPreferences.vibrationIntensity
+    val keyboardHeightScale = userPreferences.keyboardHeightScale
 
     private val _inputMode = MutableStateFlow(InputMode.EZ)
     val inputMode: StateFlow<InputMode> = _inputMode.asStateFlow()

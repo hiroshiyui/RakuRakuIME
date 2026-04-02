@@ -51,6 +51,7 @@ fun KeyButton(
     keyDef: KeyDefinition,
     isUppercase: Boolean = true,
     modifier: Modifier = Modifier,
+    keyHeight: androidx.compose.ui.unit.Dp = KeyboardLayout.KEY_HEIGHT,
     backgroundColorOverride: androidx.compose.ui.graphics.Color? = null,
     textColorOverride: androidx.compose.ui.graphics.Color? = null,
     onSwipeUp: (() -> Unit)? = null,
@@ -66,12 +67,12 @@ fun KeyButton(
     val displayLabel = if (isUppercase) keyDef.qwertyChar.uppercase() else keyDef.qwertyChar.lowercase()
 
     val density = LocalDensity.current
-    val popupOffsetY = with(density) { -(KeyboardLayout.KEY_HEIGHT + 12.dp).roundToPx() }
+    val popupOffsetY = with(density) { -(keyHeight + 12.dp).roundToPx() }
     val swipeThresholdPx = with(density) { 24.dp.toPx() }
 
     Box(
         modifier = modifier
-            .height(KeyboardLayout.KEY_HEIGHT)
+            .height(keyHeight)
             .widthIn(min = 28.dp)
             .padding(2.dp)
             .clip(RoundedCornerShape(8.dp))

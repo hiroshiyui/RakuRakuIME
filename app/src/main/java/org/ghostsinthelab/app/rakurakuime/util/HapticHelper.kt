@@ -33,12 +33,15 @@ class HapticHelper(context: Context) {
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
 
-    fun vibrate() {
+    fun vibrate(intensity: Float = 0.5f) {
+        val duration = 10L
+        val amplitude = (intensity * 255).toInt().coerceIn(1, 255)
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator?.vibrate(VibrationEffect.createOneShot(duration, amplitude))
         } else {
             @Suppress("DEPRECATION")
-            vibrator?.vibrate(10)
+            vibrator?.vibrate(duration)
         }
     }
 }

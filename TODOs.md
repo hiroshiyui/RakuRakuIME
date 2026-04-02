@@ -12,15 +12,15 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 ## User Interface (UI)
 - [ ] **Advanced Symbol Panels:** Categorized symbol pages (Punctuation, Math, Arrows, Emoticons) instead of a single row.
 - [ ] **Key Alternates:** Show a popup of related characters (e.g., accented vowels) on long-press.
-- [ ] **Adjustable Keyboard Height:** Allow users to scale the keyboard height in settings.
+- [x] **Adjustable Keyboard Height:** Allow users to scale the keyboard height in settings.
 - [ ] **Dynamic Material You Theming:** support wallpaper-derived colors on Android 12+.
 - [ ] **Split Keyboard Layout:** A specialized layout for landscape orientation or tablets.
 
 ## System & Settings
-- [ ] **Settings Screen:** A dedicated UI in `MainActivity` to manage preferences.
-    - [ ] Vibration intensity/toggle.
-    - [ ] Dictionary management (re-import/reset).
-    - [ ] "About" section with full attribution for **高衡緒** and **輕鬆資訊企業社**.
+- [x] **Settings Screen:** A dedicated UI in `MainActivity` to manage preferences.
+    - [x] Vibration intensity/toggle.
+    - [x] Dictionary management (re-import/reset).
+    - [x] "About" section with full attribution for **高衡緒** and **輕鬆資訊企業社**.
 - [ ] **Accessibility (TalkBack):** Add comprehensive `semantics` labels for candidates, roots, and function keys.
 
 ## Technical Debt / Performance

@@ -29,6 +29,7 @@ import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 fun FunctionRow(
     inputMode: InputMode,
     isShifted: Boolean,
+    keyHeight: androidx.compose.ui.unit.Dp = KeyboardLayout.KEY_HEIGHT,
     onBackspace: () -> Unit,
     onSpace: () -> Unit,
     onEnter: () -> Unit,
@@ -48,6 +49,7 @@ fun FunctionRow(
         KeyButton(
             keyDef = KeyDefinition(if (inputMode == InputMode.EZ) "?123" else "EZ"),
             modifier = Modifier.weight(1.5f),
+            keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = {
@@ -60,6 +62,7 @@ fun FunctionRow(
         KeyButton(
             keyDef = KeyDefinition("🌐"),
             modifier = Modifier.weight(1f),
+            keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = onSwitchIme
@@ -69,6 +72,7 @@ fun FunctionRow(
         KeyButton(
             keyDef = KeyDefinition(" ", "Space"),
             modifier = Modifier.weight(4f),
+            keyHeight = keyHeight,
             onClick = onSpace
         )
 
@@ -76,6 +80,7 @@ fun FunctionRow(
         KeyButton(
             keyDef = KeyDefinition("⌫"),
             modifier = Modifier.weight(1.5f),
+            keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = onBackspace
@@ -85,6 +90,7 @@ fun FunctionRow(
         KeyButton(
             keyDef = KeyDefinition("⏎"),
             modifier = Modifier.weight(1.5f),
+            keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = onEnter

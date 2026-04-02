@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeyButton(
@@ -55,13 +56,17 @@ fun KeyButton(
     backgroundColorOverride: androidx.compose.ui.graphics.Color? = null,
     textColorOverride: androidx.compose.ui.graphics.Color? = null,
     onSwipeUp: (() -> Unit)? = null,
+    onAlternateSelected: ((String) -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val currentOnClick by rememberUpdatedState(onClick)
     val currentOnSwipeUp by rememberUpdatedState(onSwipeUp)
+    val currentOnAlternateSelected by rememberUpdatedState(onAlternateSelected)
     var isPressed by remember { mutableStateOf(false) }
+    var showAlternates by remember { mutableStateOf(false) }
+    var activeAlternateIndex by remember { mutableStateOf(-1) }
     val colors = KeyboardTheme.current
-    val backgroundColor = backgroundColorOverride ?: if (isPressed) colors.keyPressedBackground else colors.keyBackground
+    val backgroundColor = backgroundColorOverride ?: if (isPressed && !showAlternates) colors.keyPressedBackground else colors.keyBackground
     val textColor = textColorOverride ?: colors.keyTextColor
 
     val displayLabel = if (isUppercase) keyDef.qwertyChar.uppercase() else keyDef.qwertyChar.lowercase()
@@ -79,12 +84,24 @@ fun KeyButton(
             .background(backgroundColor)
             .pointerInput(Unit) {
                 coroutineScope {
+                    val scope = this
                     awaitPointerEventScope {
                         while (true) {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             isPressed = true
+                            showAlternates = false
+                            activeAlternateIndex = -1
                             val startY = down.position.y
+                            val startX = down.position.x
                             var gestureHandled = false
+
+                            val longPressJob = scope.launch {
+                                kotlinx.coroutines.delay(400)
+                                if (isPressed && !gestureHandled && keyDef.alternates.isNotEmpty()) {
+                                    showAlternates = true
+                                    activeAlternateIndex = 0
+                                }
+                            }
 
                             var released = false
                             try {
@@ -96,27 +113,45 @@ fun KeyButton(
                                         break
                                     }
 
-                                    val dy = change.position.y - startY
-                                    if (!gestureHandled && dy < -swipeThresholdPx) {
-                                        gestureHandled = true
-                                        isPressed = false
-                                        currentOnSwipeUp?.invoke()
-                                        // Consume remaining until up
-                                        while (true) {
-                                            val ev = awaitPointerEvent(PointerEventPass.Main)
-                                            if (ev.changes.all { it.changedToUp() }) break
+                                    if (showAlternates) {
+                                        val dx = change.position.x - startX
+                                        val itemWidthPx = with(density) { 40.dp.toPx() }
+                                        val steps = (dx / itemWidthPx).toInt()
+                                        activeAlternateIndex = (steps).coerceIn(0, keyDef.alternates.lastIndex)
+                                    } else {
+                                        val dy = change.position.y - startY
+                                        if (!gestureHandled && dy < -swipeThresholdPx) {
+                                            gestureHandled = true
+                                            isPressed = false
+                                            longPressJob.cancel()
+                                            currentOnSwipeUp?.invoke()
+                                            // Consume remaining until up
+                                            while (true) {
+                                                val ev = awaitPointerEvent(PointerEventPass.Main)
+                                                if (ev.changes.all { it.changedToUp() }) break
+                                            }
+                                            released = true
+                                            break
                                         }
-                                        released = true
-                                        break
                                     }
                                 }
                             } catch (_: Exception) {
                                 released = false
                             }
 
+                            longPressJob.cancel()
                             isPressed = false
+                            
+                            val wasShowingAlternates = showAlternates
+                            val finalActiveIndex = activeAlternateIndex
+                            showAlternates = false
+                            
                             if (released && !gestureHandled) {
-                                currentOnClick()
+                                if (wasShowingAlternates && finalActiveIndex in keyDef.alternates.indices) {
+                                    currentOnAlternateSelected?.invoke(keyDef.alternates[finalActiveIndex])
+                                } else {
+                                    currentOnClick()
+                                }
                             }
                         }
                     }
@@ -128,25 +163,32 @@ fun KeyButton(
         if (keyDef.ezRoot.isNotEmpty()) {
             Text(
                 text = keyDef.ezRoot,
-                fontSize = 10.sp,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
                 color = colors.rootLabelColor,
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(start = 4.dp, top = 2.dp),
+                    .padding(start = 5.dp, top = 2.dp),
             )
         }
         
-        // Main character label
+        // Main character label (qwertyChar) at bottom-right
         Text(
             text = displayLabel,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Normal,
             color = textColor,
-            textAlign = TextAlign.Center,
+            modifier = if (keyDef.ezRoot.isNotEmpty()) {
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 5.dp, bottom = 2.dp)
+            } else {
+                Modifier.align(Alignment.Center)
+            },
         )
 
         // Popup preview when pressed
-        if (isPressed) {
+        if (isPressed && !showAlternates) {
             Popup(
                 alignment = Alignment.TopCenter,
                 offset = IntOffset(0, popupOffsetY),
@@ -160,11 +202,47 @@ fun KeyButton(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = displayLabel,
+                        text = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.keyTextColor,
                     )
+                }
+            }
+        }
+        
+        // Alternates popup
+        if (showAlternates) {
+            Popup(
+                alignment = Alignment.TopCenter,
+                offset = IntOffset(0, popupOffsetY),
+            ) {
+                androidx.compose.foundation.layout.Row(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(colors.keyBackground)
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    keyDef.alternates.forEachIndexed { index, alt ->
+                        val isSelected = index == activeAlternateIndex
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp, 50.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (isSelected) colors.keyPressedBackground else androidx.compose.ui.graphics.Color.Transparent),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (isUppercase) alt.uppercase() else alt.lowercase(),
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.keyTextColor,
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                             initStatus = "Error initializing dictionary: ${e.localizedMessage}"
                         }
                     } else {
-                        initStatus = "Dictionary ready ($count entries)."
+                        initStatus = "Dictionary ready ($count entries). Please enable RakuRaku IME in system settings."
                         isReady = true
                     }
                 }

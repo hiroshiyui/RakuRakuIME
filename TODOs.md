@@ -1,6 +1,6 @@
-# RakuRakuIME TODOs
+# RakuRaku IME TODOs
 
-This list tracks the missing features and planned improvements for RakuRakuIME, modeled after professional IME standards (like JustArray and Gboard).
+This list tracks the missing features and planned improvements for RakuRaku IME, modeled after professional IME standards (like JustArray and Gboard).
 
 ## Input & Logic
 - [ ] **Frequency-Based Sorting:** Dynamically move frequently used characters to the front of the candidate list based on user history.

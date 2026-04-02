@@ -5,7 +5,6 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 ## Input & Logic
 - [x] **Frequency-Based Sorting:** Dynamically move frequently used characters to the front of the candidate list based on user history.
 - [x] **Auto-Select:** Automatically commit a character if it is the only possible match for a sequence.
-- [ ] **Short Code (簡碼) & Special Code support:** Implement specific EZ-method optimizations for common phrases.
 - [ ] **English Word Prediction:** Suggest English words as you type in English/Shifted mode.
 - [ ] **Physical Keyboard Support:** Logic to handle typing when a Bluetooth or USB keyboard is attached.
 - [ ] **Pro Shift Key:** Implement "one-shot" shift (resets after one key) and "Caps Lock" (double-tap).

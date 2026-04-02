@@ -3,7 +3,7 @@
 This list tracks the missing features and planned improvements for RakuRaku IME, modeled after professional IME standards (like JustArray and Gboard).
 
 ## Input & Logic
-- [ ] **Frequency-Based Sorting:** Dynamically move frequently used characters to the front of the candidate list based on user history.
+- [x] **Frequency-Based Sorting:** Dynamically move frequently used characters to the front of the candidate list based on user history.
 - [ ] **Auto-Select:** Automatically commit a character if it is the only possible match for a sequence.
 - [ ] **Short Code (簡碼) & Special Code support:** Implement specific EZ-method optimizations for common phrases.
 - [ ] **English Word Prediction:** Suggest English words as you type in English/Shifted mode.

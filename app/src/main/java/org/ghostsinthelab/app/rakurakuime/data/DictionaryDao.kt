@@ -39,4 +39,7 @@ interface DictionaryDao {
 
     @Query("DELETE FROM dictionary")
     suspend fun clearAll()
+
+    @Query("UPDATE dictionary SET frequency = frequency + 1 WHERE character = :character AND (keystroke = :exactKeystroke OR (keystroke LIKE :prefix || '%' AND :exactKeystroke = ''))")
+    suspend fun incrementFrequency(character: String, exactKeystroke: String, prefix: String)
 }

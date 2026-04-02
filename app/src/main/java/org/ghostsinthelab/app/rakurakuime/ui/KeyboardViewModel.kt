@@ -183,6 +183,13 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun selectCandidate(candidate: String): String {
+        val currentRoots = _composingText.value
+        viewModelScope.launch {
+            // Increment frequency for the selected candidate
+            // We pass currentRoots as the prefix to help narrow down which mapping was intended
+            db.dictionaryDao().incrementFrequency(candidate, exactKeystroke = currentRoots, prefix = currentRoots)
+        }
+        
         val newPreEdit = _preEditBuffer.value + candidate
         _preEditBuffer.value = newPreEdit
         _composingText.value = ""

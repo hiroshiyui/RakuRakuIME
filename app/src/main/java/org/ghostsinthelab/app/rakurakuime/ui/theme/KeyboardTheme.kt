@@ -18,9 +18,13 @@
 
 package org.ghostsinthelab.app.rakurakuime.ui.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
@@ -36,31 +40,19 @@ data class KeyboardThemeColors(
     val rootLabelColor: Color,
 )
 
-val LightKeyboardColors = KeyboardThemeColors(
-    keyboardBackground = Color(0xFFD2D5DB),
-    keyBackground = Color(0xFFFFFFFF),
-    keyPressedBackground = Color(0xFFD1D1D1),
-    keyTextColor = Color(0xFF000000),
-    functionKeyBackground = Color(0xFFABB1BA),
-    functionKeyTextColor = Color(0xFF000000),
-    candidateBarBackground = Color(0xFFF0F1F2),
-    candidateTextColor = Color(0xFF000000),
-    rootLabelColor = Color(0xFF8E8E93),
+fun KeyboardThemeColors(colorScheme: ColorScheme): KeyboardThemeColors = KeyboardThemeColors(
+    keyboardBackground = colorScheme.surfaceContainerLow,
+    keyBackground = colorScheme.surfaceContainerHigh,
+    keyPressedBackground = colorScheme.surfaceContainerHighest,
+    keyTextColor = colorScheme.onSurface,
+    functionKeyBackground = colorScheme.secondaryContainer,
+    functionKeyTextColor = colorScheme.onSecondaryContainer,
+    candidateBarBackground = colorScheme.surfaceContainer,
+    candidateTextColor = colorScheme.onSurface,
+    rootLabelColor = colorScheme.onSurfaceVariant,
 )
 
-val DarkKeyboardColors = KeyboardThemeColors(
-    keyboardBackground = Color(0xFF1C1C1E),
-    keyBackground = Color(0xFF3A3A3C),
-    keyPressedBackground = Color(0xFF2C2C2E),
-    keyTextColor = Color(0xFFFFFFFF),
-    functionKeyBackground = Color(0xFF2C2C2E),
-    functionKeyTextColor = Color(0xFFFFFFFF),
-    candidateBarBackground = Color(0xFF000000),
-    candidateTextColor = Color(0xFFFFFFFF),
-    rootLabelColor = Color(0xFFAEAEB2),
-)
-
-internal val LocalKeyboardThemeColors = staticCompositionLocalOf { LightKeyboardColors }
+internal val LocalKeyboardThemeColors = staticCompositionLocalOf { KeyboardThemeColors(lightColorScheme()) }
 
 object KeyboardTheme {
     val current: KeyboardThemeColors
@@ -71,10 +63,12 @@ object KeyboardTheme {
 
 @Composable
 fun KeyboardTheme(
-    darkTheme: Boolean,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkKeyboardColors else LightKeyboardColors
+    val colorScheme = MaterialTheme.colorScheme
+    val colors = remember(colorScheme) {
+        KeyboardThemeColors(colorScheme)
+    }
     CompositionLocalProvider(LocalKeyboardThemeColors provides colors) {
         content()
     }

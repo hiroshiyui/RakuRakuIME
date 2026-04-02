@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.stateIn
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
+import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
 import org.ghostsinthelab.app.rakurakuime.ui.keyboard.*
 import org.ghostsinthelab.app.rakurakuime.util.HapticHelper
 
@@ -91,16 +92,18 @@ class RakuRakuImeService : InputMethodService() {
             setViewTreeViewModelStoreOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)
             setContent {
-                KeyboardTheme(darkTheme = isSystemInDarkTheme()) {
-                    KeyboardScreen(
-                        viewModel = viewModel,
-                        currentInputConnection = currentInputConnection,
-                        onKeyPress = { handleKeyPress() },
-                        onSwitchIme = {
-                            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-                            imm.showInputMethodPicker()
-                        }
-                    )
+                RakuRakuIMETheme {
+                    KeyboardTheme {
+                        KeyboardScreen(
+                            viewModel = viewModel,
+                            currentInputConnection = currentInputConnection,
+                            onKeyPress = { handleKeyPress() },
+                            onSwitchIme = {
+                                val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                                imm.showInputMethodPicker()
+                            }
+                        )
+                    }
                 }
             }
         }

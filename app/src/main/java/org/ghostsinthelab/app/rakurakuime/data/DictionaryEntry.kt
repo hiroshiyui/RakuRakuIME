@@ -19,6 +19,7 @@
 package org.ghostsinthelab.app.rakurakuime.data
 
 import androidx.room.Entity
+import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import androidx.room.Index
 
@@ -31,4 +32,11 @@ data class DictionaryEntry(
     val keystroke: String,
     val character: String,
     val frequency: Int = 0
+)
+
+@Entity(tableName = "dictionary_fts")
+@Fts4(contentEntity = DictionaryEntry::class)
+data class DictionaryFts(
+    val keystroke: String,
+    val character: String
 )

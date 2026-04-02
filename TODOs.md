@@ -10,8 +10,8 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 - [ ] **Pro Shift Key:** Implement "one-shot" shift (resets after one key) and "Caps Lock" (double-tap).
 
 ## User Interface (UI)
-- [ ] **Advanced Symbol Panels:** Categorized symbol pages (Punctuation, Math, Arrows, Emoticons) instead of a single row.
-- [ ] **Key Alternates:** Show a popup of related characters (e.g., accented vowels) on long-press.
+- [x] **Advanced Symbol Panels:** Categorized symbol pages (Punctuation, Math, Arrows, Emoticons) instead of a single row.
+- [x] **Key Alternates:** Show a popup of related characters (e.g., accented vowels) on long-press.
 - [x] **Adjustable Keyboard Height:** Allow users to scale the keyboard height in settings.
 - [x] **Dynamic Material You Theming:** support wallpaper-derived colors on Android 12+.
 - [ ] **Split Keyboard Layout:** A specialized layout for landscape orientation or tablets.
@@ -25,4 +25,4 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 
 ## Technical Debt / Performance
 - [ ] **Database Optimization:** Ensure Room queries for prefix matching remain performant as usage history grows.
-- [ ] **Initialization UX:** Add a progress bar for the first-run dictionary import.
+- [x] **Initialization UX:** Add a progress bar for the first-run dictionary import.

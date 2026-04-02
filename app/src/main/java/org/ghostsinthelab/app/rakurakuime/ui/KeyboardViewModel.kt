@@ -187,7 +187,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             }
 
             // Fetch all possible completions starting with this prefix
-            val allPossible = db.dictionaryDao().getCharactersByPrefix(keystroke)
+            val allPossible = db.dictionaryDao().getCharactersByPrefix("$keystroke*")
 
             if (allPossible.size == 1) {
                 // Only one possible character or phrase exists for this sequence and its extensions.

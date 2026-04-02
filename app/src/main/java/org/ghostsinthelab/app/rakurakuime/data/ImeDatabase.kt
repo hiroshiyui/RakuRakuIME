@@ -23,7 +23,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [DictionaryEntry::class], version = 1, exportSchema = false)
+@Database(entities = [DictionaryEntry::class, DictionaryFts::class], version = 2, exportSchema = false)
 abstract class ImeDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
 
@@ -37,7 +37,10 @@ abstract class ImeDatabase : RoomDatabase() {
                     context.applicationContext,
                     ImeDatabase::class.java,
                     "ime_database"
-                ).build()
+                )
+                .createFromAsset("databases/ime_database.db")
+                .fallbackToDestructiveMigration(dropAllTables = true)
+                .build()
                 INSTANCE = instance
                 instance
             }

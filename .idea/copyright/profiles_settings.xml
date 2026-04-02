@@ -1,3 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="RakuRaku IME" />
+  <settings default="RakuRaku IME">
+    <module2copyright>
+      <element module="Project Source Files" copyright="RakuRaku IME" />
+    </module2copyright>
+  </settings>
 </component>

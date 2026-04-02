@@ -28,8 +28,15 @@ interface DictionaryDao {
     @Query("SELECT character FROM dictionary WHERE keystroke = :keystroke ORDER BY frequency DESC")
     suspend fun getCharacters(keystroke: String): List<String>
 
-    @Query("SELECT character FROM dictionary WHERE keystroke LIKE :keystrokePrefix || '%' ORDER BY frequency DESC LIMIT 50")
-    suspend fun getCharactersByPrefix(keystrokePrefix: String): List<String>
+    @Query("""
+        SELECT dictionary.character 
+        FROM dictionary 
+        JOIN dictionary_fts ON dictionary.id = dictionary_fts.rowid 
+        WHERE dictionary_fts.keystroke MATCH :query 
+        ORDER BY dictionary.frequency DESC 
+        LIMIT 50
+    """)
+    suspend fun getCharactersByPrefix(query: String): List<String>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entries: List<DictionaryEntry>)

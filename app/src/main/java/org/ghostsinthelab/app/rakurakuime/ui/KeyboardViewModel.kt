@@ -171,13 +171,24 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 _candidates.value = emptyList()
                 return@launch
             }
-            // Fetch exact matches first
-            val exact = db.dictionaryDao().getCharacters(keystroke)
-            if (exact.isNotEmpty()) {
-                _candidates.value = exact
+
+            // Fetch all possible completions starting with this prefix
+            val allPossible = db.dictionaryDao().getCharactersByPrefix(keystroke)
+
+            if (allPossible.size == 1) {
+                // Only one possible character or phrase exists for this sequence and its extensions.
+                // Auto-select it to save the user a keystroke.
+                selectCandidate(allPossible[0])
             } else {
-                // If no exact match, fetch prefix matches
-                _candidates.value = db.dictionaryDao().getCharactersByPrefix(keystroke)
+                // Multiple possibilities exist.
+                // Show exact matches first for the current sequence.
+                val exact = db.dictionaryDao().getCharacters(keystroke)
+                if (exact.isNotEmpty()) {
+                    _candidates.value = exact
+                } else {
+                    // If no exact match yet, show the prefix matches as candidates.
+                    _candidates.value = allPossible
+                }
             }
         }
     }

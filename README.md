@@ -9,9 +9,15 @@ The dictionary mapping data included in this project (`ezbig.utf-8.cin`) is the 
 - **Original Author:** 高衡緒
 - **Organization:** 輕鬆資訊企業社
 
-### Licensing
+## Licensing
 
-The `ezbig.utf-8.cin` data is licensed under:
+### Application
+
+This project (RakuRaku IME) is licensed under the **GNU General Public License, version 3 or later** (GPLv3+). The full text is available in the [LICENSE](LICENSE) file.
+
+### Dictionary Data
+
+The `ezbig.utf-8.cin` dictionary data is licensed separately under:
 - **GPLv2** (GNU General Public License, version 2, available in `app/src/main/assets/gpl.txt`)
 - **《輕鬆資訊「輕鬆輸入法大詞庫」公眾授權書》** (Public license for the EZ Input Method dictionary provided by 輕鬆資訊企業社, available in `app/src/main/assets/ezphrase.txt`)
 

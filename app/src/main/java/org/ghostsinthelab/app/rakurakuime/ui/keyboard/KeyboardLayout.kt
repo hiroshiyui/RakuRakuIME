@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.dp
 
 data class KeyDefinition(
     val qwertyChar: String,
-    val ezRoot: String = "",
+            val ezRoot: String = "",
+    val alternates: List<String> = emptyList()
 )
 
 object KeyboardLayout {
@@ -31,39 +32,39 @@ object KeyboardLayout {
     val ROWS = listOf(
         // Row 1: Numbers & Symbols
         listOf(
-            KeyDefinition("`", "厂"),
-            KeyDefinition("1", "〡"),
-            KeyDefinition("2", "車"),
-            KeyDefinition("3", "糸"),
-            KeyDefinition("4", "言"),
-            KeyDefinition("5", "貝"),
-            KeyDefinition("6", "雨"),
-            KeyDefinition("7", "ㄇ"),
-            KeyDefinition("8", "八"),
-            KeyDefinition("9", "耳"),
-            KeyDefinition("0", "鳥"),
-            KeyDefinition("-", "儿"),
-            KeyDefinition("=", "母")
+            KeyDefinition("`", "厂", listOf("~")),
+            KeyDefinition("1", "〡", listOf("！")),
+            KeyDefinition("2", "車", listOf("＠")),
+            KeyDefinition("3", "糸", listOf("＃")),
+            KeyDefinition("4", "言", listOf("＄")),
+            KeyDefinition("5", "貝", listOf("％")),
+            KeyDefinition("6", "雨", listOf("︿")),
+            KeyDefinition("7", "ㄇ", listOf("＆")),
+            KeyDefinition("8", "八", listOf("＊")),
+            KeyDefinition("9", "耳", listOf("（")),
+            KeyDefinition("0", "鳥", listOf("）")),
+            KeyDefinition("-", "儿", listOf("_", "—")),
+            KeyDefinition("=", "母", listOf("+"))
         ),
         // Row 2: QWERTY
         listOf(
             KeyDefinition("q", "手"),
             KeyDefinition("w", "田"),
-            KeyDefinition("e", "水"),
+            KeyDefinition("e", "水", listOf("é", "è", "ê", "ë", "ē")),
             KeyDefinition("r", "口"),
             KeyDefinition("t", "廾"),
             KeyDefinition("y", "、"),
-            KeyDefinition("u", "山"),
-            KeyDefinition("i", "戈"),
-            KeyDefinition("o", "人"),
+            KeyDefinition("u", "山", listOf("ú", "ù", "û", "ü", "ū")),
+            KeyDefinition("i", "戈", listOf("í", "ì", "î", "ï", "ī")),
+            KeyDefinition("o", "人", listOf("ó", "ò", "ô", "ö", "ō")),
             KeyDefinition("p", "心"),
-            KeyDefinition("[", "匚"),
-            KeyDefinition("]", "】")
+            KeyDefinition("[", "匚", listOf("{")),
+            KeyDefinition("]", "】", listOf("}"))
         ),
         // Row 3: ASDF
         listOf(
-            KeyDefinition("a", "日"),
-            KeyDefinition("s", "尸"),
+            KeyDefinition("a", "日", listOf("á", "à", "â", "ä", "ā")),
+            KeyDefinition("s", "尸", listOf("ß")),
             KeyDefinition("d", "木"),
             KeyDefinition("f", "火"),
             KeyDefinition("g", "土"),
@@ -71,22 +72,22 @@ object KeyboardLayout {
             KeyDefinition("j", "十"),
             KeyDefinition("k", "大"),
             KeyDefinition("l", "中"),
-            KeyDefinition(";", "寸"),
-            KeyDefinition("'", "Ｌ")
+            KeyDefinition(";", "寸", listOf(":", "；", "：")),
+            KeyDefinition("'", "Ｌ", listOf("\"", "’", "”"))
         ),
         // Row 4: ZXCV
         listOf(
             KeyDefinition("z", "辶"),
             KeyDefinition("x", "又"),
-            KeyDefinition("c", "金"),
+            KeyDefinition("c", "金", listOf("ç")),
             KeyDefinition("v", "女"),
             KeyDefinition("b", "月"),
-            KeyDefinition("n", "弓"),
+            KeyDefinition("n", "弓", listOf("ñ")),
             KeyDefinition("m", "一"),
-            KeyDefinition(",", "，"),
-            KeyDefinition(".", "＼"),
-            KeyDefinition("/", "ㄙ"),
-            KeyDefinition("\\", "的")
+            KeyDefinition(",", "，", listOf("，", "、", "<")),
+            KeyDefinition(".", "＼", listOf("。", "．", "…", ">")),
+            KeyDefinition("/", "ㄙ", listOf("？", "?")),
+            KeyDefinition("\\", "的", listOf("|"))
         )
     )
 }

@@ -46,9 +46,15 @@ fun KeyboardScreen(
     val inputMode by viewModel.inputMode.collectAsState()
     val isShifted by viewModel.isShifted.collectAsState()
     val heightScale by viewModel.keyboardHeightScale.collectAsState(initial = 1.0f)
+    val splitLayoutLandscape by viewModel.splitLayoutLandscape.collectAsState(initial = true)
+    val symbolCategory by viewModel.symbolCategory.collectAsState()
     val colors = KeyboardTheme.current
 
     val scaledKeyHeight = KeyboardLayout.KEY_HEIGHT * heightScale
+    
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val shouldSplit = isLandscape && splitLayoutLandscape
 
     Column(
         modifier = Modifier
@@ -81,31 +87,50 @@ fun KeyboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            for (key in row) {
-                                KeyButton(
-                                    keyDef = key,
-                                    isUppercase = isShifted,
-                                    modifier = Modifier.weight(1f),
-                                    keyHeight = scaledKeyHeight,
-                                    onSwipeUp = {
-                                        onKeyPress()
-                                        currentInputConnection?.commitText(key.qwertyChar.uppercase(), 1)
-                                    },
-                                    onClick = {
-                                        onKeyPress()
-                                        val selIndex = when(key.qwertyChar) {
-                                            "1" -> 0; "2" -> 1; "3" -> 2; "4" -> 3; "5" -> 4
-                                            "6" -> 5; "7" -> 6; "8" -> 7; "9" -> 8; "0" -> 9
-                                            else -> -1
+                            val keys = if (shouldSplit) {
+                                val half = row.size / 2
+                                val list = mutableListOf<Any>()
+                                list.addAll(row.take(half))
+                                list.add("SPACE")
+                                list.addAll(row.drop(half))
+                                list
+                            } else {
+                                row
+                            }
+
+                            for (item in keys) {
+                                if (item is String && item == "SPACE") {
+                                    Spacer(modifier = Modifier.weight(if (isLandscape) 2f else 1f))
+                                } else if (item is KeyDefinition) {
+                                    KeyButton(
+                                        keyDef = item,
+                                        isUppercase = isShifted,
+                                        modifier = Modifier.weight(1f),
+                                        keyHeight = scaledKeyHeight,
+                                        onSwipeUp = {
+                                            onKeyPress()
+                                            currentInputConnection?.commitText(item.qwertyChar.uppercase(), 1)
+                                        },
+                                        onAlternateSelected = { alt ->
+                                            onKeyPress()
+                                            currentInputConnection?.commitText(if (isShifted) alt.uppercase() else alt.lowercase(), 1)
+                                        },
+                                        onClick = {
+                                            onKeyPress()
+                                            val selIndex = when(item.qwertyChar) {
+                                                "1" -> 0; "2" -> 1; "3" -> 2; "4" -> 3; "5" -> 4
+                                                "6" -> 5; "7" -> 6; "8" -> 7; "9" -> 8; "0" -> 9
+                                                else -> -1
+                                            }
+                                            
+                                            if (isSelecting && pagedCandidates.isNotEmpty() && selIndex != -1 && selIndex < pagedCandidates.size) {
+                                                viewModel.selectCandidate(pagedCandidates[selIndex])
+                                            } else {
+                                                viewModel.onKeyPress(item.qwertyChar)
+                                            }
                                         }
-                                        
-                                        if (isSelecting && pagedCandidates.isNotEmpty() && selIndex != -1 && selIndex < pagedCandidates.size) {
-                                            viewModel.selectCandidate(pagedCandidates[selIndex])
-                                        } else {
-                                            viewModel.onKeyPress(key.qwertyChar)
-                                        }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
@@ -123,22 +148,97 @@ fun KeyboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            for (char in row) {
-                                KeyButton(
-                                    keyDef = KeyDefinition(char),
-                                    modifier = Modifier.weight(1f),
-                                    keyHeight = scaledKeyHeight,
-                                    onClick = {
-                                        onKeyPress()
-                                        currentInputConnection?.commitText(char, 1)
-                                    }
-                                )
+                            val keys = if (shouldSplit) {
+                                val half = row.size / 2
+                                val list = mutableListOf<String>()
+                                list.addAll(row.take(half))
+                                list.add("SPACE")
+                                list.addAll(row.drop(half))
+                                list
+                            } else {
+                                row
+                            }
+
+                            for (char in keys) {
+                                if (char == "SPACE") {
+                                    Spacer(modifier = Modifier.weight(if (isLandscape) 2f else 1f))
+                                } else {
+                                    KeyButton(
+                                        keyDef = KeyDefinition(char),
+                                        modifier = Modifier.weight(1f),
+                                        keyHeight = scaledKeyHeight,
+                                        onAlternateSelected = { alt ->
+                                            onKeyPress()
+                                            currentInputConnection?.commitText(alt, 1)
+                                        },
+                                        onClick = {
+                                            onKeyPress()
+                                            currentInputConnection?.commitText(char, 1)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-            else -> {}
+            InputMode.SYMBOL -> {
+                Column(modifier = Modifier.padding(horizontal = 4.dp)) {
+                    // Category Tabs
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        SymbolLayout.CATEGORIES.forEachIndexed { index, pair ->
+                            val isSelected = symbolCategory == index
+                            KeyButton(
+                                keyDef = KeyDefinition(pair.first),
+                                modifier = Modifier.weight(1f).padding(horizontal = 2.dp),
+                                keyHeight = scaledKeyHeight * 0.8f,
+                                backgroundColorOverride = if (isSelected) colors.functionKeyBackground else colors.keyBackground,
+                                textColorOverride = if (isSelected) colors.functionKeyTextColor else colors.keyTextColor,
+                                onClick = { viewModel.setSymbolCategory(index) }
+                            )
+                        }
+                    }
+
+                    // Symbols Grid
+                    val currentRows = SymbolLayout.CATEGORIES.getOrNull(symbolCategory)?.second ?: emptyList()
+                    for (row in currentRows) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            val keys = if (shouldSplit) {
+                                val half = row.size / 2
+                                val list = mutableListOf<String>()
+                                list.addAll(row.take(half))
+                                list.add("SPACE")
+                                list.addAll(row.drop(half))
+                                list
+                            } else {
+                                row
+                            }
+
+                            for (char in keys) {
+                                if (char == "SPACE") {
+                                    Spacer(modifier = Modifier.weight(if (isLandscape) 2f else 1f))
+                                } else {
+                                    KeyButton(
+                                        keyDef = KeyDefinition(char),
+                                        modifier = Modifier.weight(1f),
+                                        keyHeight = scaledKeyHeight,
+                                        onClick = {
+                                            onKeyPress()
+                                            currentInputConnection?.commitText(char, 1)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -148,6 +248,7 @@ fun KeyboardScreen(
             inputMode = inputMode,
             isShifted = isShifted,
             keyHeight = scaledKeyHeight,
+            shouldSplit = shouldSplit,
             onBackspace = {
                 onKeyPress()
                 val handledByBuffer = viewModel.onBackspace()

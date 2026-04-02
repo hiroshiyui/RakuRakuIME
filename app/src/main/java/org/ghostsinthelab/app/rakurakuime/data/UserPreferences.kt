@@ -33,6 +33,7 @@ class UserPreferences(private val context: Context) {
         private val KEY_VIBRATION_ENABLED = booleanPreferencesKey("vibration_enabled")
         private val KEY_VIBRATION_INTENSITY = floatPreferencesKey("vibration_intensity")
         private val KEY_KEYBOARD_HEIGHT_SCALE = floatPreferencesKey("keyboard_height_scale")
+        private val KEY_SPLIT_LAYOUT_LANDSCAPE = booleanPreferencesKey("split_layout_landscape")
     }
 
     val vibrationEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
@@ -47,6 +48,10 @@ class UserPreferences(private val context: Context) {
         prefs[KEY_KEYBOARD_HEIGHT_SCALE] ?: 1.0f
     }
 
+    val splitLayoutLandscape: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_SPLIT_LAYOUT_LANDSCAPE] ?: true
+    }
+
     suspend fun setVibrationEnabled(enabled: Boolean) {
         context.dataStore.edit { it[KEY_VIBRATION_ENABLED] = enabled }
     }
@@ -57,5 +62,9 @@ class UserPreferences(private val context: Context) {
 
     suspend fun setKeyboardHeightScale(scale: Float) {
         context.dataStore.edit { it[KEY_KEYBOARD_HEIGHT_SCALE] = scale }
+    }
+
+    suspend fun setSplitLayoutLandscape(split: Boolean) {
+        context.dataStore.edit { it[KEY_SPLIT_LAYOUT_LANDSCAPE] = split }
     }
 }

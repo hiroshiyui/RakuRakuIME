@@ -43,9 +43,17 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     val vibrationEnabled = userPreferences.vibrationEnabled
     val vibrationIntensity = userPreferences.vibrationIntensity
     val keyboardHeightScale = userPreferences.keyboardHeightScale
+    val splitLayoutLandscape = userPreferences.splitLayoutLandscape
 
     private val _inputMode = MutableStateFlow(InputMode.EZ)
     val inputMode: StateFlow<InputMode> = _inputMode.asStateFlow()
+
+    private val _symbolCategory = MutableStateFlow(0)
+    val symbolCategory: StateFlow<Int> = _symbolCategory.asStateFlow()
+
+    fun setSymbolCategory(index: Int) {
+        _symbolCategory.value = index
+    }
 
     private val _isShifted = MutableStateFlow(false)
     val isShifted: StateFlow<Boolean> = _isShifted.asStateFlow()

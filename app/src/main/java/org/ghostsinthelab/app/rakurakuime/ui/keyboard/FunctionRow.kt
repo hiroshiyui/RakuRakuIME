@@ -30,6 +30,7 @@ fun FunctionRow(
     inputMode: InputMode,
     isShifted: Boolean,
     keyHeight: androidx.compose.ui.unit.Dp = KeyboardLayout.KEY_HEIGHT,
+    shouldSplit: Boolean = false,
     onBackspace: () -> Unit,
     onSpace: () -> Unit,
     onEnter: () -> Unit,
@@ -45,16 +46,24 @@ fun FunctionRow(
             .padding(horizontal = 4.dp, vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        // Mode toggle (?123)
+        // Mode toggle
+        val modeKeyDef = when (inputMode) {
+            InputMode.EZ -> KeyDefinition("?123")
+            InputMode.NUMBER -> KeyDefinition("=\\<+")
+            InputMode.SYMBOL -> KeyDefinition("ABC")
+        }
         KeyButton(
-            keyDef = KeyDefinition(if (inputMode == InputMode.EZ) "?123" else "EZ"),
+            keyDef = modeKeyDef,
             modifier = Modifier.weight(1.5f),
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = {
-                if (inputMode == InputMode.EZ) onToggleMode(InputMode.NUMBER)
-                else onToggleMode(InputMode.EZ)
+                when (inputMode) {
+                    InputMode.EZ -> onToggleMode(InputMode.NUMBER)
+                    InputMode.NUMBER -> onToggleMode(InputMode.SYMBOL)
+                    InputMode.SYMBOL -> onToggleMode(InputMode.EZ)
+                }
             }
         )
 
@@ -68,6 +77,10 @@ fun FunctionRow(
             onClick = onSwitchIme
         )
 
+        if (shouldSplit) {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
         // Space
         KeyButton(
             keyDef = KeyDefinition(" ", "Space"),
@@ -75,6 +88,10 @@ fun FunctionRow(
             keyHeight = keyHeight,
             onClick = onSpace
         )
+
+        if (shouldSplit) {
+            Spacer(modifier = Modifier.weight(1f))
+        }
 
         // Backspace
         KeyButton(

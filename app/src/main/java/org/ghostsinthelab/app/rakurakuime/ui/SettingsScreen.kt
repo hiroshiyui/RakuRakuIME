@@ -44,6 +44,7 @@ fun SettingsScreen(
     val db = remember { ImeDatabase.getDatabase(context) }
 
     val vibration by userPreferences.vibrationEnabled.collectAsState(initial = true)
+    val splitLayout by userPreferences.splitLayoutLandscape.collectAsState(initial = true)
     val heightScale by userPreferences.keyboardHeightScale.collectAsState(initial = 1.0f)
 
     var showReimportDialog by remember { mutableStateOf(false) }
@@ -69,6 +70,12 @@ fun SettingsScreen(
             label = stringResource(R.string.settings_vibration),
             checked = vibration,
             onCheckedChange = { scope.launch { userPreferences.setVibrationEnabled(it) } }
+        )
+
+        SettingsSwitch(
+            label = "Split Keyboard in Landscape", // TODO: Move to string resources
+            checked = splitLayout,
+            onCheckedChange = { scope.launch { userPreferences.setSplitLayoutLandscape(it) } }
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))

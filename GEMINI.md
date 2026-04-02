@@ -1,5 +1,8 @@
 # Project Knowledge: RakuRaku IME (EZ Input Method)
 
+## Project Mandates
+- **Task Tracking:** Always mark a to-do task as done in `TODOs.md` immediately upon completion.
+
 ## Dictionary and Assets
 - The primary dictionary source is `app/src/main/assets/ezbig.utf-8.cin`.
 - This file was converted from the original Big5 `ezbig.cin` using `iconv -c -f BIG5-HKSCS -t UTF-8`.

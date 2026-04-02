@@ -14,7 +14,7 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 - [x] **Key Alternates:** Show a popup of related characters (e.g., accented vowels) on long-press.
 - [x] **Adjustable Keyboard Height:** Allow users to scale the keyboard height in settings.
 - [x] **Dynamic Material You Theming:** support wallpaper-derived colors on Android 12+.
-- [ ] **Split Keyboard Layout:** A specialized layout for landscape orientation or tablets.
+- [x] **Split Keyboard Layout:** A specialized layout for landscape orientation or tablets.
 
 ## System & Settings
 - [x] **Settings Screen:** A dedicated UI in `MainActivity` to manage preferences.
@@ -24,5 +24,5 @@ This list tracks the missing features and planned improvements for RakuRaku IME,
 - [ ] **Accessibility (TalkBack):** Add comprehensive `semantics` labels for candidates, roots, and function keys.
 
 ## Technical Debt / Performance
-- [ ] **Database Optimization:** Ensure Room queries for prefix matching remain performant as usage history grows.
+- [x] **Database Optimization:** Ensure Room queries for prefix matching remain performant as usage history grows.
 - [x] **Initialization UX:** Add a progress bar for the first-run dictionary import.

@@ -1,0 +1,1 @@
+- The dictionary source is now 'app/src/main/assets/ezbig.utf-8.cin', which was converted from Big5 to UTF-8 using iconv.

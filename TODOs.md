@@ -176,15 +176,6 @@ observed issue, user-visible impact, and the fix direction.
     - **Fix:** Bump Compose BOM to a current release and move Room to
       the latest stable before publishing. Run lint/tests afterwards.
 
-- [ ] **L6 — Silent skipping of malformed asset lines**
-    - **Files:** `data/CinParser.kt:53-57, 63-64`;
-      `data/EnglishDictionary.kt:45-49`.
-    - **Issue:** Malformed / empty lines are silently dropped during
-      parsing. A truncated asset produces a silently-short dictionary.
-    - **Fix:** After the loop, assert on a minimum entry count (e.g.
-      CIN > 90 000, English > 9 000) and throw (or log loudly) if
-      under; catches corrupted builds early.
-
 - [ ] **L7 — (Noted, no change needed) `EnglishDictionary` lazy init**
     - **File:** `data/EnglishDictionary.kt:40-57`.
     - **Observation:** The double-checked `trie?.let { return it }`

@@ -36,6 +36,12 @@ object CinParser {
     // treats the dictionary as stale, and redoes the reimport.
     private const val HASH_IN_PROGRESS = "__in_progress__"
 
+    // Lower bound for a sane CIN parse. The shipped asset contains on the
+    // order of 130 000 entries; anything below this implies a truncated or
+    // corrupt bundle and we'd rather surface a clear error than a mostly-
+    // silent dictionary.
+    private const val MIN_EXPECTED_ENTRIES = 90_000
+
     enum class SyncResult { AlreadyCurrent, Reimported }
 
     suspend fun assetHash(context: Context): String = withContext(Dispatchers.IO) {
@@ -90,6 +96,7 @@ object CinParser {
     }
 
     suspend fun parseAndPopulate(context: Context, database: ImeDatabase) = withContext(Dispatchers.IO) {
+        var totalInserted = 0
         context.assets.open(ASSET_NAME).use { inputStream ->
             BufferedReader(InputStreamReader(inputStream, "UTF-8")).use { reader ->
                 var inKeyname = false
@@ -118,6 +125,7 @@ object CinParser {
 
                                 if (entries.size >= 5000) {
                                     database.dictionaryDao().insertAll(entries)
+                                    totalInserted += entries.size
                                     entries.clear()
                                 }
                             }
@@ -126,9 +134,15 @@ object CinParser {
                     }
                     if (entries.isNotEmpty()) {
                         database.dictionaryDao().insertAll(entries)
+                        totalInserted += entries.size
                     }
                 }
             }
+        }
+        check(totalInserted >= MIN_EXPECTED_ENTRIES) {
+            "CIN dictionary parsed only $totalInserted entries " +
+                "(expected at least $MIN_EXPECTED_ENTRIES); " +
+                "$ASSET_NAME may be truncated or corrupt."
         }
     }
 

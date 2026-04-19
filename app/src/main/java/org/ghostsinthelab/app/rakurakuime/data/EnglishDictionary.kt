@@ -19,13 +19,19 @@
 package org.ghostsinthelab.app.rakurakuime.data
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 object EnglishDictionary {
+    private const val TAG = "EnglishDictionary"
     private const val ASSET_NAME = "google_10k_english.txt"
+    // The bundled Google 10K corpus contains ~9 894 words; anything much
+    // lower implies a truncated or corrupt APK. Log loudly and keep going
+    // with whatever we could parse (predictions degrade rather than crash).
+    private const val MIN_EXPECTED_WORDS = 9_000
 
     @Volatile
     private var trie: EnglishTrie? = null
@@ -42,11 +48,23 @@ object EnglishDictionary {
         return loadMutex.withLock {
             trie ?: withContext(Dispatchers.IO) {
                 val built = EnglishTrie()
+                var inserted = 0
                 context.assets.open(ASSET_NAME).bufferedReader().useLines { lines ->
                     for (line in lines) {
                         val w = line.trim()
-                        if (w.isNotEmpty()) built.insert(w.lowercase())
+                        if (w.isNotEmpty()) {
+                            built.insert(w.lowercase())
+                            inserted++
+                        }
                     }
+                }
+                if (inserted < MIN_EXPECTED_WORDS) {
+                    Log.w(
+                        TAG,
+                        "Loaded only $inserted words from $ASSET_NAME " +
+                            "(expected at least $MIN_EXPECTED_WORDS); " +
+                            "English predictions will be sparse.",
+                    )
                 }
                 built
             }.also { trie = it }

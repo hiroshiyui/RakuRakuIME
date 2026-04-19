@@ -19,21 +19,65 @@
 package org.ghostsinthelab.app.rakurakuime.data
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.security.MessageDigest
 
 object CinParser {
+    private const val ASSET_NAME = "ezbig.utf-8.cin"
+    private const val PREFS_NAME = "cin_parser"
+    private const val KEY_ASSET_HASH = "ezbig_asset_hash"
+
+    enum class SyncResult { AlreadyCurrent, Reimported }
+
+    suspend fun assetHash(context: Context): String = withContext(Dispatchers.IO) {
+        computeAssetHash(context)
+    }
+
+    suspend fun syncWithAsset(context: Context, database: ImeDatabase): SyncResult =
+        withContext(Dispatchers.IO) {
+            val currentHash = computeAssetHash(context)
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val storedHash = prefs.getString(KEY_ASSET_HASH, null)
+            val hasData = database.dictionaryDao().count() > 0
+
+            // Trust the pre-packaged DB on first launch: it ships alongside the asset,
+            // so we record the current hash rather than re-parsing.
+            val upToDate = hasData && (storedHash == null || storedHash == currentHash)
+            if (upToDate) {
+                if (storedHash != currentHash) {
+                    prefs.edit { putString(KEY_ASSET_HASH, currentHash) }
+                }
+                return@withContext SyncResult.AlreadyCurrent
+            }
+
+            database.dictionaryDao().clearAll()
+            parseAndPopulate(context, database)
+            prefs.edit { putString(KEY_ASSET_HASH, currentHash) }
+            SyncResult.Reimported
+        }
+
+    suspend fun forceReimport(context: Context, database: ImeDatabase) =
+        withContext(Dispatchers.IO) {
+            val currentHash = computeAssetHash(context)
+            database.dictionaryDao().clearAll()
+            parseAndPopulate(context, database)
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit { putString(KEY_ASSET_HASH, currentHash) }
+        }
+
     suspend fun parseAndPopulate(context: Context, database: ImeDatabase) = withContext(Dispatchers.IO) {
         val assetManager = context.assets
-        val inputStream = assetManager.open("ezbig.utf-8.cin")
+        val inputStream = assetManager.open(ASSET_NAME)
         val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
-        
+
         var inKeyname = false
         val entries = mutableListOf<DictionaryEntry>()
-        
+
         database.withTransaction {
             var line: String? = reader.readLine()
             while (line != null) {
@@ -54,7 +98,7 @@ object CinParser {
                         val keystroke = parts[0]
                         val character = parts[1]
                         entries.add(DictionaryEntry(keystroke = keystroke, character = character))
-                        
+
                         if (entries.size >= 5000) {
                             database.dictionaryDao().insertAll(entries)
                             entries.clear()
@@ -68,5 +112,18 @@ object CinParser {
             }
         }
         inputStream.close()
+    }
+
+    private fun computeAssetHash(context: Context): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        context.assets.open(ASSET_NAME).use { input ->
+            val buffer = ByteArray(8192)
+            while (true) {
+                val read = input.read(buffer)
+                if (read == -1) break
+                digest.update(buffer, 0, read)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 }

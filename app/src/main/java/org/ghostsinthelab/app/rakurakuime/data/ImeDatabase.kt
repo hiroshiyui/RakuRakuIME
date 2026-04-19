@@ -23,7 +23,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [DictionaryEntry::class, DictionaryFts::class], version = 2, exportSchema = false)
+@Database(
+    entities = [DictionaryEntry::class, DictionaryFts::class],
+    version = 2,
+    // Export the schema under app/schemas so future @AutoMigration and
+    // manual Migration code has a baseline to diff against. The destructive
+    // fallback below remains as a last-resort safety net for upgrades that
+    // ever land without a matching Migration.
+    exportSchema = true,
+)
 abstract class ImeDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
 

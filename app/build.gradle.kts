@@ -22,6 +22,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// Room schema JSONs are committed under app/schemas/ so future
+// @AutoMigration / Migration additions have a baseline to diff against.
+// See TODOs.md L8 for the migration policy.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 android {
     namespace = "org.ghostsinthelab.app.rakurakuime"
     compileSdk {

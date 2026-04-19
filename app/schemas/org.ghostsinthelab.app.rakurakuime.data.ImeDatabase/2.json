@@ -1,0 +1,99 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "3bf50d38786ec443bfceac2dae8ce941",
+    "entities": [
+      {
+        "tableName": "dictionary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keystroke` TEXT NOT NULL, `character` TEXT NOT NULL, `frequency` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keystroke",
+            "columnName": "keystroke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "character",
+            "columnName": "character",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dictionary_keystroke",
+            "unique": false,
+            "columnNames": [
+              "keystroke"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dictionary_keystroke` ON `${TABLE_NAME}` (`keystroke`)"
+          }
+        ]
+      },
+      {
+        "tableName": "dictionary_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`keystroke` TEXT NOT NULL, `character` TEXT NOT NULL, content=`dictionary`)",
+        "fields": [
+          {
+            "fieldPath": "keystroke",
+            "columnName": "keystroke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "character",
+            "columnName": "character",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "simple",
+          "tokenizerArgs": [],
+          "contentTable": "dictionary",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_BEFORE_UPDATE BEFORE UPDATE ON `dictionary` BEGIN DELETE FROM `dictionary_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_BEFORE_DELETE BEFORE DELETE ON `dictionary` BEGIN DELETE FROM `dictionary_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_AFTER_UPDATE AFTER UPDATE ON `dictionary` BEGIN INSERT INTO `dictionary_fts`(`docid`, `keystroke`, `character`) VALUES (NEW.`rowid`, NEW.`keystroke`, NEW.`character`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_AFTER_INSERT AFTER INSERT ON `dictionary` BEGIN INSERT INTO `dictionary_fts`(`docid`, `keystroke`, `character`) VALUES (NEW.`rowid`, NEW.`keystroke`, NEW.`character`); END"
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3bf50d38786ec443bfceac2dae8ce941')"
+    ]
+  }
+}

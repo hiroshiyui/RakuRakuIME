@@ -189,22 +189,43 @@ fun KeyboardScreen(
                 }
             }
             InputMode.ENGLISH -> {
+                // Commits a non-letter token (digit, punctuation, alternate)
+                // into the editor. Flushes any in-progress English buffer
+                // first so word prediction doesn't swallow the boundary.
+                val commitNonLetter: (String) -> Unit = { token ->
+                    val buffer = viewModel.commitEnglishBuffer()
+                    if (buffer.isNotEmpty()) inputConnection()?.commitText(buffer, 1)
+                    inputConnection()?.commitText(token, 1)
+                }
+
                 Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                     EnglishLayout.ROWS.forEachIndexed { rowIndex, row ->
+                        // Normalise every row to ROW_WEIGHT so key widths line
+                        // up across rows despite the differing key counts
+                        // (13 / 12 / 11 / 11+shift). In split landscape we
+                        // skip this — that layout deliberately breaks to two
+                        // half-width halves with a centre spacer.
+                        val shiftWeight = if (rowIndex == EnglishLayout.SHIFT_ROW_INDEX) EnglishLayout.SHIFT_WEIGHT else 0f
+                        val rowKeyWeight = row.size.toFloat() + shiftWeight
+                        val sidePad = if (shouldSplit) 0f
+                            else ((EnglishLayout.ROW_WEIGHT - rowKeyWeight) / 2f).coerceAtLeast(0f)
+
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            // Last row starts with the tri-state shift key:
+                            if (sidePad > 0f) Spacer(modifier = Modifier.weight(sidePad))
+
+                            // Shift key on the last row only:
                             //   NONE        → ⇧ on the default key background
                             //   SHIFTED     → ⇧ on the function-key background (one-shot)
                             //   CAPS_LOCK   → ⇪ on the function-key background (sticky)
-                            if (rowIndex == EnglishLayout.ROWS.lastIndex) {
+                            if (rowIndex == EnglishLayout.SHIFT_ROW_INDEX) {
                                 val shiftLabel = if (shiftState == ShiftState.CAPS_LOCK) "⇪" else "⇧"
                                 val shiftActive = shiftState != ShiftState.NONE
                                 KeyButton(
                                     keyDef = KeyDefinition(shiftLabel),
-                                    modifier = Modifier.weight(1.5f),
+                                    modifier = Modifier.weight(EnglishLayout.SHIFT_WEIGHT),
                                     keyHeight = scaledKeyHeight,
                                     backgroundColorOverride = if (shiftActive) colors.functionKeyBackground else colors.keyBackground,
                                     textColorOverride = if (shiftActive) colors.functionKeyTextColor else colors.keyTextColor,
@@ -215,38 +236,59 @@ fun KeyboardScreen(
                                 )
                             }
 
-                            val keys = if (shouldSplit) {
+                            // Split-landscape: inject a centre spacer between
+                            // the two halves of the row. Use Any so the marker
+                            // sits alongside KeyDefinition entries.
+                            val items: List<Any> = if (shouldSplit) {
                                 val half = row.size / 2
-                                val list = mutableListOf<String>()
-                                list.addAll(row.take(half))
-                                list.add("SPACE")
-                                list.addAll(row.drop(half))
-                                list
+                                buildList {
+                                    addAll(row.take(half))
+                                    add("__SPLIT__")
+                                    addAll(row.drop(half))
+                                }
                             } else {
                                 row
                             }
 
-                            for (char in keys) {
-                                if (char == "SPACE") {
-                                    Spacer(modifier = Modifier.weight(if (isLandscape) 2f else 1f))
-                                } else {
-                                    val display = if (isShifted) char.uppercase() else char
-                                    KeyButton(
-                                        keyDef = KeyDefinition(display),
-                                        modifier = Modifier.weight(1f),
-                                        keyHeight = scaledKeyHeight,
-                                        onClick = {
-                                            onKeyPress()
-                                            // Accumulate into a composing buffer so the
-                                            // candidate bar can offer predictions.
-                                            viewModel.onEnglishKeyPress(display)
-                                            // One-shot shift auto-releases after the
-                                            // letter that used it; CAPS_LOCK is sticky.
-                                            viewModel.consumeShift()
-                                        }
+                            for (item in items) {
+                                when (item) {
+                                    is String -> Spacer(
+                                        modifier = Modifier.weight(if (isLandscape) 2f else 1f),
                                     )
+                                    is KeyDefinition -> {
+                                        val ch = item.qwertyChar
+                                        val isLetter = ch.length == 1 && ch[0].isLetter()
+                                        val display = if (isShifted && isLetter) ch.uppercase() else ch
+                                        KeyButton(
+                                            keyDef = KeyDefinition(display, "", item.alternates),
+                                            modifier = Modifier.weight(1f),
+                                            keyHeight = scaledKeyHeight,
+                                            onAlternateSelected = { alt ->
+                                                onKeyPress()
+                                                commitNonLetter(alt)
+                                                viewModel.consumeShift()
+                                            },
+                                            onClick = {
+                                                onKeyPress()
+                                                if (isLetter) {
+                                                    // Accumulate into the composing buffer so
+                                                    // the candidate bar can offer predictions.
+                                                    viewModel.onEnglishKeyPress(display)
+                                                } else {
+                                                    // Digits and inline punctuation terminate
+                                                    // the current word.
+                                                    commitNonLetter(display)
+                                                }
+                                                // One-shot shift auto-releases after the key
+                                                // that used it; CAPS_LOCK is sticky.
+                                                viewModel.consumeShift()
+                                            }
+                                        )
+                                    }
                                 }
                             }
+
+                            if (sidePad > 0f) Spacer(modifier = Modifier.weight(sidePad))
                         }
                     }
                 }

@@ -1,0 +1,43 @@
+# F-Droid metadata for RakuRaku IME.
+#
+# This file is a *reference copy*. F-Droid's own index is built from
+# metadata/org.ghostsinthelab.app.rakurakuime.yml inside the separate
+# `fdroiddata` repo at https://gitlab.com/fdroid/fdroiddata. Submit
+# this content via either:
+#   * an RFP (Request For Packaging) issue at
+#     https://gitlab.com/fdroid/rfp/-/issues, or
+#   * a merge request that adds the file directly to `fdroiddata/metadata/`.
+# Tag/commit references below assume release 0.0.1.
+#
+# Author metadata (AuthorEmail, AuthorWebSite) is deliberately aligned
+# with the other app in this author's fdroiddata footprint:
+# org.ghostsinthelab.apps.guilelessbopomofo.yml.
+
+Categories:
+  - Keyboard & IME
+  - Writing
+License: GPL-3.0-or-later
+AuthorName: Hui-Hong You
+AuthorEmail: hiroshiyui@gmail.com
+AuthorWebSite: https://ghostsinthelab.org/
+SourceCode: https://github.com/hiroshiyui/RakuRakuIME
+IssueTracker: https://github.com/hiroshiyui/RakuRakuIME/issues
+Changelog: https://github.com/hiroshiyui/RakuRakuIME/releases
+
+AutoName: RakuRaku IME
+
+RepoType: git
+Repo: https://github.com/hiroshiyui/RakuRakuIME.git
+
+Builds:
+  - versionName: 0.0.1
+    versionCode: 1
+    commit: 0.0.1
+    subdir: app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 0.0.1
+CurrentVersionCode: 1

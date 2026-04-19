@@ -57,6 +57,10 @@ fun KeyButton(
     keyHeight: androidx.compose.ui.unit.Dp = KeyboardLayout.KEY_HEIGHT,
     backgroundColorOverride: androidx.compose.ui.graphics.Color? = null,
     textColorOverride: androidx.compose.ui.graphics.Color? = null,
+    // Where to pin the ezRoot label inside the key. Defaults to the
+    // top-start corner (where Chinese roots sit on an EZ key); override
+    // with e.g. Alignment.BottomCenter for word-labels like "Space".
+    rootLabelAlignment: Alignment = Alignment.TopStart,
     onSwipeUp: (() -> Unit)? = null,
     onAlternateSelected: ((String) -> Unit)? = null,
     onClick: () -> Unit,
@@ -186,16 +190,24 @@ fun KeyButton(
             },
         contentAlignment = Alignment.Center,
     ) {
-        // EZ Root label in top-left
+        // EZ Root (or free-form word) label. Positioned by rootLabelAlignment;
+        // padding flips to match so it hugs the chosen edge without squeezing
+        // the central qwertyChar.
         if (keyDef.ezRoot.isNotEmpty()) {
+            val rootPadding = when (rootLabelAlignment) {
+                Alignment.BottomCenter -> Modifier.padding(bottom = 4.dp)
+                Alignment.TopCenter -> Modifier.padding(top = 4.dp)
+                Alignment.Center -> Modifier
+                else -> Modifier.padding(start = 5.dp, top = 2.dp)
+            }
             Text(
                 text = keyDef.ezRoot,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = colors.rootLabelColor,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(start = 5.dp, top = 2.dp),
+                    .align(rootLabelAlignment)
+                    .then(rootPadding),
             )
         }
         

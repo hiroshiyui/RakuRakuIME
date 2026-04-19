@@ -20,6 +20,7 @@ package org.ghostsinthelab.app.rakurakuime.ui.keyboard
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
@@ -90,6 +91,7 @@ fun FunctionRow(
             keyDef = KeyDefinition(" ", "Space"),
             modifier = Modifier.weight(4f),
             keyHeight = keyHeight,
+            rootLabelAlignment = Alignment.BottomCenter,
             onClick = onSpace
         )
 

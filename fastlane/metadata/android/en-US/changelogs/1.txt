@@ -1,0 +1,7 @@
+First public release.
+
+* EZ Input Method keyboard with radical composition and phrase rules.
+* English word prediction (Google 10K corpus).
+* Emoji picker with eight categories.
+* Material You / Solarized theming, Traditional Chinese and English UI.
+* Fully offline — no network access, no analytics.

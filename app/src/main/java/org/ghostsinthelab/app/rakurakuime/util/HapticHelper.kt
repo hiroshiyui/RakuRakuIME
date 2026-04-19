@@ -33,15 +33,10 @@ class HapticHelper(context: Context) {
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
 
+    // VibrationEffect.createOneShot is available since API 26 (Oreo); the app's
+    // minSdk is 26, so we don't need a pre-O fallback.
     fun vibrate(intensity: Float = 0.5f) {
-        val duration = 10L
         val amplitude = (intensity * 255).toInt().coerceIn(1, 255)
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(duration, amplitude))
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator?.vibrate(duration)
-        }
+        vibrator?.vibrate(VibrationEffect.createOneShot(10L, amplitude))
     }
 }

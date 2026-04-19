@@ -18,12 +18,11 @@
 
 package org.ghostsinthelab.app.rakurakuime.ime
 
-import android.app.Application
 import android.inputmethodservice.InputMethodService
-import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -34,13 +33,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
-import org.ghostsinthelab.app.rakurakuime.ui.InputMode
+import org.ghostsinthelab.app.rakurakuime.ui.keyboard.KeyboardScreen
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
 import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import org.ghostsinthelab.app.rakurakuime.ui.keyboard.*
 import org.ghostsinthelab.app.rakurakuime.util.HapticHelper
 
 class RakuRakuImeService : InputMethodService() {

@@ -145,14 +145,14 @@ observed issue, user-visible impact, and the fix direction.
 
 ### Low / Informational
 
-- [ ] **L1 — Dead code in `HapticHelper.vibrate`**
+- [x] **L1 — Dead code in `HapticHelper.vibrate`**
     - **File:** `util/HapticHelper.kt:42-45`.
     - **Issue:** The `@Suppress("DEPRECATION") vibrator?.vibrate(duration)`
       branch is unreachable because minSdk = 26 (`Build.VERSION_CODES.O`).
     - **Fix:** Drop the `if (SDK_INT >= O)` guard and the else branch;
       keep only `vibrator?.vibrate(VibrationEffect.createOneShot(…))`.
 
-- [ ] **L2 — Unused imports in `RakuRakuImeService`**
+- [x] **L2 — Unused imports in `RakuRakuImeService`**
     - **File:** `ime/RakuRakuImeService.kt:26, 39, 45`.
     - **Issue:** `isSystemInDarkTheme`, `InputMode`, and the
       `ui.keyboard.*` wildcard are not used.
@@ -174,7 +174,7 @@ observed issue, user-visible impact, and the fix direction.
           ship learned frequencies off-device). Align the
           PRIVACY-POLICY wording with whichever choice.
 
-- [ ] **L4 — Release build ships unminified / unobfuscated**
+- [x] **L4 — Release build ships unminified / unobfuscated**
     - **File:** `app/build.gradle.kts:43-48`.
     - **Issue:** `isMinifyEnabled = false` in the `release` block.
       APK size is larger than necessary; R8 dead-code elimination is
@@ -184,7 +184,7 @@ observed issue, user-visible impact, and the fix direction.
       Compose + Room + DataStore all work under R8 but sometimes need
       hints for reflection.
 
-- [ ] **L5 — Stale dependencies**
+- [x] **L5 — Stale dependencies**
     - **File:** `gradle/libs.versions.toml`.
     - **Issue:** `composeBom = "2024.09.00"` is roughly 18 months old;
       `room = "2.7.0-alpha11"` is an alpha.

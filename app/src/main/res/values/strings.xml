@@ -2,10 +2,14 @@
     <string name="app_name">RakuRaku IME</string>
     <string name="ime_name">RakuRaku IME</string>
     <string name="subtype_zh_tw">輕鬆</string>
-    <string name="subtype_en_us">English</string>
 
     <string name="settings_title">RakuRaku IME Settings</string>
+    <string name="settings_ime_status_label">IME Status:</string>
+    <string name="settings_ime_status_enabled">Enabled</string>
+    <string name="settings_ime_status_disabled">Not enabled</string>
+    <string name="settings_ime_enable_button">Open System Keyboard Settings</string>
     <string name="settings_vibration">Keypress Vibration</string>
+    <string name="settings_split_landscape">Split Keyboard in Landscape</string>
     <string name="settings_keyboard_height">Keyboard Height Scale</string>
     <string name="settings_dict_management">Dictionary Management</string>
     <string name="settings_dict_reimport">Re-import Dictionary</string>
@@ -14,7 +18,7 @@
     <string name="settings_clear_freq">Reset Learning (Frequencies)</string>
     <string name="settings_clear_freq_confirm">This will reset all character frequencies to zero. Continue?</string>
     <string name="settings_about">About</string>
-    <string name="settings_about_author">Original Author: 高衡緒</string>
+    <string name="settings_about_inventor">Input Method Inventor: 高衡緒</string>
     <string name="settings_about_org">Organization: 輕鬆資訊企業社 (Inactive)</string>
     <string name="settings_about_license">Application licensed under GPLv3+</string>
 </resources>

@@ -18,6 +18,10 @@
 
 package org.ghostsinthelab.app.rakurakuime.ui
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,11 +32,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.launch
 import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.data.CinParser
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
+
+private fun isImeEnabled(context: Context): Boolean {
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    return imm.enabledInputMethodList.any { it.packageName == context.packageName }
+}
 
 @Composable
 fun SettingsScreen(
@@ -51,6 +63,25 @@ fun SettingsScreen(
     var showResetFreqDialog by remember { mutableStateOf(false) }
     var isBusy by remember { mutableStateOf(false) }
     var busyMessage by remember { mutableStateOf("") }
+    var assetHash by remember { mutableStateOf<String?>(null) }
+    var imeEnabled by remember { mutableStateOf(isImeEnabled(context)) }
+
+    LaunchedEffect(isBusy) {
+        if (!isBusy) {
+            assetHash = CinParser.assetHash(context)
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                imeEnabled = isImeEnabled(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Column(
         modifier = modifier
@@ -63,7 +94,37 @@ fun SettingsScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.settings_ime_status_label),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(
+                    if (imeEnabled) R.string.settings_ime_status_enabled
+                    else R.string.settings_ime_status_disabled
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (imeEnabled) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Button(onClick = {
+                context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+            }) {
+                Text(stringResource(R.string.settings_ime_enable_button))
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
         // Vibration
         SettingsSwitch(
@@ -73,7 +134,7 @@ fun SettingsScreen(
         )
 
         SettingsSwitch(
-            label = "Split Keyboard in Landscape", // TODO: Move to string resources
+            label = stringResource(R.string.settings_split_landscape),
             checked = splitLayout,
             onCheckedChange = { scope.launch { userPreferences.setSplitLayoutLandscape(it) } }
         )
@@ -100,6 +161,14 @@ fun SettingsScreen(
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
+
+        assetHash?.let { hash ->
+            Text(
+                text = "CIN SHA-256: $hash",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         if (isBusy) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -131,7 +200,7 @@ fun SettingsScreen(
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = stringResource(R.string.settings_about_author), style = MaterialTheme.typography.bodyMedium)
+        Text(text = stringResource(R.string.settings_about_inventor), style = MaterialTheme.typography.bodyMedium)
         Text(text = stringResource(R.string.settings_about_org), style = MaterialTheme.typography.bodyMedium)
         Text(text = stringResource(R.string.settings_about_license), style = MaterialTheme.typography.bodyMedium)
     }
@@ -147,8 +216,7 @@ fun SettingsScreen(
                     isBusy = true
                     busyMessage = "Re-importing..."
                     scope.launch {
-                        db.dictionaryDao().clearAll()
-                        CinParser.parseAndPopulate(context, db)
+                        CinParser.forceReimport(context, db)
                         isBusy = false
                     }
                 }) {

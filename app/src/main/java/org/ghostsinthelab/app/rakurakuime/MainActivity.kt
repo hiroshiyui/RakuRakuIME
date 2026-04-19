@@ -18,9 +18,7 @@
 
 package org.ghostsinthelab.app.rakurakuime
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -49,21 +47,17 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     val db = ImeDatabase.getDatabase(this@MainActivity)
-                    val count = db.dictionaryDao().count()
-                    
-                    if (count == 0) {
-                        initStatus = "Importing dictionary... Please wait."
-                        try {
-                            CinParser.parseAndPopulate(this@MainActivity, db)
-                            val finalCount = db.dictionaryDao().count()
-                            initStatus = "Dictionary initialized ($finalCount entries)!"
-                            isReady = true
-                        } catch (e: Exception) {
-                            initStatus = "Error initializing dictionary: ${e.localizedMessage}"
+                    try {
+                        initStatus = "Preparing dictionary..."
+                        val result = CinParser.syncWithAsset(this@MainActivity, db)
+                        val count = db.dictionaryDao().count()
+                        initStatus = when (result) {
+                            CinParser.SyncResult.Reimported -> "Dictionary updated ($count entries)!"
+                            CinParser.SyncResult.AlreadyCurrent -> "Dictionary ready ($count entries)."
                         }
-                    } else {
-                        initStatus = "Dictionary ready ($count entries)."
                         isReady = true
+                    } catch (e: Exception) {
+                        initStatus = "Error initializing dictionary: ${e.localizedMessage}"
                     }
                 }
 
@@ -80,34 +74,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     } else {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            // Top bar with "Enable" button
-                            Surface(
-                                tonalElevation = 4.dp,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "IME is ready",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Button(onClick = {
-                                        startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
-                                    }) {
-                                        Text("Enable in Settings")
-                                    }
-                                }
-                            }
-                            
-                            SettingsScreen(
-                                userPreferences = userPreferences,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
+                        SettingsScreen(
+                            userPreferences = userPreferences,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }

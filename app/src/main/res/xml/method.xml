@@ -4,8 +4,4 @@
         android:imeSubtypeLocale="zh_TW"
         android:imeSubtypeMode="keyboard"
         android:label="@string/subtype_zh_tw" />
-    <subtype
-        android:imeSubtypeLocale="en_US"
-        android:imeSubtypeMode="keyboard"
-        android:label="@string/subtype_en_us" />
 </input-method>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ RakuRaku IME - EZ Input Method for Android
+  ~ Copyright (C) 2026  RakuRaku IME Contributors
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="app_name">新修輕鬆輸入法</string>
+    <string name="ime_name">新修輕鬆輸入法</string>
+    <string name="subtype_zh_tw">輕鬆</string>
+
+    <string name="settings_title">新修輕鬆輸入法設定</string>
+    <string name="settings_ime_status_label">輸入法狀態：</string>
+    <string name="settings_ime_status_enabled">已啟用</string>
+    <string name="settings_ime_status_disabled">尚未啟用</string>
+    <string name="settings_ime_enable_button">開啟系統鍵盤管理設定</string>
+    <string name="settings_vibration">按鍵震動</string>
+    <string name="settings_split_landscape">橫向時分割鍵盤</string>
+    <string name="settings_keyboard_height">鍵盤高度比例</string>
+    <string name="settings_dict_management">詞庫管理</string>
+    <string name="settings_dict_reimport">重新匯入詞庫</string>
+    <string name="settings_dict_reimport_confirm">此操作將清除並重新匯入整個詞庫，是否繼續？</string>
+    <string name="settings_dict_reimporting">重新匯入中…</string>
+    <string name="settings_clear_freq">重設學習紀錄（使用頻率）</string>
+    <string name="settings_clear_freq_confirm">此操作將所有字元的使用頻率歸零，是否繼續？</string>
+    <string name="settings_about">關於</string>
+    <string name="settings_about_inventor">輸入法發明人：高衡緒</string>
+    <string name="settings_about_org">機構：輕鬆資訊企業社（已停止營運）</string>
+    <string name="settings_about_license">本應用程式依 GPLv3+ 授權</string>
+</resources>

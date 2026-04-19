@@ -19,6 +19,12 @@ project by the Meaningless Keyboard Project and redistributed here under the
 GNU General Public License v3.0. Source:
 https://github.com/hiroshiyui/MeaninglessKeyboard
 
+The *Roboto Slab* font (used for alphanumerical keycaps, vendored in
+`app/src/main/res/font/roboto_slab_*.ttf`) was designed by Christian Robertson
+and is distributed under the SIL Open Font License 1.1. The full license
+text is bundled at `app/src/main/assets/OFL.txt`. Source:
+https://fonts.google.com/specimen/Roboto+Slab
+
 ## Licensing
 
 ### Application

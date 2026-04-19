@@ -79,7 +79,8 @@ Custom pointer-input loop (not `detectTapGestures`) because it must support tap,
 - `ezbig.utf-8.cin` — EZ dictionary source (高衡緒 / 輕鬆資訊企業社, GPLv2 + EZ public licence).
 - `databases/ime_database.db` — pre-packaged Room DB built from the CIN.
 - `google_10k_english.txt`, `emoji.json` — English prediction + emoji categories (see README attributions).
-- `gpl.txt`, `ezphrase.txt`, `LICENSE_EZBIG.md` — license texts shipped for compliance.
+- `res/font/roboto_slab_*.ttf` — alphanumerical keycap font (Roboto Slab, SIL OFL 1.1).
+- `gpl.txt`, `ezphrase.txt`, `LICENSE_EZBIG.md`, `OFL.txt` — license texts shipped for compliance.
 
 When touching attribution-bearing assets, update both `README.md` and the matching in-app references.
 

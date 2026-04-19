@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
+import org.ghostsinthelab.app.rakurakuime.ui.theme.RobotoSlab
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -200,9 +201,11 @@ fun KeyButton(
                 Alignment.Center -> Modifier
                 else -> Modifier.padding(start = 5.dp, top = 2.dp)
             }
+            val rootIsAscii = keyDef.ezRoot.all { it.code in 0x20..0x7E }
             Text(
                 text = keyDef.ezRoot,
                 fontSize = 15.sp,
+                fontFamily = if (rootIsAscii) RobotoSlab else null,
                 fontWeight = FontWeight.Medium,
                 color = colors.rootLabelColor,
                 modifier = Modifier
@@ -213,10 +216,18 @@ fun KeyButton(
         
         // Main character label (qwertyChar). Smaller when it plays second fiddle
         // to an EZ root in the same key; larger when it is the only label.
+        //
+        // Roboto Slab is applied when every character in the label is in the
+        // printable-ASCII range — that covers single letters/digits/punctuation
+        // AND multi-char word labels like "EN", "?123", "Space". CJK roots,
+        // emojis, and glyph-symbols like ⇧ / ⌫ / ⏎ fall back to the system
+        // default so their coverage is preserved.
         val hasEzRoot = keyDef.ezRoot.isNotEmpty()
+        val useSlabFont = displayLabel.isNotEmpty() && displayLabel.all { it.code in 0x20..0x7E }
         Text(
             text = displayLabel,
             fontSize = if (hasEzRoot) 12.sp else 20.sp,
+            fontFamily = if (useSlabFont) RobotoSlab else null,
             fontWeight = if (hasEzRoot) FontWeight.Normal else FontWeight.Medium,
             color = textColor,
             textAlign = TextAlign.Center,
@@ -243,9 +254,12 @@ fun KeyButton(
                         .background(colors.keyBackground),
                     contentAlignment = Alignment.Center,
                 ) {
+                    val previewText = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel
+                    val previewSlab = previewText.isNotEmpty() && previewText.all { it.code in 0x20..0x7E }
                     Text(
-                        text = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel,
+                        text = previewText,
                         fontSize = 32.sp,
+                        fontFamily = if (previewSlab) RobotoSlab else null,
                         fontWeight = FontWeight.Bold,
                         color = colors.keyTextColor,
                     )
@@ -277,9 +291,12 @@ fun KeyButton(
                                 .background(if (isSelected) colors.keyPressedBackground else androidx.compose.ui.graphics.Color.Transparent),
                             contentAlignment = Alignment.Center
                         ) {
+                            val altText = if (isUppercase) alt.uppercase() else alt.lowercase()
+                            val altSlab = altText.isNotEmpty() && altText.all { it.code in 0x20..0x7E }
                             Text(
-                                text = if (isUppercase) alt.uppercase() else alt.lowercase(),
+                                text = altText,
                                 fontSize = 24.sp,
+                                fontFamily = if (altSlab) RobotoSlab else null,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.keyTextColor,
                             )

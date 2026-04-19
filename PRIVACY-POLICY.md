@@ -11,6 +11,10 @@ data on your device.
 - It does **not** include analytics, crash reporting, or advertising SDKs.
 - It does **not** request or access the clipboard, contacts, microphone,
   camera, accounts, SMS, or your location.
+- It does **not** participate in Android's cloud auto-backup or
+  device-to-device transfer. The manifest declares
+  `android:allowBackup="false"`, so app data is excluded from Google
+  Drive backups and from the setup-wizard transfer flow.
 
 ## What the app stores locally
 

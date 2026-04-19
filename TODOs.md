@@ -159,21 +159,6 @@ observed issue, user-visible impact, and the fix direction.
     - **Fix:** Remove the two explicit imports; narrow the wildcard to
       the single `KeyboardScreen` symbol actually referenced.
 
-- [ ] **L3 — `allowBackup="true"` with empty `backup_rules.xml`**
-    - **Files:** `AndroidManifest.xml:8-10`, `res/xml/backup_rules.xml`.
-    - **Issue:** All IME local state (Room dictionary with learned
-      frequencies, DataStore preferences, the CIN-asset hash in
-      SharedPreferences) is pushed to Google's encrypted backup tied
-      to the user's account. The PRIVACY-POLICY promises "never leave
-      the device", which is strictly only true if cloud backup is
-      opted out — backup is user-initiated but still off-device.
-    - **Fix:** Decide intentionally:
-      (a) Set `android:allowBackup="false"` and remove the rules file; or
-      (b) Keep backup but add explicit `include`/`exclude` rules
-          (at minimum exclude the Room dictionary if you'd rather not
-          ship learned frequencies off-device). Align the
-          PRIVACY-POLICY wording with whichever choice.
-
 - [x] **L4 — Release build ships unminified / unobfuscated**
     - **File:** `app/build.gradle.kts:43-48`.
     - **Issue:** `isMinifyEnabled = false` in the `release` block.

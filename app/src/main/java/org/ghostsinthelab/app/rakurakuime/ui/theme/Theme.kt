@@ -40,7 +40,8 @@ private val SolarizedLightColors = lightColorScheme(
     primaryContainer = Color(0xFFBAD9EE),
     onPrimaryContainer = SolarizedBase03,
     secondary = SolarizedCyan,
-    onSecondary = SolarizedBase3,
+    // Dark text on mid-tone cyan — cream read at ~2.9:1 and failed AA.
+    onSecondary = SolarizedBase03,
     secondaryContainer = Color(0xFFBCE0DC),
     onSecondaryContainer = SolarizedBase03,
     tertiary = SolarizedViolet,
@@ -48,7 +49,10 @@ private val SolarizedLightColors = lightColorScheme(
     tertiaryContainer = Color(0xFFD8D8F0),
     onTertiaryContainer = SolarizedBase03,
     error = SolarizedRed,
-    onError = SolarizedBase3,
+    // Solarized red sits in the mid-luminance band where neither cream
+    // nor base03 hits AA; pure white is the only Solarized-adjacent
+    // choice that clears 4.5:1.
+    onError = Color.White,
     errorContainer = Color(0xFFF3C6C4),
     onErrorContainer = SolarizedBase03,
     background = SolarizedBase3,
@@ -57,7 +61,9 @@ private val SolarizedLightColors = lightColorScheme(
     onSurface = SolarizedBase00,
     surfaceVariant = SolarizedBase2,
     onSurfaceVariant = SolarizedBase01,
-    outline = SolarizedBase1,
+    // One base darker than base1 so outline strokes clear M3's 3:1 UI
+    // contrast minimum against surface.
+    outline = SolarizedBase01,
     outlineVariant = Color(0xFFE0DBC6),
     surfaceContainerLowest = SolarizedBase3,
     surfaceContainerLow = Color(0xFFF9F2DF),
@@ -79,11 +85,14 @@ private val SolarizedDarkColors = darkColorScheme(
     secondaryContainer = Color(0xFF12584F),
     onSecondaryContainer = SolarizedBase2,
     tertiary = SolarizedViolet,
-    onTertiary = SolarizedBase03,
+    // Solarized violet is mid-tone; white reads clearest on it.
+    onTertiary = Color.White,
     tertiaryContainer = Color(0xFF2E325F),
     onTertiaryContainer = SolarizedBase2,
     error = SolarizedRed,
-    onError = SolarizedBase03,
+    // Same reasoning as light: pure white is the only Solarized-adjacent
+    // option that clears AA on mid-luminance red.
+    onError = Color.White,
     errorContainer = Color(0xFF6F1916),
     onErrorContainer = SolarizedBase2,
     background = SolarizedBase03,
@@ -92,7 +101,9 @@ private val SolarizedDarkColors = darkColorScheme(
     onSurface = SolarizedBase0,
     surfaceVariant = SolarizedBase02,
     onSurfaceVariant = SolarizedBase1,
-    outline = SolarizedBase01,
+    // One base lighter than base01 so outline strokes clear 3:1 against
+    // the dark surface.
+    outline = SolarizedBase0,
     outlineVariant = Color(0xFF143842),
     surfaceContainerLowest = SolarizedBase03,
     surfaceContainerLow = Color(0xFF022E39),

@@ -40,7 +40,10 @@ The project's history is mixed — some commits use a conventional-style prefix 
    EOF
    )"
    ```
-4. **Push** — always confirm with the user before pushing.
+4. **Push** — push to `origin/main` immediately after the commits land.
+   Do not pause to ask for confirmation first; the user's standing
+   preference for this repo is "just push". Still refuse a force-push
+   to `main` unless explicitly requested.
 
 ## Remotes & Branches
 

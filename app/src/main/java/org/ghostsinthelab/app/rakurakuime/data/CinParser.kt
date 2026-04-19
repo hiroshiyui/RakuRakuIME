@@ -71,47 +71,46 @@ object CinParser {
         }
 
     suspend fun parseAndPopulate(context: Context, database: ImeDatabase) = withContext(Dispatchers.IO) {
-        val assetManager = context.assets
-        val inputStream = assetManager.open(ASSET_NAME)
-        val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
+        context.assets.open(ASSET_NAME).use { inputStream ->
+            BufferedReader(InputStreamReader(inputStream, "UTF-8")).use { reader ->
+                var inKeyname = false
+                val entries = mutableListOf<DictionaryEntry>()
 
-        var inKeyname = false
-        val entries = mutableListOf<DictionaryEntry>()
-
-        database.withTransaction {
-            var line: String? = reader.readLine()
-            while (line != null) {
-                line = line.trim()
-                if (line.isEmpty() || line.startsWith("#")) {
-                    line = reader.readLine()
-                    continue
-                }
-
-                if (line == "%keyname begin") {
-                    inKeyname = true
-                } else if (line == "%keyname end") {
-                    inKeyname = false
-                } else if (!inKeyname && !line.startsWith("%")) {
-                    // If it's not a % command and not in keyname, it's a data line
-                    val parts = line.split(Regex("\\s+"))
-                    if (parts.size >= 2) {
-                        val keystroke = parts[0]
-                        val character = parts[1]
-                        entries.add(DictionaryEntry(keystroke = keystroke, character = character))
-
-                        if (entries.size >= 5000) {
-                            database.dictionaryDao().insertAll(entries)
-                            entries.clear()
+                database.withTransaction {
+                    var line: String? = reader.readLine()
+                    while (line != null) {
+                        line = line.trim()
+                        if (line.isEmpty() || line.startsWith("#")) {
+                            line = reader.readLine()
+                            continue
                         }
+
+                        if (line == "%keyname begin") {
+                            inKeyname = true
+                        } else if (line == "%keyname end") {
+                            inKeyname = false
+                        } else if (!inKeyname && !line.startsWith("%")) {
+                            // If it's not a % command and not in keyname, it's a data line
+                            val parts = line.split(Regex("\\s+"))
+                            if (parts.size >= 2) {
+                                val keystroke = parts[0]
+                                val character = parts[1]
+                                entries.add(DictionaryEntry(keystroke = keystroke, character = character))
+
+                                if (entries.size >= 5000) {
+                                    database.dictionaryDao().insertAll(entries)
+                                    entries.clear()
+                                }
+                            }
+                        }
+                        line = reader.readLine()
+                    }
+                    if (entries.isNotEmpty()) {
+                        database.dictionaryDao().insertAll(entries)
                     }
                 }
-                line = reader.readLine()
-            }
-            if (entries.isNotEmpty()) {
-                database.dictionaryDao().insertAll(entries)
             }
         }
-        inputStream.close()
     }
 
     private fun computeAssetHash(context: Context): String {

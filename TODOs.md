@@ -35,7 +35,7 @@ observed issue, user-visible impact, and the fix direction.
 
 ### High
 
-- [ ] **H1 — Vibration preferences silently ignored + coroutine leak per keystroke**
+- [x] **H1 — Vibration preferences silently ignored + coroutine leak per keystroke**
     - **File:** `ime/RakuRakuImeService.kt:68-84`.
     - **Issue:** `handleKeyPress()` calls the extension
       `Flow<T>.stateIn(scope, SharingStarted.Eagerly, initial).value` on
@@ -54,7 +54,7 @@ observed issue, user-visible impact, and the fix direction.
       `SharingStarted.Eagerly`, then read `.value` per key press.
       Remove the per-call extension.
 
-- [ ] **H2 — Resource leak in `CinParser.parseAndPopulate`**
+- [x] **H2 — Resource leak in `CinParser.parseAndPopulate`**
     - **File:** `data/CinParser.kt:73-114`.
     - **Issue:** `inputStream` / `reader` are opened outside a
       `use { }` / try-finally block. The closing `inputStream.close()`
@@ -66,7 +66,7 @@ observed issue, user-visible impact, and the fix direction.
       `context.assets.open(ASSET_NAME).bufferedReader().use { reader -> database.withTransaction { … } }`
       and delete the trailing manual `close()`.
 
-- [ ] **H3 — Stale `currentInputConnection` snapshot passed into Compose**
+- [x] **H3 — Stale `currentInputConnection` snapshot passed into Compose**
     - **File:** `ime/RakuRakuImeService.kt:101-103` (and the call sites
       in `ui/keyboard/KeyboardScreen.kt` that call `.commitText(…)`).
     - **Issue:** `setContent` captures `currentInputConnection` as a

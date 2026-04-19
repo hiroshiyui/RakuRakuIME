@@ -42,7 +42,10 @@ import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 @Composable
 fun KeyboardScreen(
     viewModel: KeyboardViewModel,
-    currentInputConnection: InputConnection?,
+    // Read lazily: the IME service's currentInputConnection updates across
+    // input sessions without recreating the ComposeView, so we must re-fetch
+    // per callback invocation instead of capturing a snapshot.
+    inputConnection: () -> InputConnection?,
     onKeyPress: () -> Unit,
     onSwitchIme: () -> Unit,
 ) {
@@ -83,7 +86,7 @@ fun KeyboardScreen(
                 onKeyPress()
                 if (isEnglish) {
                     val word = viewModel.selectEnglishCandidate(candidate)
-                    currentInputConnection?.commitText("$word ", 1)
+                    inputConnection()?.commitText("$word ", 1)
                 } else {
                     viewModel.selectCandidate(candidate)
                 }
@@ -125,11 +128,11 @@ fun KeyboardScreen(
                                         keyHeight = scaledKeyHeight,
                                         onSwipeUp = {
                                             onKeyPress()
-                                            currentInputConnection?.commitText(item.qwertyChar.uppercase(), 1)
+                                            inputConnection()?.commitText(item.qwertyChar.uppercase(), 1)
                                         },
                                         onAlternateSelected = { alt ->
                                             onKeyPress()
-                                            currentInputConnection?.commitText(if (isShifted) alt.uppercase() else alt.lowercase(), 1)
+                                            inputConnection()?.commitText(if (isShifted) alt.uppercase() else alt.lowercase(), 1)
                                         },
                                         onClick = {
                                             onKeyPress()
@@ -173,7 +176,7 @@ fun KeyboardScreen(
                                     keyHeight = scaledKeyHeight,
                                     onClick = {
                                         onKeyPress()
-                                        currentInputConnection?.commitText(char, 1)
+                                        inputConnection()?.commitText(char, 1)
                                     }
                                 )
                             }
@@ -293,7 +296,7 @@ fun KeyboardScreen(
                                         keyHeight = scaledKeyHeight,
                                         onClick = {
                                             onKeyPress()
-                                            currentInputConnection?.commitText(emoji, 1)
+                                            inputConnection()?.commitText(emoji, 1)
                                         }
                                     )
                                 }
@@ -324,8 +327,8 @@ fun KeyboardScreen(
                     viewModel.onBackspace()
                 }
                 if (!handledByBuffer) {
-                    currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                    currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
+                    inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
+                    inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
                 }
             },
             onSpace = {
@@ -333,9 +336,9 @@ fun KeyboardScreen(
                 if (inputMode == InputMode.ENGLISH) {
                     val buffer = viewModel.commitEnglishBuffer()
                     if (buffer.isNotEmpty()) {
-                        currentInputConnection?.commitText(buffer, 1)
+                        inputConnection()?.commitText(buffer, 1)
                     }
-                    currentInputConnection?.commitText(" ", 1)
+                    inputConnection()?.commitText(" ", 1)
                 } else if (composingText.isNotEmpty() || viewModel.preEditBuffer.value.isNotEmpty()) {
                     val wasAlreadySelecting = isSelecting
                     val canSelect = viewModel.enterSelectionMode()
@@ -343,13 +346,13 @@ fun KeyboardScreen(
                     if (wasAlreadySelecting || !canSelect) {
                         val textToCommit = viewModel.commitAll()
                         if (textToCommit.isNotEmpty()) {
-                            currentInputConnection?.commitText(textToCommit, 1)
+                            inputConnection()?.commitText(textToCommit, 1)
                         } else {
-                            currentInputConnection?.commitText(" ", 1)
+                            inputConnection()?.commitText(" ", 1)
                         }
                     }
                 } else {
-                    currentInputConnection?.commitText(" ", 1)
+                    inputConnection()?.commitText(" ", 1)
                 }
             },
             onEnter = {
@@ -357,16 +360,16 @@ fun KeyboardScreen(
                 if (inputMode == InputMode.ENGLISH) {
                     val buffer = viewModel.commitEnglishBuffer()
                     if (buffer.isNotEmpty()) {
-                        currentInputConnection?.commitText(buffer, 1)
+                        inputConnection()?.commitText(buffer, 1)
                     }
                 } else {
                     val textToCommit = viewModel.commitAll()
                     if (textToCommit.isNotEmpty()) {
-                        currentInputConnection?.commitText(textToCommit, 1)
+                        inputConnection()?.commitText(textToCommit, 1)
                     }
                 }
-                currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
-                currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+                inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+                inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
             },
             onToggleShift = { 
                 onKeyPress()

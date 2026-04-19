@@ -30,8 +30,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -50,6 +48,12 @@ class RakuRakuImeService : InputMethodService() {
     private lateinit var viewModel: KeyboardViewModel
     private lateinit var hapticHelper: HapticHelper
 
+    // Cached once in onCreate so each keystroke is a plain .value read, not
+    // a fresh stateIn(...) that would leak collectors and return the initial
+    // value forever.
+    private lateinit var vibrationEnabled: StateFlow<Boolean>
+    private lateinit var vibrationIntensity: StateFlow<Float>
+
     override fun onCreate() {
         super.onCreate()
         lifecycleOwner.onCreate()
@@ -59,6 +63,11 @@ class RakuRakuImeService : InputMethodService() {
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         )[KeyboardViewModel::class.java]
 
+        vibrationEnabled = viewModel.vibrationEnabled
+            .stateIn(lifecycleOwner.lifecycleScope, SharingStarted.Eagerly, true)
+        vibrationIntensity = viewModel.vibrationIntensity
+            .stateIn(lifecycleOwner.lifecycleScope, SharingStarted.Eagerly, 0.5f)
+
         // Link ViewModel callback to InputConnection
         viewModel.onUpdateComposingText = { text ->
             currentInputConnection?.setComposingText(text, 1)
@@ -66,22 +75,10 @@ class RakuRakuImeService : InputMethodService() {
     }
 
     private fun handleKeyPress() {
-        // Collect current vibration settings
-        val enabled = viewModel.vibrationEnabled.asStateFlow(lifecycleOwner.lifecycleScope, true).value
-        val intensity = viewModel.vibrationIntensity.asStateFlow(lifecycleOwner.lifecycleScope, 0.5f).value
-        
-        if (enabled) {
-            hapticHelper.vibrate(intensity)
+        if (vibrationEnabled.value) {
+            hapticHelper.vibrate(vibrationIntensity.value)
         }
     }
-
-    // Helper extension to convert Flow to StateFlow for one-off reads if needed, 
-    // though better to collect in a scope. For simplicity in handleKeyPress:
-    private fun <T> Flow<T>.asStateFlow(
-        scope: CoroutineScope,
-        initialValue: T
-    ): StateFlow<T> = 
-        this.stateIn(scope, SharingStarted.Eagerly, initialValue)
 
     override fun onCreateInputView(): View {
         window?.window?.decorView?.let { decorView ->
@@ -100,7 +97,10 @@ class RakuRakuImeService : InputMethodService() {
                     KeyboardTheme {
                         KeyboardScreen(
                             viewModel = viewModel,
-                            currentInputConnection = currentInputConnection,
+                            // Lazy accessor so the Compose tree always sees
+                            // the live IC, even after an input-session change
+                            // that doesn't trigger onCreateInputView again.
+                            inputConnection = { currentInputConnection },
                             onKeyPress = { handleKeyPress() },
                             onSwitchIme = {
                                 val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager

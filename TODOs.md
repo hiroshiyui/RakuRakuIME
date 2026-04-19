@@ -3,9 +3,6 @@
 Outstanding work for RakuRaku IME. Completed items have been cleaned
 out — see `git log` for the full history of what's landed.
 
-## Input & Logic
-- [ ] **Physical Keyboard Support:** Logic to handle typing when a Bluetooth or USB keyboard is attached.
-
 ## System & Settings
 - [ ] **Accessibility (TalkBack):** Add comprehensive `semantics` labels for candidates, roots, and function keys.
 

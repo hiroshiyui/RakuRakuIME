@@ -2,6 +2,31 @@
 
 An Android Input Method Editor (IME) for the **EZ Input Method** (輕鬆輸入法), built with Jetpack Compose and Room Database.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="fastlane/metadata/android/zh-TW/images/phoneScreenshots/01_settings.png" width="220" alt="Settings screen" /><br/>
+      <sub>Settings — IME status, theme selector, dictionary management</sub>
+    </td>
+    <td align="center">
+      <img src="fastlane/metadata/android/zh-TW/images/phoneScreenshots/02_ez_keyboard.png" width="220" alt="EZ keyboard" /><br/>
+      <sub>EZ (輕鬆輸入法) mid-composition with the candidate bar</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="fastlane/metadata/android/zh-TW/images/phoneScreenshots/03_english_keyboard.png" width="220" alt="English keyboard" /><br/>
+      <sub>Full-QWERTY English with Google-10K word prediction</sub>
+    </td>
+    <td align="center">
+      <img src="fastlane/metadata/android/zh-TW/images/phoneScreenshots/04_emoji_keyboard.png" width="220" alt="Emoji panel" /><br/>
+      <sub>Emoji panel — eight categorised tabs, 1,184 glyphs</sub>
+    </td>
+  </tr>
+</table>
+
 ## Attribution & Credits
 
 The dictionary mapping data included in this project (`ezbig.utf-8.cin`) is the work of:

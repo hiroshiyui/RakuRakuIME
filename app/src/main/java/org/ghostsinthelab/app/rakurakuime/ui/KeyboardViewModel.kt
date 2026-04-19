@@ -33,25 +33,52 @@ import org.ghostsinthelab.app.rakurakuime.data.EnglishDictionary
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
 
+/**
+ * Supported input modes for the RakuRaku IME.
+ */
 enum class InputMode {
-    EZ, NUMBER, ENGLISH, EMOJI
+    /** Primary radical-based input mode. */
+    EZ,
+    /** Numeric and special character input. */
+    NUMBER,
+    /** English text input with word prediction. */
+    ENGLISH,
+    /** Emoji selection mode. */
+    EMOJI
 }
 
+/**
+ * The central state manager for the keyboard UI.
+ *
+ * This ViewModel handles the logic for:
+ * - Tracking the current [InputMode].
+ * - Managing the composing buffer for both EZ and English modes.
+ * - Fetching and paging candidates from the database.
+ * - Handling user interactions like key presses, backspaces, and selections.
+ * - Exposing user preferences (vibration, height, etc.) to the UI.
+ */
 class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
     private val db = ImeDatabase.getDatabase(application)
     private val userPreferences = UserPreferences(application)
     private val appContext = application.applicationContext
 
+    /** Whether vibration is enabled for key presses. */
     val vibrationEnabled = userPreferences.vibrationEnabled
+    /** The intensity of the haptic feedback. */
     val vibrationIntensity = userPreferences.vibrationIntensity
+    /** The scaling factor for the keyboard's height. */
     val keyboardHeightScale = userPreferences.keyboardHeightScale
+    /** Whether to use a split layout in landscape mode. */
     val splitLayoutLandscape = userPreferences.splitLayoutLandscape
+    /** The current theme mode (light, dark, or system). */
     val themeMode = userPreferences.themeMode
 
     private val _inputMode = MutableStateFlow(InputMode.EZ)
+    /** The currently active input mode. */
     val inputMode: StateFlow<InputMode> = _inputMode.asStateFlow()
 
     private val _emojiCategory = MutableStateFlow(0)
+    /** The index of the currently selected emoji category. */
     val emojiCategory: StateFlow<Int> = _emojiCategory.asStateFlow()
 
     fun setEmojiCategory(index: Int) {
@@ -60,27 +87,35 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     // English prediction state.
     private val _englishBuffer = MutableStateFlow("")
+    /** The current raw text typed in English mode. */
     val englishBuffer: StateFlow<String> = _englishBuffer.asStateFlow()
 
     private val _englishCandidates = MutableStateFlow<List<String>>(emptyList())
+    /** List of predicted English words based on the current buffer. */
     val englishCandidates: StateFlow<List<String>> = _englishCandidates.asStateFlow()
 
     private val _isShifted = MutableStateFlow(false)
+    /** Whether the keyboard is currently in a shifted (uppercase/alternative) state. */
     val isShifted: StateFlow<Boolean> = _isShifted.asStateFlow()
 
     private val _composingText = MutableStateFlow("")
+    /** The active keystroke sequence being typed in EZ mode. */
     val composingText: StateFlow<String> = _composingText.asStateFlow()
 
     private val _preEditBuffer = MutableStateFlow("")
+    /** Characters already selected but not yet committed to the editor. */
     val preEditBuffer: StateFlow<String> = _preEditBuffer.asStateFlow()
 
     private val _candidates = MutableStateFlow<List<String>>(emptyList())
+    /** The full list of character candidates for the current keystroke sequence. */
     val candidates: StateFlow<List<String>> = _candidates.asStateFlow()
 
     private val _candidatePage = MutableStateFlow(0)
+    /** The current page index for the candidate list. */
     val candidatePage: StateFlow<Int> = _candidatePage.asStateFlow()
 
     private val _isSelecting = MutableStateFlow(false)
+    /** Whether the user is currently navigating the candidate list. */
     val isSelecting: StateFlow<Boolean> = _isSelecting.asStateFlow()
 
     // Callback for InputMethodService to update the composing region
@@ -204,6 +239,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private val _inputType = MutableStateFlow(android.text.InputType.TYPE_CLASS_TEXT)
     val inputType: StateFlow<Int> = _inputType.asStateFlow()
 
+    /**
+     * Updates the editor information and automatically switches input modes
+     * based on the target text field's [android.text.InputType].
+     */
     fun updateEditorInfo(info: android.view.inputmethod.EditorInfo?) {
         _inputType.value = info?.inputType ?: android.text.InputType.TYPE_CLASS_TEXT
         // Switch to NUMBER mode automatically if needed
@@ -216,6 +255,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /**
+     * Handles a key press in EZ input mode.
+     * Appends the character to the composing buffer and updates the candidate list.
+     */
     fun onKeyPress(key: String) {
         val newText = _composingText.value + key
         _composingText.value = newText
@@ -225,6 +268,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         updateCandidates(newText)
     }
 
+    /**
+     * Handles a backspace event.
+     * Returns true if a character was removed from a buffer, false otherwise.
+     */
     fun onBackspace(): Boolean {
         if (_composingText.value.isNotEmpty()) {
             val newText = _composingText.value.dropLast(1)
@@ -286,6 +333,13 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /**
+     * Commits the selected candidate to the pre-edit buffer and clears the composing state.
+     * Also updates the frequency of the candidate in the database for future sorting.
+     *
+     * @param candidate The character or phrase to select.
+     * @return The updated pre-edit buffer string.
+     */
     fun selectCandidate(candidate: String): String {
         val currentRoots = _composingText.value
         viewModelScope.launch {
@@ -304,6 +358,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         return newPreEdit
     }
 
+    /**
+     * Finalizes the current composition by combining the pre-edit and composing buffers.
+     * Clears all temporary state and returns the full text to be committed.
+     */
     fun commitAll(): String {
         val text = _preEditBuffer.value + _composingText.value
         clearComposing()

@@ -25,4 +25,27 @@
     <string name="settings_about_inventor">Input Method Inventor: 高衡緒</string>
     <string name="settings_about_org">Organization: 輕鬆資訊企業社 (Inactive)</string>
     <string name="settings_about_license">Application licensed under GPLv3+</string>
+
+    <!-- TalkBack descriptions for keyboard keys. Non-letter / symbolic
+         keys read their glyphs poorly, so each carries an explicit string. -->
+    <string name="a11y_key_shift">Shift</string>
+    <string name="a11y_key_caps_lock">Caps Lock</string>
+    <string name="a11y_key_backspace">Backspace</string>
+    <string name="a11y_key_enter">Enter</string>
+    <string name="a11y_key_space">Space</string>
+    <string name="a11y_key_switch_ime">Switch input method</string>
+    <string name="a11y_key_mode_to_english">Switch to English</string>
+    <string name="a11y_key_mode_to_numbers">Switch to numbers</string>
+    <string name="a11y_key_mode_to_emoji">Switch to emoji</string>
+    <string name="a11y_key_mode_to_chinese">Switch to Chinese</string>
+    <string name="a11y_candidate_prev_page">Previous candidates</string>
+    <string name="a11y_candidate_next_page">Next candidates</string>
+    <string name="a11y_emoji_tab_smileys">Smileys</string>
+    <string name="a11y_emoji_tab_gestures">Gestures</string>
+    <string name="a11y_emoji_tab_animals">Animals</string>
+    <string name="a11y_emoji_tab_food">Food</string>
+    <string name="a11y_emoji_tab_travel">Travel</string>
+    <string name="a11y_emoji_tab_activities">Activities</string>
+    <string name="a11y_emoji_tab_objects">Objects</string>
+    <string name="a11y_emoji_tab_symbols">Symbols</string>
 </resources>

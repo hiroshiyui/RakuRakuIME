@@ -39,6 +39,10 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -62,6 +66,11 @@ fun KeyButton(
     // top-start corner (where Chinese roots sit on an EZ key); override
     // with e.g. Alignment.BottomCenter for word-labels like "Space".
     rootLabelAlignment: Alignment = Alignment.TopStart,
+    // TalkBack announcement. When null, falls back to the visible
+    // label: the EZ root if present, else the main character glyph.
+    // Pass an explicit value for symbolic keys (⇧, ⌫, ⏎, 🌐) where
+    // reading the glyph literally would not help a screen-reader user.
+    contentDescription: String? = null,
     onSwipeUp: (() -> Unit)? = null,
     onAlternateSelected: ((String) -> Unit)? = null,
     onClick: () -> Unit,
@@ -78,6 +87,11 @@ fun KeyButton(
 
     val displayLabel = if (isUppercase) keyDef.qwertyChar.uppercase() else keyDef.qwertyChar.lowercase()
 
+    // TalkBack announcement: prefer the caller-provided description;
+    // otherwise fall back to the EZ root, or the displayed glyph.
+    val resolvedContentDescription = contentDescription
+        ?: keyDef.ezRoot.ifEmpty { displayLabel }
+
     val density = LocalDensity.current
     val popupOffsetY = with(density) { -(keyHeight + 12.dp).roundToPx() }
     val swipeThresholdPx = with(density) { 24.dp.toPx() }
@@ -88,6 +102,13 @@ fun KeyButton(
             .widthIn(min = 28.dp)
             .padding(2.dp)
             .clip(RoundedCornerShape(8.dp))
+            // Replace all child semantics with a single Button node so
+            // TalkBack issues one announcement per key instead of reading
+            // every inner Text separately.
+            .clearAndSetSemantics {
+                this.contentDescription = resolvedContentDescription
+                role = Role.Button
+            }
             .background(backgroundColor)
             .pointerInput(Unit) {
                 // Defer the key action until a clean release — so scroll gestures,

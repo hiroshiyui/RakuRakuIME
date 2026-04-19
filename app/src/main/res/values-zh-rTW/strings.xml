@@ -43,4 +43,26 @@
     <string name="settings_about_inventor">輸入法發明人：高衡緒</string>
     <string name="settings_about_org">機構：輕鬆資訊企業社（已停止營運）</string>
     <string name="settings_about_license">本應用程式依 GPLv3+ 授權</string>
+
+    <!-- TalkBack 鍵盤按鍵描述 -->
+    <string name="a11y_key_shift">上檔鍵</string>
+    <string name="a11y_key_caps_lock">大寫鎖定</string>
+    <string name="a11y_key_backspace">退格鍵</string>
+    <string name="a11y_key_enter">換行鍵</string>
+    <string name="a11y_key_space">空白鍵</string>
+    <string name="a11y_key_switch_ime">切換輸入法</string>
+    <string name="a11y_key_mode_to_english">切換至英文輸入</string>
+    <string name="a11y_key_mode_to_numbers">切換至數字輸入</string>
+    <string name="a11y_key_mode_to_emoji">切換至表情符號</string>
+    <string name="a11y_key_mode_to_chinese">切換回中文輸入</string>
+    <string name="a11y_candidate_prev_page">上一頁候選字</string>
+    <string name="a11y_candidate_next_page">下一頁候選字</string>
+    <string name="a11y_emoji_tab_smileys">表情</string>
+    <string name="a11y_emoji_tab_gestures">手勢</string>
+    <string name="a11y_emoji_tab_animals">動物</string>
+    <string name="a11y_emoji_tab_food">食物</string>
+    <string name="a11y_emoji_tab_travel">旅行</string>
+    <string name="a11y_emoji_tab_activities">活動</string>
+    <string name="a11y_emoji_tab_objects">物品</string>
+    <string name="a11y_emoji_tab_symbols">符號</string>
 </resources>

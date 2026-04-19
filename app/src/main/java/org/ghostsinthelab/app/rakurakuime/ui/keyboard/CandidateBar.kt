@@ -27,9 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 
 @Composable
@@ -52,11 +58,16 @@ fun CandidateBar(
     ) {
         // Prev button
         if (hasPrev) {
+            val prevDescription = stringResource(R.string.a11y_candidate_prev_page)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clickable { onPrevPage() }
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 12.dp)
+                    .semantics {
+                        contentDescription = prevDescription
+                        role = Role.Button
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "◀", color = colors.candidateTextColor, fontWeight = FontWeight.Bold)
@@ -96,11 +107,16 @@ fun CandidateBar(
 
         // Next button
         if (hasNext) {
+            val nextDescription = stringResource(R.string.a11y_candidate_next_page)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clickable { onNextPage() }
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 12.dp)
+                    .semantics {
+                        contentDescription = nextDescription
+                        role = Role.Button
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "▶", color = colors.candidateTextColor, fontWeight = FontWeight.Bold)

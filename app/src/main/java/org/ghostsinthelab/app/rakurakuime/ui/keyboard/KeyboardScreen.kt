@@ -33,7 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.data.EmojiDictionary
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
@@ -223,12 +225,17 @@ fun KeyboardScreen(
                             if (rowIndex == EnglishLayout.SHIFT_ROW_INDEX) {
                                 val shiftLabel = if (shiftState == ShiftState.CAPS_LOCK) "⇪" else "⇧"
                                 val shiftActive = shiftState != ShiftState.NONE
+                                val shiftDescription = stringResource(
+                                    if (shiftState == ShiftState.CAPS_LOCK) R.string.a11y_key_caps_lock
+                                    else R.string.a11y_key_shift
+                                )
                                 KeyButton(
                                     keyDef = KeyDefinition(shiftLabel),
                                     modifier = Modifier.weight(EnglishLayout.SHIFT_WEIGHT),
                                     keyHeight = scaledKeyHeight,
                                     backgroundColorOverride = if (shiftActive) colors.functionKeyBackground else colors.keyBackground,
                                     textColorOverride = if (shiftActive) colors.functionKeyTextColor else colors.keyTextColor,
+                                    contentDescription = shiftDescription,
                                     onClick = {
                                         onKeyPress()
                                         viewModel.toggleShift()
@@ -319,12 +326,25 @@ fun KeyboardScreen(
                     ) {
                         categories.forEachIndexed { index, category ->
                             val isSelected = emojiCategory == index
+                            val tabDescription = stringResource(
+                                when (index) {
+                                    0 -> R.string.a11y_emoji_tab_smileys
+                                    1 -> R.string.a11y_emoji_tab_gestures
+                                    2 -> R.string.a11y_emoji_tab_animals
+                                    3 -> R.string.a11y_emoji_tab_food
+                                    4 -> R.string.a11y_emoji_tab_travel
+                                    5 -> R.string.a11y_emoji_tab_activities
+                                    6 -> R.string.a11y_emoji_tab_objects
+                                    else -> R.string.a11y_emoji_tab_symbols
+                                }
+                            )
                             KeyButton(
                                 keyDef = KeyDefinition(category.tabIcon),
                                 modifier = Modifier.weight(1f).padding(horizontal = 2.dp),
                                 keyHeight = tabRowHeight,
                                 backgroundColorOverride = if (isSelected) colors.functionKeyBackground else colors.keyBackground,
                                 textColorOverride = if (isSelected) colors.functionKeyTextColor else colors.keyTextColor,
+                                contentDescription = tabDescription,
                                 onClick = { viewModel.setEmojiCategory(index) }
                             )
                         }

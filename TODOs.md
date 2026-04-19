@@ -3,9 +3,6 @@
 Outstanding work for RakuRaku IME. Completed items have been cleaned
 out — see `git log` for the full history of what's landed.
 
-## System & Settings
-- [ ] **Accessibility (TalkBack):** Add comprehensive `semantics` labels for candidates, roots, and function keys.
-
 ## Code Review & Security Audit (2026-04-19)
 
 Remaining Low/Informational items from the 2026-04-19 audit pass.

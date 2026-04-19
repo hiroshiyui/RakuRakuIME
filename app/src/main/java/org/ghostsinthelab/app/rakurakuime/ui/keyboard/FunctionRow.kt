@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 
@@ -55,12 +57,19 @@ fun FunctionRow(
             InputMode.NUMBER -> KeyDefinition("\uD83D\uDE00") // 😀
             InputMode.EMOJI -> KeyDefinition("中")
         }
+        val modeKeyDescription = when (inputMode) {
+            InputMode.EZ -> stringResource(R.string.a11y_key_mode_to_english)
+            InputMode.ENGLISH -> stringResource(R.string.a11y_key_mode_to_numbers)
+            InputMode.NUMBER -> stringResource(R.string.a11y_key_mode_to_emoji)
+            InputMode.EMOJI -> stringResource(R.string.a11y_key_mode_to_chinese)
+        }
         KeyButton(
             keyDef = modeKeyDef,
             modifier = Modifier.weight(1.5f),
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
+            contentDescription = modeKeyDescription,
             onClick = {
                 val next = when (inputMode) {
                     InputMode.EZ -> InputMode.ENGLISH
@@ -79,6 +88,7 @@ fun FunctionRow(
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
+            contentDescription = stringResource(R.string.a11y_key_switch_ime),
             onClick = onSwitchIme
         )
 
@@ -92,6 +102,7 @@ fun FunctionRow(
             modifier = Modifier.weight(4f),
             keyHeight = keyHeight,
             rootLabelAlignment = Alignment.BottomCenter,
+            contentDescription = stringResource(R.string.a11y_key_space),
             onClick = onSpace
         )
 
@@ -106,6 +117,7 @@ fun FunctionRow(
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
+            contentDescription = stringResource(R.string.a11y_key_backspace),
             onClick = onBackspace
         )
 
@@ -116,6 +128,7 @@ fun FunctionRow(
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
+            contentDescription = stringResource(R.string.a11y_key_enter),
             onClick = onEnter
         )
     }

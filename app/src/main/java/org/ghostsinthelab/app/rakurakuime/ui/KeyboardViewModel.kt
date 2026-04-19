@@ -312,8 +312,13 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 return@launch
             }
 
-            // Fetch all possible completions starting with this prefix
-            val allPossible = db.dictionaryDao().getCharactersByPrefix("$keystroke*")
+            // Fetch all possible completions starting with this prefix.
+            // FTS4 MATCH reserves "-", """, ":", "()", "*" — some EZ keystrokes
+            // (e.g. the "-" root) can produce invalid MATCH patterns; we treat
+            // any SQLite error as "no completions" rather than crashing.
+            val allPossible = runCatching {
+                db.dictionaryDao().getCharactersByPrefix("$keystroke*")
+            }.getOrElse { emptyList() }
 
             if (allPossible.size == 1) {
                 // Only one possible character or phrase exists for this sequence and its extensions.
@@ -343,9 +348,8 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     fun selectCandidate(candidate: String): String {
         val currentRoots = _composingText.value
         viewModelScope.launch {
-            // Increment frequency for the selected candidate
-            // We pass currentRoots as the prefix to help narrow down which mapping was intended
-            db.dictionaryDao().incrementFrequency(candidate, exactKeystroke = currentRoots, prefix = currentRoots)
+            // Increment frequency for the exact keystroke the user committed on.
+            db.dictionaryDao().incrementFrequencyExact(candidate, keystroke = currentRoots)
         }
         
         val newPreEdit = _preEditBuffer.value + candidate

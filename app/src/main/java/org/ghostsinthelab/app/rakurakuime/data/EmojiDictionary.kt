@@ -59,23 +59,25 @@ object EmojiDictionary {
         }
     }
 
-    private fun parse(context: Context): List<Category> {
+    // Parsing uses opt* throughout and catches at the outer boundary so a
+    // corrupt / truncated asset degrades to "no emoji categories" instead of
+    // crashing the IME's first entry into EMOJI mode.
+    private fun parse(context: Context): List<Category> = runCatching {
         val text = context.assets.open(ASSET_NAME).bufferedReader().use { it.readText() }
-        val root = JSONObject(text)
-        val layouts = root.getJSONObject("layouts")
-        return CATEGORY_ORDER.mapNotNull { (name, icon) ->
+        val layouts = JSONObject(text).optJSONObject("layouts") ?: return@runCatching emptyList()
+        CATEGORY_ORDER.mapNotNull { (name, icon) ->
             val layout = layouts.optJSONObject(name) ?: return@mapNotNull null
-            val rows = layout.getJSONArray("rows")
+            val rows = layout.optJSONArray("rows") ?: return@mapNotNull null
             val emojis = ArrayList<String>()
             for (i in 0 until rows.length()) {
-                val keys = rows.getJSONObject(i).getJSONArray("keys")
+                val keys = rows.optJSONObject(i)?.optJSONArray("keys") ?: continue
                 for (j in 0 until keys.length()) {
-                    val key = keys.getJSONObject(j)
+                    val key = keys.optJSONObject(j) ?: continue
                     if (key.has("switchLayout")) continue
                     key.optString("output").takeIf { it.isNotEmpty() }?.let(emojis::add)
                 }
             }
             Category(tabIcon = icon, emojis = emojis)
         }
-    }
+    }.getOrElse { emptyList() }
 }

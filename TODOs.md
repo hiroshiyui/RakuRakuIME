@@ -86,7 +86,7 @@ observed issue, user-visible impact, and the fix direction.
 
 ### Medium
 
-- [ ] **M1 — Unguarded JSON parse in `EmojiDictionary.parse`**
+- [x] **M1 — Unguarded JSON parse in `EmojiDictionary.parse`**
     - **File:** `data/EmojiDictionary.kt:62-77`.
     - **Issue:** `root.getJSONObject("layouts")`, inner
       `.getJSONArray("rows")`, `.getJSONObject(i)` all throw
@@ -101,7 +101,7 @@ observed issue, user-visible impact, and the fix direction.
       `optJSONObject` / `optJSONArray` and return `emptyList()` on the
       unexpected-schema path. Log the exception in debug builds.
 
-- [ ] **M2 — Hash/parse ordering leaves a small redundant-work window on crash**
+- [x] **M2 — Hash/parse ordering leaves a small redundant-work window on crash**
     - **File:** `data/CinParser.kt:34-56`.
     - **Issue:** Order is `clearAll()` → `parseAndPopulate()` →
       `prefs.edit { putString(KEY_ASSET_HASH, currentHash) }`. If the
@@ -117,7 +117,7 @@ observed issue, user-visible impact, and the fix direction.
       force a reimport. Or simply swap the order — write hash first,
       delete it on a parse failure.
 
-- [ ] **M3 — `DictionaryDao.incrementFrequency` compound WHERE hides intent**
+- [x] **M3 — `DictionaryDao.incrementFrequency` compound WHERE hides intent**
     - **File:** `data/DictionaryDao.kt:50-51`.
     - **Issue:** The clause
       `(keystroke = :exactKeystroke OR (keystroke LIKE :prefix || '%' AND :exactKeystroke = ''))`
@@ -130,7 +130,7 @@ observed issue, user-visible impact, and the fix direction.
       and `incrementFrequencyByPrefix(character, prefix)`. Update the
       two call sites in `KeyboardViewModel.selectCandidate`.
 
-- [ ] **M4 — FTS4 MATCH accepts any caller-supplied pattern**
+- [x] **M4 — FTS4 MATCH accepts any caller-supplied pattern**
     - **File:** `data/DictionaryDao.kt:31-39`.
     - **Issue:** `dictionary_fts.keystroke MATCH :query` is today only
       called with `"$keystroke*"` from internal state, but there is no

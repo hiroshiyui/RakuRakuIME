@@ -1,4 +1,4 @@
-# RakuRaku IME (輕鬆輸入法 for Android)
+# RakuRaku IME 新修輕鬆輸入法
 
 An Android Input Method Editor (IME) for the **EZ Input Method** (輕鬆輸入法), built with Jetpack Compose and Room Database.
 

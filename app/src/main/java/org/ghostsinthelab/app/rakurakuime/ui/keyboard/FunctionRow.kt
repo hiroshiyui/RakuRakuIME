@@ -86,9 +86,9 @@ fun FunctionRow(
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // Space
+        // Space — label is U+2423 OPEN BOX.
         KeyButton(
-            keyDef = KeyDefinition(" ", "Space"),
+            keyDef = KeyDefinition(" ", "\u2423"),
             modifier = Modifier.weight(4f),
             keyHeight = keyHeight,
             rootLabelAlignment = Alignment.BottomCenter,

@@ -29,16 +29,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.ghostsinthelab.app.rakurakuime.data.EnglishDictionary
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
 
 enum class InputMode {
-    EZ, SYMBOL, NUMBER
+    EZ, NUMBER, ENGLISH, EMOJI
 }
 
 class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
     private val db = ImeDatabase.getDatabase(application)
     private val userPreferences = UserPreferences(application)
+    private val appContext = application.applicationContext
 
     val vibrationEnabled = userPreferences.vibrationEnabled
     val vibrationIntensity = userPreferences.vibrationIntensity
@@ -49,12 +51,19 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private val _inputMode = MutableStateFlow(InputMode.EZ)
     val inputMode: StateFlow<InputMode> = _inputMode.asStateFlow()
 
-    private val _symbolCategory = MutableStateFlow(0)
-    val symbolCategory: StateFlow<Int> = _symbolCategory.asStateFlow()
+    private val _emojiCategory = MutableStateFlow(0)
+    val emojiCategory: StateFlow<Int> = _emojiCategory.asStateFlow()
 
-    fun setSymbolCategory(index: Int) {
-        _symbolCategory.value = index
+    fun setEmojiCategory(index: Int) {
+        _emojiCategory.value = index
     }
+
+    // English prediction state.
+    private val _englishBuffer = MutableStateFlow("")
+    val englishBuffer: StateFlow<String> = _englishBuffer.asStateFlow()
+
+    private val _englishCandidates = MutableStateFlow<List<String>>(emptyList())
+    val englishCandidates: StateFlow<List<String>> = _englishCandidates.asStateFlow()
 
     private val _isShifted = MutableStateFlow(false)
     val isShifted: StateFlow<Boolean> = _isShifted.asStateFlow()
@@ -120,6 +129,75 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _inputMode.value = mode
         if (mode != InputMode.EZ) {
             clearComposing()
+        }
+        if (mode != InputMode.ENGLISH) {
+            clearEnglishBuffer()
+        }
+    }
+
+    private var englishUpdateJob: kotlinx.coroutines.Job? = null
+
+    fun onEnglishKeyPress(char: String) {
+        val newBuffer = _englishBuffer.value + char
+        _englishBuffer.value = newBuffer
+        onUpdateComposingText?.invoke(newBuffer)
+        updateEnglishCandidates(newBuffer)
+    }
+
+    fun onEnglishBackspace(): Boolean {
+        if (_englishBuffer.value.isEmpty()) return false
+        val newBuffer = _englishBuffer.value.dropLast(1)
+        _englishBuffer.value = newBuffer
+        onUpdateComposingText?.invoke(newBuffer)
+        if (newBuffer.isEmpty()) {
+            _englishCandidates.value = emptyList()
+            englishUpdateJob?.cancel()
+        } else {
+            updateEnglishCandidates(newBuffer)
+        }
+        return true
+    }
+
+    /**
+     * Takes the English buffer as-is for commit and clears state. The caller
+     * is expected to push the returned text (plus any trailing separator)
+     * into the input connection.
+     */
+    fun commitEnglishBuffer(): String {
+        val text = _englishBuffer.value
+        clearEnglishBuffer()
+        return text
+    }
+
+    /**
+     * Clears the buffer and returns the candidate string with the case of the
+     * first character matched to what the user had typed (so `H` -> `Hello`,
+     * `he` -> `hello`). Further learning/frequency logic could hook in here.
+     */
+    fun selectEnglishCandidate(word: String): String {
+        val leading = _englishBuffer.value.firstOrNull()
+        val cased = if (leading != null && leading.isUpperCase() && word.isNotEmpty()) {
+            word.first().uppercase() + word.drop(1)
+        } else {
+            word
+        }
+        clearEnglishBuffer()
+        return cased
+    }
+
+    private fun clearEnglishBuffer() {
+        englishUpdateJob?.cancel()
+        if (_englishBuffer.value.isNotEmpty()) {
+            _englishBuffer.value = ""
+            onUpdateComposingText?.invoke("")
+        }
+        _englishCandidates.value = emptyList()
+    }
+
+    private fun updateEnglishCandidates(prefix: String) {
+        englishUpdateJob?.cancel()
+        englishUpdateJob = viewModelScope.launch {
+            _englishCandidates.value = EnglishDictionary.prefixLookup(appContext, prefix)
         }
     }
 

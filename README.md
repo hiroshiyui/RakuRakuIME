@@ -9,6 +9,16 @@ The dictionary mapping data included in this project (`ezbig.utf-8.cin`) is the 
 - **Original Author:** 高衡緒
 - **Organization:** 輕鬆資訊企業社
 
+The English word list used for word prediction (`google_10k_english.txt`) is
+Josh Kaufman's *Google 10000 English* corpus, derived from the Google Web
+Trillion Word Corpus and distributed under the MIT License. Source:
+https://github.com/first20hours/google-10000-english
+
+The emoji category layout (`emoji.json`) is adapted from the *MeaninglessKeyboard*
+project by the Meaningless Keyboard Project and redistributed here under the
+GNU General Public License v3.0. Source:
+https://github.com/hiroshiyui/MeaninglessKeyboard
+
 ## Licensing
 
 ### Application

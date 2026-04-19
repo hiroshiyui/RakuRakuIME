@@ -1,0 +1,696 @@
+{
+  "name": "Emoji",
+  "author": "Meaningless Keyboard Project",
+  "version": 1,
+  "defaultLayout": "smileys",
+  "layouts": {
+    "smileys": {
+      "rows": [
+        { "keys": [
+          { "label": "😀", "output": "😀" }, { "label": "😃", "output": "😃" }, { "label": "😄", "output": "😄" }, { "label": "😁", "output": "😁" },
+          { "label": "😆", "output": "😆" }, { "label": "😅", "output": "😅" }, { "label": "🤣", "output": "🤣" }, { "label": "😂", "output": "😂" }
+        ]},
+        { "keys": [
+          { "label": "🙂", "output": "🙂" }, { "label": "🙃", "output": "🙃" }, { "label": "😉", "output": "😉" }, { "label": "😊", "output": "😊" },
+          { "label": "😇", "output": "😇" }, { "label": "🥰", "output": "🥰" }, { "label": "😍", "output": "😍" }, { "label": "🤩", "output": "🤩" }
+        ]},
+        { "keys": [
+          { "label": "😘", "output": "😘" }, { "label": "😗", "output": "😗" }, { "label": "☺", "output": "☺" }, { "label": "😚", "output": "😚" },
+          { "label": "😙", "output": "😙" }, { "label": "🥲", "output": "🥲" }, { "label": "😋", "output": "😋" }, { "label": "😛", "output": "😛" }
+        ]},
+        { "keys": [
+          { "label": "😜", "output": "😜" }, { "label": "🤪", "output": "🤪" }, { "label": "😝", "output": "😝" }, { "label": "🤑", "output": "🤑" },
+          { "label": "🤗", "output": "🤗" }, { "label": "🤭", "output": "🤭" }, { "label": "🤫", "output": "🤫" }, { "label": "🤔", "output": "🤔" }
+        ]},
+        { "keys": [
+          { "label": "🤐", "output": "🤐" }, { "label": "🤨", "output": "🤨" }, { "label": "😐", "output": "😐" }, { "label": "😑", "output": "😑" },
+          { "label": "😶", "output": "😶" }, { "label": "🫥", "output": "🫥" }, { "label": "😏", "output": "😏" }, { "label": "😒", "output": "😒" }
+        ]},
+        { "keys": [
+          { "label": "🙄", "output": "🙄" }, { "label": "😬", "output": "😬" }, { "label": "🤥", "output": "🤥" }, { "label": "🫠", "output": "🫠" },
+          { "label": "😌", "output": "😌" }, { "label": "😔", "output": "😔" }, { "label": "😪", "output": "😪" }, { "label": "🤤", "output": "🤤" }
+        ]},
+        { "keys": [
+          { "label": "😴", "output": "😴" }, { "label": "😷", "output": "😷" }, { "label": "🤒", "output": "🤒" }, { "label": "🤕", "output": "🤕" },
+          { "label": "🤢", "output": "🤢" }, { "label": "🤮", "output": "🤮" }, { "label": "🥴", "output": "🥴" }, { "label": "😵", "output": "😵" }
+        ]},
+        { "keys": [
+          { "label": "🤯", "output": "🤯" }, { "label": "🥳", "output": "🥳" }, { "label": "🥸", "output": "🥸" }, { "label": "😎", "output": "😎" },
+          { "label": "🤓", "output": "🤓" }, { "label": "🧐", "output": "🧐" }, { "label": "😕", "output": "😕" }, { "label": "🫤", "output": "🫤" }
+        ]},
+        { "keys": [
+          { "label": "😟", "output": "😟" }, { "label": "🙁", "output": "🙁" }, { "label": "☹", "output": "☹" }, { "label": "😮", "output": "😮" },
+          { "label": "😯", "output": "😯" }, { "label": "😲", "output": "😲" }, { "label": "😳", "output": "😳" }, { "label": "🥺", "output": "🥺" }
+        ]},
+        { "keys": [
+          { "label": "🥹", "output": "🥹" }, { "label": "😦", "output": "😦" }, { "label": "😧", "output": "😧" }, { "label": "😨", "output": "😨" },
+          { "label": "😰", "output": "😰" }, { "label": "😥", "output": "😥" }, { "label": "😢", "output": "😢" }, { "label": "😭", "output": "😭" }
+        ]},
+        { "keys": [
+          { "label": "😱", "output": "😱" }, { "label": "😖", "output": "😖" }, { "label": "😣", "output": "😣" }, { "label": "😞", "output": "😞" },
+          { "label": "😓", "output": "😓" }, { "label": "😩", "output": "😩" }, { "label": "😫", "output": "😫" }, { "label": "🥱", "output": "🥱" }
+        ]},
+        { "keys": [
+          { "label": "😤", "output": "😤" }, { "label": "😡", "output": "😡" }, { "label": "😠", "output": "😠" }, { "label": "🤬", "output": "🤬" },
+          { "label": "😈", "output": "😈" }, { "label": "👿", "output": "👿" }, { "label": "💀", "output": "💀" }, { "label": "☠", "output": "☠" }
+        ]},
+        { "keys": [
+          { "label": "💩", "output": "💩" }, { "label": "🤡", "output": "🤡" }, { "label": "👹", "output": "👹" }, { "label": "👺", "output": "👺" },
+          { "label": "👻", "output": "👻" }, { "label": "👽", "output": "👽" }, { "label": "👾", "output": "👾" }, { "label": "🤖", "output": "🤖" }
+        ]},
+        { "keys": [
+          { "label": "😺", "output": "😺" }, { "label": "😸", "output": "😸" }, { "label": "😹", "output": "😹" }, { "label": "😻", "output": "😻" },
+          { "label": "😼", "output": "😼" }, { "label": "😽", "output": "😽" }, { "label": "🙀", "output": "🙀" }, { "label": "😿", "output": "😿" }
+        ]},
+        { "keys": [
+          { "label": "😾", "output": "😾" }, { "label": "🙈", "output": "🙈" }, { "label": "🙉", "output": "🙉" }, { "label": "🙊", "output": "🙊" },
+          { "label": "💋", "output": "💋" }, { "label": "💌", "output": "💌" }, { "label": "💘", "output": "💘" }, { "label": "💝", "output": "💝" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "gestures": {
+      "rows": [
+        { "keys": [
+          { "label": "👋", "output": "👋" }, { "label": "🤚", "output": "🤚" }, { "label": "🖐", "output": "🖐" }, { "label": "✋", "output": "✋" },
+          { "label": "🖖", "output": "🖖" }, { "label": "🫱", "output": "🫱" }, { "label": "🫲", "output": "🫲" }, { "label": "🫳", "output": "🫳" }
+        ]},
+        { "keys": [
+          { "label": "🫴", "output": "🫴" }, { "label": "👌", "output": "👌" }, { "label": "🤌", "output": "🤌" }, { "label": "🤏", "output": "🤏" },
+          { "label": "✌", "output": "✌" }, { "label": "🤞", "output": "🤞" }, { "label": "🫰", "output": "🫰" }, { "label": "🤟", "output": "🤟" }
+        ]},
+        { "keys": [
+          { "label": "🤘", "output": "🤘" }, { "label": "🤙", "output": "🤙" }, { "label": "👈", "output": "👈" }, { "label": "👉", "output": "👉" },
+          { "label": "👆", "output": "👆" }, { "label": "🖕", "output": "🖕" }, { "label": "👇", "output": "👇" }, { "label": "☝", "output": "☝" }
+        ]},
+        { "keys": [
+          { "label": "🫵", "output": "🫵" }, { "label": "👍", "output": "👍" }, { "label": "👎", "output": "👎" }, { "label": "✊", "output": "✊" },
+          { "label": "👊", "output": "👊" }, { "label": "🤛", "output": "🤛" }, { "label": "🤜", "output": "🤜" }, { "label": "👏", "output": "👏" }
+        ]},
+        { "keys": [
+          { "label": "🙌", "output": "🙌" }, { "label": "🫶", "output": "🫶" }, { "label": "👐", "output": "👐" }, { "label": "🤲", "output": "🤲" },
+          { "label": "🤝", "output": "🤝" }, { "label": "🙏", "output": "🙏" }, { "label": "✍", "output": "✍" }, { "label": "💅", "output": "💅" }
+        ]},
+        { "keys": [
+          { "label": "🤳", "output": "🤳" }, { "label": "💪", "output": "💪" }, { "label": "🦾", "output": "🦾" }, { "label": "🦿", "output": "🦿" },
+          { "label": "🦵", "output": "🦵" }, { "label": "🦶", "output": "🦶" }, { "label": "👂", "output": "👂" }, { "label": "🦻", "output": "🦻" }
+        ]},
+        { "keys": [
+          { "label": "👃", "output": "👃" }, { "label": "👁", "output": "👁" }, { "label": "👀", "output": "👀" }, { "label": "🫀", "output": "🫀" },
+          { "label": "🫁", "output": "🫁" }, { "label": "🧠", "output": "🧠" }, { "label": "🦷", "output": "🦷" }, { "label": "🦴", "output": "🦴" }
+        ]},
+        { "keys": [
+          { "label": "👄", "output": "👄" }, { "label": "🫦", "output": "🫦" }, { "label": "👅", "output": "👅" }, { "label": "🩸", "output": "🩸" },
+          { "label": "👶", "output": "👶" }, { "label": "👧", "output": "👧" }, { "label": "🧒", "output": "🧒" }, { "label": "👦", "output": "👦" }
+        ]},
+        { "keys": [
+          { "label": "👩", "output": "👩" }, { "label": "🧑", "output": "🧑" }, { "label": "👨", "output": "👨" }, { "label": "👴", "output": "👴" },
+          { "label": "👵", "output": "👵" }, { "label": "🧓", "output": "🧓" }, { "label": "👼", "output": "👼" }, { "label": "💂", "output": "💂" }
+        ]},
+        { "keys": [
+          { "label": "🤴", "output": "🤴" }, { "label": "👸", "output": "👸" }, { "label": "🧕", "output": "🧕" }, { "label": "🤵", "output": "🤵" },
+          { "label": "👰", "output": "👰" }, { "label": "🤰", "output": "🤰" }, { "label": "🫃", "output": "🫃" }, { "label": "🫄", "output": "🫄" }
+        ]},
+        { "keys": [
+          { "label": "🧙", "output": "🧙" }, { "label": "🧚", "output": "🧚" }, { "label": "🧛", "output": "🧛" }, { "label": "🧜", "output": "🧜" },
+          { "label": "🧝", "output": "🧝" }, { "label": "🧞", "output": "🧞" }, { "label": "🧟", "output": "🧟" }, { "label": "🦸", "output": "🦸" }
+        ]},
+        { "keys": [
+          { "label": "🦹", "output": "🦹" }, { "label": "🥷", "output": "🥷" }, { "label": "🎅", "output": "🎅" }, { "label": "🤶", "output": "🤶" },
+          { "label": "💆", "output": "💆" }, { "label": "💇", "output": "💇" }, { "label": "🚶", "output": "🚶" }, { "label": "🧍", "output": "🧍" }
+        ]},
+        { "keys": [
+          { "label": "🧎", "output": "🧎" }, { "label": "🏃", "output": "🏃" }, { "label": "💃", "output": "💃" }, { "label": "🕺", "output": "🕺" },
+          { "label": "👯", "output": "👯" }, { "label": "🧖", "output": "🧖" }, { "label": "🧗", "output": "🧗" }, { "label": "🤸", "output": "🤸" }
+        ]},
+        { "keys": [
+          { "label": "⛹", "output": "⛹" }, { "label": "🏋", "output": "🏋" }, { "label": "🤼", "output": "🤼" }, { "label": "🤽", "output": "🤽" },
+          { "label": "🤾", "output": "🤾" }, { "label": "🤺", "output": "🤺" }, { "label": "🏌", "output": "🏌" }, { "label": "🏇", "output": "🏇" }
+        ]},
+        { "keys": [
+          { "label": "🏊", "output": "🏊" }, { "label": "🏄", "output": "🏄" }, { "label": "🚣", "output": "🚣" }, { "label": "🧘", "output": "🧘" },
+          { "label": "🛀", "output": "🛀" }, { "label": "🛌", "output": "🛌" }, { "label": "👫", "output": "👫" }, { "label": "👬", "output": "👬" }
+        ]},
+        { "keys": [
+          { "label": "👭", "output": "👭" }, { "label": "💏", "output": "💏" }, { "label": "💑", "output": "💑" }, { "label": "👪", "output": "👪" },
+          { "label": "🗣", "output": "🗣" }, { "label": "👤", "output": "👤" }, { "label": "👥", "output": "👥" }, { "label": "🫂", "output": "🫂" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "animals": {
+      "rows": [
+        { "keys": [
+          { "label": "🐶", "output": "🐶" }, { "label": "🐱", "output": "🐱" }, { "label": "🐭", "output": "🐭" }, { "label": "🐹", "output": "🐹" },
+          { "label": "🐰", "output": "🐰" }, { "label": "🦊", "output": "🦊" }, { "label": "🐻", "output": "🐻" }, { "label": "🐼", "output": "🐼" }
+        ]},
+        { "keys": [
+          { "label": "🐻‍❄️", "output": "🐻‍❄️" }, { "label": "🐨", "output": "🐨" }, { "label": "🐯", "output": "🐯" }, { "label": "🦁", "output": "🦁" },
+          { "label": "🐮", "output": "🐮" }, { "label": "🐷", "output": "🐷" }, { "label": "🐽", "output": "🐽" }, { "label": "🐸", "output": "🐸" }
+        ]},
+        { "keys": [
+          { "label": "🐵", "output": "🐵" }, { "label": "🐒", "output": "🐒" }, { "label": "🦍", "output": "🦍" }, { "label": "🦧", "output": "🦧" },
+          { "label": "🐕", "output": "🐕" }, { "label": "🐩", "output": "🐩" }, { "label": "🐺", "output": "🐺" }, { "label": "🦝", "output": "🦝" }
+        ]},
+        { "keys": [
+          { "label": "🐈", "output": "🐈" }, { "label": "🐅", "output": "🐅" }, { "label": "🐆", "output": "🐆" }, { "label": "🐴", "output": "🐴" },
+          { "label": "🐎", "output": "🐎" }, { "label": "🦄", "output": "🦄" }, { "label": "🦓", "output": "🦓" }, { "label": "🦌", "output": "🦌" }
+        ]},
+        { "keys": [
+          { "label": "🦬", "output": "🦬" }, { "label": "🐂", "output": "🐂" }, { "label": "🐃", "output": "🐃" }, { "label": "🐄", "output": "🐄" },
+          { "label": "🐖", "output": "🐖" }, { "label": "🐗", "output": "🐗" }, { "label": "🐏", "output": "🐏" }, { "label": "🐑", "output": "🐑" }
+        ]},
+        { "keys": [
+          { "label": "🐐", "output": "🐐" }, { "label": "🐪", "output": "🐪" }, { "label": "🐫", "output": "🐫" }, { "label": "🦙", "output": "🦙" },
+          { "label": "🦒", "output": "🦒" }, { "label": "🐘", "output": "🐘" }, { "label": "🦣", "output": "🦣" }, { "label": "🦏", "output": "🦏" }
+        ]},
+        { "keys": [
+          { "label": "🦛", "output": "🦛" }, { "label": "🐁", "output": "🐁" }, { "label": "🐀", "output": "🐀" }, { "label": "🐇", "output": "🐇" },
+          { "label": "🐿", "output": "🐿" }, { "label": "🦫", "output": "🦫" }, { "label": "🦔", "output": "🦔" }, { "label": "🦇", "output": "🦇" }
+        ]},
+        { "keys": [
+          { "label": "🦥", "output": "🦥" }, { "label": "🦦", "output": "🦦" }, { "label": "🦨", "output": "🦨" }, { "label": "🦘", "output": "🦘" },
+          { "label": "🦡", "output": "🦡" }, { "label": "🐾", "output": "🐾" }, { "label": "🦃", "output": "🦃" }, { "label": "🐔", "output": "🐔" }
+        ]},
+        { "keys": [
+          { "label": "🐓", "output": "🐓" }, { "label": "🐣", "output": "🐣" }, { "label": "🐤", "output": "🐤" }, { "label": "🐥", "output": "🐥" },
+          { "label": "🐦", "output": "🐦" }, { "label": "🐧", "output": "🐧" }, { "label": "🕊", "output": "🕊" }, { "label": "🦅", "output": "🦅" }
+        ]},
+        { "keys": [
+          { "label": "🦆", "output": "🦆" }, { "label": "🦢", "output": "🦢" }, { "label": "🦉", "output": "🦉" }, { "label": "🦤", "output": "🦤" },
+          { "label": "🪶", "output": "🪶" }, { "label": "🦩", "output": "🦩" }, { "label": "🦚", "output": "🦚" }, { "label": "🦜", "output": "🦜" }
+        ]},
+        { "keys": [
+          { "label": "🪽", "output": "🪽" }, { "label": "🐊", "output": "🐊" }, { "label": "🐢", "output": "🐢" }, { "label": "🦎", "output": "🦎" },
+          { "label": "🐍", "output": "🐍" }, { "label": "🐲", "output": "🐲" }, { "label": "🐉", "output": "🐉" }, { "label": "🦕", "output": "🦕" }
+        ]},
+        { "keys": [
+          { "label": "🦖", "output": "🦖" }, { "label": "🐳", "output": "🐳" }, { "label": "🐋", "output": "🐋" }, { "label": "🐬", "output": "🐬" },
+          { "label": "🦭", "output": "🦭" }, { "label": "🐟", "output": "🐟" }, { "label": "🐠", "output": "🐠" }, { "label": "🐡", "output": "🐡" }
+        ]},
+        { "keys": [
+          { "label": "🦈", "output": "🦈" }, { "label": "🐙", "output": "🐙" }, { "label": "🐚", "output": "🐚" }, { "label": "🪸", "output": "🪸" },
+          { "label": "🐌", "output": "🐌" }, { "label": "🦋", "output": "🦋" }, { "label": "🐛", "output": "🐛" }, { "label": "🐜", "output": "🐜" }
+        ]},
+        { "keys": [
+          { "label": "🐝", "output": "🐝" }, { "label": "🪲", "output": "🪲" }, { "label": "🐞", "output": "🐞" }, { "label": "🦗", "output": "🦗" },
+          { "label": "🪳", "output": "🪳" }, { "label": "🕷", "output": "🕷" }, { "label": "🕸", "output": "🕸" }, { "label": "🦂", "output": "🦂" }
+        ]},
+        { "keys": [
+          { "label": "🦟", "output": "🦟" }, { "label": "🪰", "output": "🪰" }, { "label": "🪱", "output": "🪱" }, { "label": "🌸", "output": "🌸" },
+          { "label": "💮", "output": "💮" }, { "label": "🏵", "output": "🏵" }, { "label": "🌹", "output": "🌹" }, { "label": "🥀", "output": "🥀" }
+        ]},
+        { "keys": [
+          { "label": "🌺", "output": "🌺" }, { "label": "🌻", "output": "🌻" }, { "label": "🌼", "output": "🌼" }, { "label": "🌷", "output": "🌷" },
+          { "label": "🪷", "output": "🪷" }, { "label": "🌱", "output": "🌱" }, { "label": "🪴", "output": "🪴" }, { "label": "🌲", "output": "🌲" }
+        ]},
+        { "keys": [
+          { "label": "🌳", "output": "🌳" }, { "label": "🌴", "output": "🌴" }, { "label": "🌵", "output": "🌵" }, { "label": "🌾", "output": "🌾" },
+          { "label": "🌿", "output": "🌿" }, { "label": "☘", "output": "☘" }, { "label": "🍀", "output": "🍀" }, { "label": "🍁", "output": "🍁" }
+        ]},
+        { "keys": [
+          { "label": "🍂", "output": "🍂" }, { "label": "🍃", "output": "🍃" }, { "label": "🪹", "output": "🪹" }, { "label": "🪺", "output": "🪺" },
+          { "label": "🍄", "output": "🍄" }, { "label": "🌰", "output": "🌰" }, { "label": "🪨", "output": "🪨" }, { "label": "🪵", "output": "🪵" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "food": {
+      "rows": [
+        { "keys": [
+          { "label": "🍇", "output": "🍇" }, { "label": "🍈", "output": "🍈" }, { "label": "🍉", "output": "🍉" }, { "label": "🍊", "output": "🍊" },
+          { "label": "🍋", "output": "🍋" }, { "label": "🍌", "output": "🍌" }, { "label": "🍍", "output": "🍍" }, { "label": "🥭", "output": "🥭" }
+        ]},
+        { "keys": [
+          { "label": "🍎", "output": "🍎" }, { "label": "🍏", "output": "🍏" }, { "label": "🍐", "output": "🍐" }, { "label": "🍑", "output": "🍑" },
+          { "label": "🍒", "output": "🍒" }, { "label": "🍓", "output": "🍓" }, { "label": "🫐", "output": "🫐" }, { "label": "🥝", "output": "🥝" }
+        ]},
+        { "keys": [
+          { "label": "🍅", "output": "🍅" }, { "label": "🫒", "output": "🫒" }, { "label": "🥥", "output": "🥥" }, { "label": "🥑", "output": "🥑" },
+          { "label": "🍆", "output": "🍆" }, { "label": "🥔", "output": "🥔" }, { "label": "🥕", "output": "🥕" }, { "label": "🌽", "output": "🌽" }
+        ]},
+        { "keys": [
+          { "label": "🌶", "output": "🌶" }, { "label": "🫑", "output": "🫑" }, { "label": "🥒", "output": "🥒" }, { "label": "🥬", "output": "🥬" },
+          { "label": "🥦", "output": "🥦" }, { "label": "🧄", "output": "🧄" }, { "label": "🧅", "output": "🧅" }, { "label": "🍄", "output": "🍄" }
+        ]},
+        { "keys": [
+          { "label": "🥜", "output": "🥜" }, { "label": "🫘", "output": "🫘" }, { "label": "🌰", "output": "🌰" }, { "label": "🍞", "output": "🍞" },
+          { "label": "🥐", "output": "🥐" }, { "label": "🥖", "output": "🥖" }, { "label": "🫓", "output": "🫓" }, { "label": "🥨", "output": "🥨" }
+        ]},
+        { "keys": [
+          { "label": "🥯", "output": "🥯" }, { "label": "🥞", "output": "🥞" }, { "label": "🧇", "output": "🧇" }, { "label": "🧀", "output": "🧀" },
+          { "label": "🍖", "output": "🍖" }, { "label": "🍗", "output": "🍗" }, { "label": "🥩", "output": "🥩" }, { "label": "🥓", "output": "🥓" }
+        ]},
+        { "keys": [
+          { "label": "🍔", "output": "🍔" }, { "label": "🍟", "output": "🍟" }, { "label": "🍕", "output": "🍕" }, { "label": "🌭", "output": "🌭" },
+          { "label": "🥪", "output": "🥪" }, { "label": "🌮", "output": "🌮" }, { "label": "🌯", "output": "🌯" }, { "label": "🫔", "output": "🫔" }
+        ]},
+        { "keys": [
+          { "label": "🥙", "output": "🥙" }, { "label": "🧆", "output": "🧆" }, { "label": "🥚", "output": "🥚" }, { "label": "🍳", "output": "🍳" },
+          { "label": "🥘", "output": "🥘" }, { "label": "🍲", "output": "🍲" }, { "label": "🫕", "output": "🫕" }, { "label": "🥣", "output": "🥣" }
+        ]},
+        { "keys": [
+          { "label": "🥗", "output": "🥗" }, { "label": "🍿", "output": "🍿" }, { "label": "🧈", "output": "🧈" }, { "label": "🧂", "output": "🧂" },
+          { "label": "🥫", "output": "🥫" }, { "label": "🍱", "output": "🍱" }, { "label": "🍘", "output": "🍘" }, { "label": "🍙", "output": "🍙" }
+        ]},
+        { "keys": [
+          { "label": "🍚", "output": "🍚" }, { "label": "🍛", "output": "🍛" }, { "label": "🍜", "output": "🍜" }, { "label": "🍝", "output": "🍝" },
+          { "label": "🍠", "output": "🍠" }, { "label": "🍢", "output": "🍢" }, { "label": "🍣", "output": "🍣" }, { "label": "🍤", "output": "🍤" }
+        ]},
+        { "keys": [
+          { "label": "🍥", "output": "🍥" }, { "label": "🥮", "output": "🥮" }, { "label": "🍡", "output": "🍡" }, { "label": "🥟", "output": "🥟" },
+          { "label": "🥠", "output": "🥠" }, { "label": "🥡", "output": "🥡" }, { "label": "🦀", "output": "🦀" }, { "label": "🦞", "output": "🦞" }
+        ]},
+        { "keys": [
+          { "label": "🦐", "output": "🦐" }, { "label": "🦑", "output": "🦑" }, { "label": "🦪", "output": "🦪" }, { "label": "🍦", "output": "🍦" },
+          { "label": "🍧", "output": "🍧" }, { "label": "🍨", "output": "🍨" }, { "label": "🍩", "output": "🍩" }, { "label": "🍪", "output": "🍪" }
+        ]},
+        { "keys": [
+          { "label": "🎂", "output": "🎂" }, { "label": "🍰", "output": "🍰" }, { "label": "🧁", "output": "🧁" }, { "label": "🥧", "output": "🥧" },
+          { "label": "🍫", "output": "🍫" }, { "label": "🍬", "output": "🍬" }, { "label": "🍭", "output": "🍭" }, { "label": "🍮", "output": "🍮" }
+        ]},
+        { "keys": [
+          { "label": "🍯", "output": "🍯" }, { "label": "🍼", "output": "🍼" }, { "label": "🥛", "output": "🥛" }, { "label": "☕", "output": "☕" },
+          { "label": "🫖", "output": "🫖" }, { "label": "🍵", "output": "🍵" }, { "label": "🍶", "output": "🍶" }, { "label": "🍾", "output": "🍾" }
+        ]},
+        { "keys": [
+          { "label": "🍷", "output": "🍷" }, { "label": "🍸", "output": "🍸" }, { "label": "🍹", "output": "🍹" }, { "label": "🍺", "output": "🍺" },
+          { "label": "🍻", "output": "🍻" }, { "label": "🥂", "output": "🥂" }, { "label": "🥃", "output": "🥃" }, { "label": "🫗", "output": "🫗" }
+        ]},
+        { "keys": [
+          { "label": "🥤", "output": "🥤" }, { "label": "🧋", "output": "🧋" }, { "label": "🧃", "output": "🧃" }, { "label": "🧉", "output": "🧉" },
+          { "label": "🧊", "output": "🧊" }, { "label": "🥢", "output": "🥢" }, { "label": "🍽", "output": "🍽" }, { "label": "🍴", "output": "🍴" }
+        ]},
+        { "keys": [
+          { "label": "🥄", "output": "🥄" }, { "label": "🔪", "output": "🔪" }, { "label": "🫙", "output": "🫙" }, { "label": "🏺", "output": "🏺" },
+          { "label": "🧑‍🍳", "output": "🧑‍🍳" }, { "label": "🥡", "output": "🥡" }, { "label": "🫕", "output": "🫕" }, { "label": "🧆", "output": "🧆" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "travel": {
+      "rows": [
+        { "keys": [
+          { "label": "🚗", "output": "🚗" }, { "label": "🚕", "output": "🚕" }, { "label": "🚙", "output": "🚙" }, { "label": "🚌", "output": "🚌" },
+          { "label": "🚎", "output": "🚎" }, { "label": "🏎", "output": "🏎" }, { "label": "🚓", "output": "🚓" }, { "label": "🚑", "output": "🚑" }
+        ]},
+        { "keys": [
+          { "label": "🚒", "output": "🚒" }, { "label": "🚐", "output": "🚐" }, { "label": "🛻", "output": "🛻" }, { "label": "🚚", "output": "🚚" },
+          { "label": "🚛", "output": "🚛" }, { "label": "🚜", "output": "🚜" }, { "label": "🏍", "output": "🏍" }, { "label": "🛵", "output": "🛵" }
+        ]},
+        { "keys": [
+          { "label": "🦽", "output": "🦽" }, { "label": "🦼", "output": "🦼" }, { "label": "🛺", "output": "🛺" }, { "label": "🚲", "output": "🚲" },
+          { "label": "🛴", "output": "🛴" }, { "label": "🛹", "output": "🛹" }, { "label": "🛼", "output": "🛼" }, { "label": "🚏", "output": "🚏" }
+        ]},
+        { "keys": [
+          { "label": "🛣", "output": "🛣" }, { "label": "🛤", "output": "🛤" }, { "label": "🛞", "output": "🛞" }, { "label": "⛽", "output": "⛽" },
+          { "label": "🚨", "output": "🚨" }, { "label": "🚥", "output": "🚥" }, { "label": "🚦", "output": "🚦" }, { "label": "🛑", "output": "🛑" }
+        ]},
+        { "keys": [
+          { "label": "🚧", "output": "🚧" }, { "label": "⚓", "output": "⚓" }, { "label": "🛟", "output": "🛟" }, { "label": "⛵", "output": "⛵" },
+          { "label": "🚤", "output": "🚤" }, { "label": "🛳", "output": "🛳" }, { "label": "⛴", "output": "⛴" }, { "label": "🛥", "output": "🛥" }
+        ]},
+        { "keys": [
+          { "label": "🚢", "output": "🚢" }, { "label": "✈", "output": "✈" }, { "label": "🛩", "output": "🛩" }, { "label": "🛫", "output": "🛫" },
+          { "label": "🛬", "output": "🛬" }, { "label": "🪂", "output": "🪂" }, { "label": "💺", "output": "💺" }, { "label": "🚁", "output": "🚁" }
+        ]},
+        { "keys": [
+          { "label": "🚟", "output": "🚟" }, { "label": "🚠", "output": "🚠" }, { "label": "🚡", "output": "🚡" }, { "label": "🛰", "output": "🛰" },
+          { "label": "🚀", "output": "🚀" }, { "label": "🛸", "output": "🛸" }, { "label": "🧳", "output": "🧳" }, { "label": "🗺", "output": "🗺" }
+        ]},
+        { "keys": [
+          { "label": "🌍", "output": "🌍" }, { "label": "🌎", "output": "🌎" }, { "label": "🌏", "output": "🌏" }, { "label": "🧭", "output": "🧭" },
+          { "label": "🏔", "output": "🏔" }, { "label": "⛰", "output": "⛰" }, { "label": "🌋", "output": "🌋" }, { "label": "🗻", "output": "🗻" }
+        ]},
+        { "keys": [
+          { "label": "🏕", "output": "🏕" }, { "label": "🏖", "output": "🏖" }, { "label": "🏜", "output": "🏜" }, { "label": "🏝", "output": "🏝" },
+          { "label": "🏞", "output": "🏞" }, { "label": "🏟", "output": "🏟" }, { "label": "🏛", "output": "🏛" }, { "label": "🏗", "output": "🏗" }
+        ]},
+        { "keys": [
+          { "label": "🧱", "output": "🧱" }, { "label": "🛖", "output": "🛖" }, { "label": "🏘", "output": "🏘" }, { "label": "🏚", "output": "🏚" },
+          { "label": "🏠", "output": "🏠" }, { "label": "🏡", "output": "🏡" }, { "label": "🏢", "output": "🏢" }, { "label": "🏣", "output": "🏣" }
+        ]},
+        { "keys": [
+          { "label": "🏤", "output": "🏤" }, { "label": "🏥", "output": "🏥" }, { "label": "🏦", "output": "🏦" }, { "label": "🏨", "output": "🏨" },
+          { "label": "🏩", "output": "🏩" }, { "label": "🏪", "output": "🏪" }, { "label": "🏫", "output": "🏫" }, { "label": "🏬", "output": "🏬" }
+        ]},
+        { "keys": [
+          { "label": "🏭", "output": "🏭" }, { "label": "🏯", "output": "🏯" }, { "label": "🏰", "output": "🏰" }, { "label": "💒", "output": "💒" },
+          { "label": "🗼", "output": "🗼" }, { "label": "🗽", "output": "🗽" }, { "label": "⛪", "output": "⛪" }, { "label": "🕌", "output": "🕌" }
+        ]},
+        { "keys": [
+          { "label": "🛕", "output": "🛕" }, { "label": "🕍", "output": "🕍" }, { "label": "⛩", "output": "⛩" }, { "label": "🕋", "output": "🕋" },
+          { "label": "⛲", "output": "⛲" }, { "label": "⛺", "output": "⛺" }, { "label": "🌁", "output": "🌁" }, { "label": "🌃", "output": "🌃" }
+        ]},
+        { "keys": [
+          { "label": "🏙", "output": "🏙" }, { "label": "🌄", "output": "🌄" }, { "label": "🌅", "output": "🌅" }, { "label": "🌆", "output": "🌆" },
+          { "label": "🌇", "output": "🌇" }, { "label": "🌉", "output": "🌉" }, { "label": "♨", "output": "♨" }, { "label": "🎠", "output": "🎠" }
+        ]},
+        { "keys": [
+          { "label": "🎡", "output": "🎡" }, { "label": "🎢", "output": "🎢" }, { "label": "💈", "output": "💈" }, { "label": "🎪", "output": "🎪" },
+          { "label": "🌌", "output": "🌌" }, { "label": "🌠", "output": "🌠" }, { "label": "🎇", "output": "🎇" }, { "label": "🎆", "output": "🎆" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "activities": {
+      "rows": [
+        { "keys": [
+          { "label": "⚽", "output": "⚽" }, { "label": "🏀", "output": "🏀" }, { "label": "🏈", "output": "🏈" }, { "label": "⚾", "output": "⚾" },
+          { "label": "🥎", "output": "🥎" }, { "label": "🎾", "output": "🎾" }, { "label": "🏐", "output": "🏐" }, { "label": "🏉", "output": "🏉" }
+        ]},
+        { "keys": [
+          { "label": "🥏", "output": "🥏" }, { "label": "🎱", "output": "🎱" }, { "label": "🪀", "output": "🪀" }, { "label": "🏓", "output": "🏓" },
+          { "label": "🏸", "output": "🏸" }, { "label": "🏒", "output": "🏒" }, { "label": "🏑", "output": "🏑" }, { "label": "🥍", "output": "🥍" }
+        ]},
+        { "keys": [
+          { "label": "🥅", "output": "🥅" }, { "label": "⛳", "output": "⛳" }, { "label": "🪁", "output": "🪁" }, { "label": "🏹", "output": "🏹" },
+          { "label": "🎣", "output": "🎣" }, { "label": "🤿", "output": "🤿" }, { "label": "🥊", "output": "🥊" }, { "label": "🥋", "output": "🥋" }
+        ]},
+        { "keys": [
+          { "label": "🎽", "output": "🎽" }, { "label": "⛸", "output": "⛸" }, { "label": "🥌", "output": "🥌" }, { "label": "🛷", "output": "🛷" },
+          { "label": "🎿", "output": "🎿" }, { "label": "⛷", "output": "⛷" }, { "label": "🏂", "output": "🏂" }, { "label": "🪂", "output": "🪂" }
+        ]},
+        { "keys": [
+          { "label": "🏆", "output": "🏆" }, { "label": "🥇", "output": "🥇" }, { "label": "🥈", "output": "🥈" }, { "label": "🥉", "output": "🥉" },
+          { "label": "🏅", "output": "🏅" }, { "label": "🎖", "output": "🎖" }, { "label": "🏵", "output": "🏵" }, { "label": "🎗", "output": "🎗" }
+        ]},
+        { "keys": [
+          { "label": "🎫", "output": "🎫" }, { "label": "🎟", "output": "🎟" }, { "label": "🎪", "output": "🎪" }, { "label": "🎨", "output": "🎨" },
+          { "label": "🎭", "output": "🎭" }, { "label": "🎤", "output": "🎤" }, { "label": "🎧", "output": "🎧" }, { "label": "🎼", "output": "🎼" }
+        ]},
+        { "keys": [
+          { "label": "🎹", "output": "🎹" }, { "label": "🥁", "output": "🥁" }, { "label": "🪘", "output": "🪘" }, { "label": "🎷", "output": "🎷" },
+          { "label": "🎺", "output": "🎺" }, { "label": "🎸", "output": "🎸" }, { "label": "🪕", "output": "🪕" }, { "label": "🎻", "output": "🎻" }
+        ]},
+        { "keys": [
+          { "label": "🪗", "output": "🪗" }, { "label": "🎬", "output": "🎬" }, { "label": "🎮", "output": "🎮" }, { "label": "🕹", "output": "🕹" },
+          { "label": "🎲", "output": "🎲" }, { "label": "🧩", "output": "🧩" }, { "label": "🧸", "output": "🧸" }, { "label": "🪆", "output": "🪆" }
+        ]},
+        { "keys": [
+          { "label": "♠", "output": "♠" }, { "label": "♥", "output": "♥" }, { "label": "♦", "output": "♦" }, { "label": "♣", "output": "♣" },
+          { "label": "♟", "output": "♟" }, { "label": "🃏", "output": "🃏" }, { "label": "🀄", "output": "🀄" }, { "label": "🎴", "output": "🎴" }
+        ]},
+        { "keys": [
+          { "label": "🎯", "output": "🎯" }, { "label": "🎳", "output": "🎳" }, { "label": "🎰", "output": "🎰" }, { "label": "🎊", "output": "🎊" },
+          { "label": "🎉", "output": "🎉" }, { "label": "🎈", "output": "🎈" }, { "label": "🎀", "output": "🎀" }, { "label": "🎁", "output": "🎁" }
+        ]},
+        { "keys": [
+          { "label": "🎄", "output": "🎄" }, { "label": "🎃", "output": "🎃" }, { "label": "🎑", "output": "🎑" }, { "label": "🎋", "output": "🎋" },
+          { "label": "🎍", "output": "🎍" }, { "label": "🎎", "output": "🎎" }, { "label": "🎏", "output": "🎏" }, { "label": "🎐", "output": "🎐" }
+        ]},
+        { "keys": [
+          { "label": "🧧", "output": "🧧" }, { "label": "🎆", "output": "🎆" }, { "label": "🎇", "output": "🎇" }, { "label": "✨", "output": "✨" },
+          { "label": "🎵", "output": "🎵" }, { "label": "🎶", "output": "🎶" }, { "label": "🪩", "output": "🪩" }, { "label": "🎙", "output": "🎙" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "objects": {
+      "rows": [
+        { "keys": [
+          { "label": "👓", "output": "👓" }, { "label": "🕶", "output": "🕶" }, { "label": "🥽", "output": "🥽" }, { "label": "🥼", "output": "🥼" },
+          { "label": "🦺", "output": "🦺" }, { "label": "👔", "output": "👔" }, { "label": "👕", "output": "👕" }, { "label": "👖", "output": "👖" }
+        ]},
+        { "keys": [
+          { "label": "🧣", "output": "🧣" }, { "label": "🧤", "output": "🧤" }, { "label": "🧥", "output": "🧥" }, { "label": "🧦", "output": "🧦" },
+          { "label": "👗", "output": "👗" }, { "label": "👘", "output": "👘" }, { "label": "🥻", "output": "🥻" }, { "label": "🩱", "output": "🩱" }
+        ]},
+        { "keys": [
+          { "label": "🩲", "output": "🩲" }, { "label": "🩳", "output": "🩳" }, { "label": "👙", "output": "👙" }, { "label": "👚", "output": "👚" },
+          { "label": "👛", "output": "👛" }, { "label": "👜", "output": "👜" }, { "label": "👝", "output": "👝" }, { "label": "🛍", "output": "🛍" }
+        ]},
+        { "keys": [
+          { "label": "🎒", "output": "🎒" }, { "label": "🩴", "output": "🩴" }, { "label": "👞", "output": "👞" }, { "label": "👟", "output": "👟" },
+          { "label": "🥾", "output": "🥾" }, { "label": "🥿", "output": "🥿" }, { "label": "👠", "output": "👠" }, { "label": "👡", "output": "👡" }
+        ]},
+        { "keys": [
+          { "label": "🩰", "output": "🩰" }, { "label": "👢", "output": "👢" }, { "label": "👑", "output": "👑" }, { "label": "👒", "output": "👒" },
+          { "label": "🎩", "output": "🎩" }, { "label": "🧢", "output": "🧢" }, { "label": "🪖", "output": "🪖" }, { "label": "⛑", "output": "⛑" }
+        ]},
+        { "keys": [
+          { "label": "💄", "output": "💄" }, { "label": "💍", "output": "💍" }, { "label": "💎", "output": "💎" }, { "label": "📱", "output": "📱" },
+          { "label": "📲", "output": "📲" }, { "label": "☎", "output": "☎" }, { "label": "📞", "output": "📞" }, { "label": "📟", "output": "📟" }
+        ]},
+        { "keys": [
+          { "label": "📠", "output": "📠" }, { "label": "🔋", "output": "🔋" }, { "label": "🪫", "output": "🪫" }, { "label": "🔌", "output": "🔌" },
+          { "label": "💻", "output": "💻" }, { "label": "🖥", "output": "🖥" }, { "label": "🖨", "output": "🖨" }, { "label": "⌨", "output": "⌨" }
+        ]},
+        { "keys": [
+          { "label": "🖱", "output": "🖱" }, { "label": "🖲", "output": "🖲" }, { "label": "💽", "output": "💽" }, { "label": "💾", "output": "💾" },
+          { "label": "💿", "output": "💿" }, { "label": "📀", "output": "📀" }, { "label": "🧮", "output": "🧮" }, { "label": "🎥", "output": "🎥" }
+        ]},
+        { "keys": [
+          { "label": "📷", "output": "📷" }, { "label": "📸", "output": "📸" }, { "label": "📹", "output": "📹" }, { "label": "📼", "output": "📼" },
+          { "label": "🔍", "output": "🔍" }, { "label": "🔎", "output": "🔎" }, { "label": "🕯", "output": "🕯" }, { "label": "💡", "output": "💡" }
+        ]},
+        { "keys": [
+          { "label": "🔦", "output": "🔦" }, { "label": "🏮", "output": "🏮" }, { "label": "🪔", "output": "🪔" }, { "label": "📔", "output": "📔" },
+          { "label": "📕", "output": "📕" }, { "label": "📖", "output": "📖" }, { "label": "📗", "output": "📗" }, { "label": "📘", "output": "📘" }
+        ]},
+        { "keys": [
+          { "label": "📙", "output": "📙" }, { "label": "📚", "output": "📚" }, { "label": "📓", "output": "📓" }, { "label": "📒", "output": "📒" },
+          { "label": "📃", "output": "📃" }, { "label": "📜", "output": "📜" }, { "label": "📄", "output": "📄" }, { "label": "📰", "output": "📰" }
+        ]},
+        { "keys": [
+          { "label": "🗞", "output": "🗞" }, { "label": "📑", "output": "📑" }, { "label": "🔖", "output": "🔖" }, { "label": "🏷", "output": "🏷" },
+          { "label": "💰", "output": "💰" }, { "label": "🪙", "output": "🪙" }, { "label": "💴", "output": "💴" }, { "label": "💵", "output": "💵" }
+        ]},
+        { "keys": [
+          { "label": "💶", "output": "💶" }, { "label": "💷", "output": "💷" }, { "label": "💸", "output": "💸" }, { "label": "💳", "output": "💳" },
+          { "label": "🧾", "output": "🧾" }, { "label": "✉", "output": "✉" }, { "label": "📧", "output": "📧" }, { "label": "📨", "output": "📨" }
+        ]},
+        { "keys": [
+          { "label": "📩", "output": "📩" }, { "label": "📤", "output": "📤" }, { "label": "📥", "output": "📥" }, { "label": "📦", "output": "📦" },
+          { "label": "📫", "output": "📫" }, { "label": "📪", "output": "📪" }, { "label": "📬", "output": "📬" }, { "label": "📭", "output": "📭" }
+        ]},
+        { "keys": [
+          { "label": "📮", "output": "📮" }, { "label": "🗳", "output": "🗳" }, { "label": "✏", "output": "✏" }, { "label": "✒", "output": "✒" },
+          { "label": "🖋", "output": "🖋" }, { "label": "🖊", "output": "🖊" }, { "label": "🖌", "output": "🖌" }, { "label": "🖍", "output": "🖍" }
+        ]},
+        { "keys": [
+          { "label": "📝", "output": "📝" }, { "label": "📁", "output": "📁" }, { "label": "📂", "output": "📂" }, { "label": "🗂", "output": "🗂" },
+          { "label": "📅", "output": "📅" }, { "label": "📆", "output": "📆" }, { "label": "🗒", "output": "🗒" }, { "label": "🗓", "output": "🗓" }
+        ]},
+        { "keys": [
+          { "label": "📇", "output": "📇" }, { "label": "📈", "output": "📈" }, { "label": "📉", "output": "📉" }, { "label": "📊", "output": "📊" },
+          { "label": "📋", "output": "📋" }, { "label": "📌", "output": "📌" }, { "label": "📍", "output": "📍" }, { "label": "📎", "output": "📎" }
+        ]},
+        { "keys": [
+          { "label": "🖇", "output": "🖇" }, { "label": "📏", "output": "📏" }, { "label": "📐", "output": "📐" }, { "label": "✂", "output": "✂" },
+          { "label": "🗃", "output": "🗃" }, { "label": "🗄", "output": "🗄" }, { "label": "🗑", "output": "🗑" }, { "label": "🔒", "output": "🔒" }
+        ]},
+        { "keys": [
+          { "label": "🔓", "output": "🔓" }, { "label": "🔏", "output": "🔏" }, { "label": "🔐", "output": "🔐" }, { "label": "🔑", "output": "🔑" },
+          { "label": "🗝", "output": "🗝" }, { "label": "🔨", "output": "🔨" }, { "label": "🪓", "output": "🪓" }, { "label": "⛏", "output": "⛏" }
+        ]},
+        { "keys": [
+          { "label": "⚒", "output": "⚒" }, { "label": "🛠", "output": "🛠" }, { "label": "🗡", "output": "🗡" }, { "label": "⚔", "output": "⚔" },
+          { "label": "🔫", "output": "🔫" }, { "label": "🪃", "output": "🪃" }, { "label": "🏹", "output": "🏹" }, { "label": "🛡", "output": "🛡" }
+        ]},
+        { "keys": [
+          { "label": "🪚", "output": "🪚" }, { "label": "🔧", "output": "🔧" }, { "label": "🪛", "output": "🪛" }, { "label": "🔩", "output": "🔩" },
+          { "label": "⚙", "output": "⚙" }, { "label": "🗜", "output": "🗜" }, { "label": "⚖", "output": "⚖" }, { "label": "🦯", "output": "🦯" }
+        ]},
+        { "keys": [
+          { "label": "🔗", "output": "🔗" }, { "label": "⛓", "output": "⛓" }, { "label": "🪝", "output": "🪝" }, { "label": "🧰", "output": "🧰" },
+          { "label": "🧲", "output": "🧲" }, { "label": "🪜", "output": "🪜" }, { "label": "⚗", "output": "⚗" }, { "label": "🧪", "output": "🧪" }
+        ]},
+        { "keys": [
+          { "label": "🧫", "output": "🧫" }, { "label": "🧬", "output": "🧬" }, { "label": "🔬", "output": "🔬" }, { "label": "🔭", "output": "🔭" },
+          { "label": "📡", "output": "📡" }, { "label": "💉", "output": "💉" }, { "label": "🩸", "output": "🩸" }, { "label": "💊", "output": "💊" }
+        ]},
+        { "keys": [
+          { "label": "🩹", "output": "🩹" }, { "label": "🩼", "output": "🩼" }, { "label": "🩺", "output": "🩺" }, { "label": "🩻", "output": "🩻" },
+          { "label": "🚪", "output": "🚪" }, { "label": "🛗", "output": "🛗" }, { "label": "🪞", "output": "🪞" }, { "label": "🪟", "output": "🪟" }
+        ]},
+        { "keys": [
+          { "label": "🛏", "output": "🛏" }, { "label": "🛋", "output": "🛋" }, { "label": "🪑", "output": "🪑" }, { "label": "🚽", "output": "🚽" },
+          { "label": "🪠", "output": "🪠" }, { "label": "🚿", "output": "🚿" }, { "label": "🛁", "output": "🛁" }, { "label": "🪤", "output": "🪤" }
+        ]},
+        { "keys": [
+          { "label": "🪒", "output": "🪒" }, { "label": "🧴", "output": "🧴" }, { "label": "🧷", "output": "🧷" }, { "label": "🧹", "output": "🧹" },
+          { "label": "🧺", "output": "🧺" }, { "label": "🧻", "output": "🧻" }, { "label": "🪣", "output": "🪣" }, { "label": "🧼", "output": "🧼" }
+        ]},
+        { "keys": [
+          { "label": "🫧", "output": "🫧" }, { "label": "🪥", "output": "🪥" }, { "label": "🧽", "output": "🧽" }, { "label": "🧯", "output": "🧯" },
+          { "label": "🛒", "output": "🛒" }, { "label": "🚬", "output": "🚬" }, { "label": "⚰", "output": "⚰" }, { "label": "⚱", "output": "⚱" }
+        ]},
+        { "keys": [
+          { "label": "🏺", "output": "🏺" }, { "label": "🪬", "output": "🪬" }, { "label": "🗿", "output": "🗿" }, { "label": "🪧", "output": "🪧" },
+          { "label": "🪪", "output": "🪪" }, { "label": "⏰", "output": "⏰" }, { "label": "🕐", "output": "🕐" }, { "label": "⌛", "output": "⌛" }
+        ]},
+        { "keys": [
+          { "label": "⏳", "output": "⏳" }, { "label": "📺", "output": "📺" }, { "label": "📻", "output": "📻" }, { "label": "📽", "output": "📽" },
+          { "label": "🔔", "output": "🔔" }, { "label": "🔕", "output": "🔕" }, { "label": "🎵", "output": "🎵" }, { "label": "🎶", "output": "🎶" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    },
+    "symbols": {
+      "rows": [
+        { "keys": [
+          { "label": "❤", "output": "❤" }, { "label": "🧡", "output": "🧡" }, { "label": "💛", "output": "💛" }, { "label": "💚", "output": "💚" },
+          { "label": "💙", "output": "💙" }, { "label": "💜", "output": "💜" }, { "label": "🖤", "output": "🖤" }, { "label": "🤍", "output": "🤍" }
+        ]},
+        { "keys": [
+          { "label": "🤎", "output": "🤎" }, { "label": "💔", "output": "💔" }, { "label": "❣", "output": "❣" }, { "label": "💕", "output": "💕" },
+          { "label": "💞", "output": "💞" }, { "label": "💓", "output": "💓" }, { "label": "💗", "output": "💗" }, { "label": "💖", "output": "💖" }
+        ]},
+        { "keys": [
+          { "label": "💘", "output": "💘" }, { "label": "💝", "output": "💝" }, { "label": "❤️‍🔥", "output": "❤️‍🔥" }, { "label": "❤️‍🩹", "output": "❤️‍🩹" },
+          { "label": "💟", "output": "💟" }, { "label": "☮", "output": "☮" }, { "label": "✝", "output": "✝" }, { "label": "☪", "output": "☪" }
+        ]},
+        { "keys": [
+          { "label": "🕉", "output": "🕉" }, { "label": "☸", "output": "☸" }, { "label": "✡", "output": "✡" }, { "label": "🔯", "output": "🔯" },
+          { "label": "🕎", "output": "🕎" }, { "label": "☯", "output": "☯" }, { "label": "☦", "output": "☦" }, { "label": "🛐", "output": "🛐" }
+        ]},
+        { "keys": [
+          { "label": "⛎", "output": "⛎" }, { "label": "♈", "output": "♈" }, { "label": "♉", "output": "♉" }, { "label": "♊", "output": "♊" },
+          { "label": "♋", "output": "♋" }, { "label": "♌", "output": "♌" }, { "label": "♍", "output": "♍" }, { "label": "♎", "output": "♎" }
+        ]},
+        { "keys": [
+          { "label": "♏", "output": "♏" }, { "label": "♐", "output": "♐" }, { "label": "♑", "output": "♑" }, { "label": "♒", "output": "♒" },
+          { "label": "♓", "output": "♓" }, { "label": "🆔", "output": "🆔" }, { "label": "⚛", "output": "⚛" }, { "label": "🉑", "output": "🉑" }
+        ]},
+        { "keys": [
+          { "label": "☢", "output": "☢" }, { "label": "☣", "output": "☣" }, { "label": "📴", "output": "📴" }, { "label": "📳", "output": "📳" },
+          { "label": "🈶", "output": "🈶" }, { "label": "🈚", "output": "🈚" }, { "label": "🈸", "output": "🈸" }, { "label": "🈺", "output": "🈺" }
+        ]},
+        { "keys": [
+          { "label": "🈷", "output": "🈷" }, { "label": "✴", "output": "✴" }, { "label": "🆚", "output": "🆚" }, { "label": "💮", "output": "💮" },
+          { "label": "🉐", "output": "🉐" }, { "label": "㊙", "output": "㊙" }, { "label": "㊗", "output": "㊗" }, { "label": "🈴", "output": "🈴" }
+        ]},
+        { "keys": [
+          { "label": "🈵", "output": "🈵" }, { "label": "🈹", "output": "🈹" }, { "label": "🈲", "output": "🈲" }, { "label": "🅰", "output": "🅰" },
+          { "label": "🅱", "output": "🅱" }, { "label": "🆎", "output": "🆎" }, { "label": "🆑", "output": "🆑" }, { "label": "🅾", "output": "🅾" }
+        ]},
+        { "keys": [
+          { "label": "🆘", "output": "🆘" }, { "label": "❌", "output": "❌" }, { "label": "⭕", "output": "⭕" }, { "label": "🛑", "output": "🛑" },
+          { "label": "⛔", "output": "⛔" }, { "label": "📛", "output": "📛" }, { "label": "🚫", "output": "🚫" }, { "label": "💯", "output": "💯" }
+        ]},
+        { "keys": [
+          { "label": "💢", "output": "💢" }, { "label": "♨", "output": "♨" }, { "label": "🚷", "output": "🚷" }, { "label": "🚯", "output": "🚯" },
+          { "label": "🚳", "output": "🚳" }, { "label": "🚱", "output": "🚱" }, { "label": "🔞", "output": "🔞" }, { "label": "📵", "output": "📵" }
+        ]},
+        { "keys": [
+          { "label": "🔴", "output": "🔴" }, { "label": "🟠", "output": "🟠" }, { "label": "🟡", "output": "🟡" }, { "label": "🟢", "output": "🟢" },
+          { "label": "🔵", "output": "🔵" }, { "label": "🟣", "output": "🟣" }, { "label": "🟤", "output": "🟤" }, { "label": "⚫", "output": "⚫" }
+        ]},
+        { "keys": [
+          { "label": "⚪", "output": "⚪" }, { "label": "🔶", "output": "🔶" }, { "label": "🔷", "output": "🔷" }, { "label": "🔸", "output": "🔸" },
+          { "label": "🔹", "output": "🔹" }, { "label": "🔺", "output": "🔺" }, { "label": "🔻", "output": "🔻" }, { "label": "💠", "output": "💠" }
+        ]},
+        { "keys": [
+          { "label": "🔘", "output": "🔘" }, { "label": "🔳", "output": "🔳" }, { "label": "🔲", "output": "🔲" }, { "label": "▪", "output": "▪" },
+          { "label": "▫", "output": "▫" }, { "label": "◾", "output": "◾" }, { "label": "◽", "output": "◽" }, { "label": "◼", "output": "◼" }
+        ]},
+        { "keys": [
+          { "label": "◻", "output": "◻" }, { "label": "⬛", "output": "⬛" }, { "label": "⬜", "output": "⬜" }, { "label": "🟥", "output": "🟥" },
+          { "label": "🟧", "output": "🟧" }, { "label": "🟨", "output": "🟨" }, { "label": "🟩", "output": "🟩" }, { "label": "🟦", "output": "🟦" }
+        ]},
+        { "keys": [
+          { "label": "🟪", "output": "🟪" }, { "label": "🟫", "output": "🟫" }, { "label": "⬆", "output": "⬆" }, { "label": "↗", "output": "↗" },
+          { "label": "➡", "output": "➡" }, { "label": "↘", "output": "↘" }, { "label": "⬇", "output": "⬇" }, { "label": "↙", "output": "↙" }
+        ]},
+        { "keys": [
+          { "label": "⬅", "output": "⬅" }, { "label": "↖", "output": "↖" }, { "label": "↕", "output": "↕" }, { "label": "↔", "output": "↔" },
+          { "label": "↩", "output": "↩" }, { "label": "↪", "output": "↪" }, { "label": "⤴", "output": "⤴" }, { "label": "⤵", "output": "⤵" }
+        ]},
+        { "keys": [
+          { "label": "🔃", "output": "🔃" }, { "label": "🔄", "output": "🔄" }, { "label": "🔙", "output": "🔙" }, { "label": "🔚", "output": "🔚" },
+          { "label": "🔛", "output": "🔛" }, { "label": "🔜", "output": "🔜" }, { "label": "🔝", "output": "🔝" }, { "label": "🔀", "output": "🔀" }
+        ]},
+        { "keys": [
+          { "label": "🔁", "output": "🔁" }, { "label": "🔂", "output": "🔂" }, { "label": "▶", "output": "▶" }, { "label": "⏩", "output": "⏩" },
+          { "label": "⏭", "output": "⏭" }, { "label": "⏯", "output": "⏯" }, { "label": "◀", "output": "◀" }, { "label": "⏪", "output": "⏪" }
+        ]},
+        { "keys": [
+          { "label": "⏮", "output": "⏮" }, { "label": "⏸", "output": "⏸" }, { "label": "⏹", "output": "⏹" }, { "label": "⏺", "output": "⏺" },
+          { "label": "⏏", "output": "⏏" }, { "label": "🔅", "output": "🔅" }, { "label": "🔆", "output": "🔆" }, { "label": "📶", "output": "📶" }
+        ]},
+        { "keys": [
+          { "label": "🔈", "output": "🔈" }, { "label": "🔉", "output": "🔉" }, { "label": "🔊", "output": "🔊" }, { "label": "🔇", "output": "🔇" },
+          { "label": "♻", "output": "♻" }, { "label": "♾", "output": "♾" }, { "label": "✅", "output": "✅" }, { "label": "✔", "output": "✔" }
+        ]},
+        { "keys": [
+          { "label": "☑", "output": "☑" }, { "label": "✖", "output": "✖" }, { "label": "❎", "output": "❎" }, { "label": "➕", "output": "➕" },
+          { "label": "➖", "output": "➖" }, { "label": "➗", "output": "➗" }, { "label": "✳", "output": "✳" }, { "label": "❇", "output": "❇" }
+        ]},
+        { "keys": [
+          { "label": "‼", "output": "‼" }, { "label": "⁉", "output": "⁉" }, { "label": "❓", "output": "❓" }, { "label": "❔", "output": "❔" },
+          { "label": "❕", "output": "❕" }, { "label": "❗", "output": "❗" }, { "label": "〰", "output": "〰" }, { "label": "💱", "output": "💱" }
+        ]},
+        { "keys": [
+          { "label": "💲", "output": "💲" }, { "label": "⚕", "output": "⚕" }, { "label": "♻", "output": "♻" }, { "label": "⚜", "output": "⚜" },
+          { "label": "🔰", "output": "🔰" }, { "label": "🔱", "output": "🔱" }, { "label": "⭐", "output": "⭐" }, { "label": "🌟", "output": "🌟" }
+        ]},
+        { "keys": [
+          { "label": "💫", "output": "💫" }, { "label": "✨", "output": "✨" }, { "label": "🪄", "output": "🪄" }, { "label": "🔮", "output": "🔮" },
+          { "label": "🧿", "output": "🧿" }, { "label": "🎐", "output": "🎐" }, { "label": "🏁", "output": "🏁" }, { "label": "🚩", "output": "🚩" }
+        ]},
+        { "keys": [
+          { "label": "🎌", "output": "🎌" }, { "label": "🏴", "output": "🏴" }, { "label": "🏳", "output": "🏳" }, { "label": "🏳️‍🌈", "output": "🏳️‍🌈" },
+          { "label": "🏴‍☠️", "output": "🏴‍☠️" }, { "label": "©", "output": "©" }, { "label": "®", "output": "®" }, { "label": "™", "output": "™" }
+        ]},
+        { "keys": [
+          { "label": "😀", "switchLayout": "smileys" }, { "label": "👋", "switchLayout": "gestures" }, { "label": "🐱", "switchLayout": "animals" }, { "label": "🍕", "switchLayout": "food" },
+          { "label": "🚗", "switchLayout": "travel" }, { "label": "⚽", "switchLayout": "activities" }, { "label": "💡", "switchLayout": "objects" }, { "label": "🏁", "switchLayout": "symbols" }
+        ]},
+        { "keys": [
+          { "label": "⌫", "keycode": "BACKSPACE", "width": 4.0, "repeatable": true },
+          { "label": "⏎", "keycode": "ENTER", "width": 4.0 }
+        ]}
+      ]
+    }
+  }
+}

@@ -46,11 +46,13 @@ fun FunctionRow(
             .padding(horizontal = 4.dp, vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        // Mode toggle
+        // Mode cycle: EZ -> ENGLISH -> NUMBER -> EMOJI -> EZ.
+        // The key label previews the *next* mode in the cycle.
         val modeKeyDef = when (inputMode) {
-            InputMode.EZ -> KeyDefinition("?123")
-            InputMode.NUMBER -> KeyDefinition("=\\<+")
-            InputMode.SYMBOL -> KeyDefinition("ABC")
+            InputMode.EZ -> KeyDefinition("EN")
+            InputMode.ENGLISH -> KeyDefinition("?123")
+            InputMode.NUMBER -> KeyDefinition("\uD83D\uDE00") // 😀
+            InputMode.EMOJI -> KeyDefinition("中")
         }
         KeyButton(
             keyDef = modeKeyDef,
@@ -59,11 +61,13 @@ fun FunctionRow(
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             onClick = {
-                when (inputMode) {
-                    InputMode.EZ -> onToggleMode(InputMode.NUMBER)
-                    InputMode.NUMBER -> onToggleMode(InputMode.SYMBOL)
-                    InputMode.SYMBOL -> onToggleMode(InputMode.EZ)
+                val next = when (inputMode) {
+                    InputMode.EZ -> InputMode.ENGLISH
+                    InputMode.ENGLISH -> InputMode.NUMBER
+                    InputMode.NUMBER -> InputMode.EMOJI
+                    InputMode.EMOJI -> InputMode.EZ
                 }
+                onToggleMode(next)
             }
         )
 

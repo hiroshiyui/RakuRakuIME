@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Signed APK output directories written by Android Studio's
+# Generate Signed APK flow. Release binaries are uploaded to the
+# GitHub Release, not stored in the repo.
+/app/debug/
+/app/release/

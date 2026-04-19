@@ -1,7 +1,17 @@
-First public release.
+First public release (0.0.1).
 
-* EZ Input Method keyboard with radical composition and phrase rules.
-* English word prediction (Google 10K corpus).
-* Emoji picker with eight categories.
-* Material You / Solarized theming, Traditional Chinese and English UI.
-* Fully offline — no network access, no analytics.
+* EZ (輕鬆輸入法) keyboard with radical composition, phrase rules,
+  live candidate bar, and auto-refresh when the bundled CIN asset
+  updates.
+* Full PC-style English QWERTY with number row, brackets,
+  punctuation, long-press shift-symbol alternates, Pro Shift key
+  (one-shot / caps lock), and Google-10K word prediction.
+* Emoji panel with eight categorised tabs (1,184 emojis).
+* Dialer-style number pad.
+* Material You dynamic theming on Android 12+, with a built-in
+  Solarized fallback selectable in Settings.
+* Roboto Slab typeface for alphanumerical keycaps.
+* Per-app language picker, split landscape, adjustable keyboard
+  height, optional keypress vibration, full TalkBack semantics.
+* Fully offline — no network, no analytics, cloud auto-backup
+  disabled.

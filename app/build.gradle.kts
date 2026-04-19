@@ -42,7 +42,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,6 +61,14 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+// Name every build artifact as "<applicationId>-<versionName>", so the
+// release APK lands as e.g. org.ghostsinthelab.app.rakurakuime-0.0.1-release.apk
+// instead of the generic app-release.apk. Placed after the android block so
+// defaultConfig.applicationId / versionName are populated at read-time.
+base {
+    archivesName = "${android.defaultConfig.applicationId}-${android.defaultConfig.versionName}"
 }
 
 dependencies {

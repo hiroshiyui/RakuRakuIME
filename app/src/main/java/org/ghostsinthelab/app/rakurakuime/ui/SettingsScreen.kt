@@ -40,6 +40,8 @@ import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.data.CinParser
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
+import org.ghostsinthelab.app.rakurakuime.ui.theme.DynamicColorAvailable
+import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
 
 private fun isImeEnabled(context: Context): Boolean {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -58,6 +60,7 @@ fun SettingsScreen(
     val vibration by userPreferences.vibrationEnabled.collectAsState(initial = true)
     val splitLayout by userPreferences.splitLayoutLandscape.collectAsState(initial = true)
     val heightScale by userPreferences.keyboardHeightScale.collectAsState(initial = 1.0f)
+    val themeMode by userPreferences.themeMode.collectAsState(initial = ThemeMode.DYNAMIC)
 
     var showReimportDialog by remember { mutableStateOf(false) }
     var showResetFreqDialog by remember { mutableStateOf(false) }
@@ -122,6 +125,35 @@ fun SettingsScreen(
             }) {
                 Text(stringResource(R.string.settings_ime_enable_button))
             }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+        // Theme
+        Text(
+            text = stringResource(R.string.settings_theme),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        ThemeModeOption(
+            label = stringResource(R.string.settings_theme_dynamic),
+            selected = themeMode == ThemeMode.DYNAMIC,
+            enabled = DynamicColorAvailable,
+            onSelect = { scope.launch { userPreferences.setThemeMode(ThemeMode.DYNAMIC) } }
+        )
+        ThemeModeOption(
+            label = stringResource(R.string.settings_theme_solarized),
+            selected = themeMode == ThemeMode.SOLARIZED,
+            enabled = true,
+            onSelect = { scope.launch { userPreferences.setThemeMode(ThemeMode.SOLARIZED) } }
+        )
+        if (!DynamicColorAvailable) {
+            Text(
+                text = stringResource(R.string.settings_theme_dynamic_unavailable),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 48.dp, top = 4.dp)
+            )
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -275,6 +307,34 @@ private fun SettingsSwitch(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+@Composable
+private fun ThemeModeOption(
+    label: String,
+    selected: Boolean,
+    enabled: Boolean,
+    onSelect: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            enabled = enabled,
+            onClick = if (enabled) onSelect else null
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (enabled) MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
         )
     }
 }

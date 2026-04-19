@@ -18,7 +18,6 @@
 
 package org.ghostsinthelab.app.rakurakuime.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -27,47 +26,98 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+enum class ThemeMode { DYNAMIC, SOLARIZED }
+
+val DynamicColorAvailable: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+private val SolarizedLightColors = lightColorScheme(
+    primary = SolarizedBlue,
+    onPrimary = SolarizedBase3,
+    primaryContainer = Color(0xFFBAD9EE),
+    onPrimaryContainer = SolarizedBase03,
+    secondary = SolarizedCyan,
+    onSecondary = SolarizedBase3,
+    secondaryContainer = Color(0xFFBCE0DC),
+    onSecondaryContainer = SolarizedBase03,
+    tertiary = SolarizedViolet,
+    onTertiary = SolarizedBase3,
+    tertiaryContainer = Color(0xFFD8D8F0),
+    onTertiaryContainer = SolarizedBase03,
+    error = SolarizedRed,
+    onError = SolarizedBase3,
+    errorContainer = Color(0xFFF3C6C4),
+    onErrorContainer = SolarizedBase03,
+    background = SolarizedBase3,
+    onBackground = SolarizedBase00,
+    surface = SolarizedBase3,
+    onSurface = SolarizedBase00,
+    surfaceVariant = SolarizedBase2,
+    onSurfaceVariant = SolarizedBase01,
+    outline = SolarizedBase1,
+    outlineVariant = Color(0xFFE0DBC6),
+    surfaceContainerLowest = SolarizedBase3,
+    surfaceContainerLow = Color(0xFFF9F2DF),
+    surfaceContainer = Color(0xFFF5EFDC),
+    surfaceContainerHigh = Color(0xFFF1EBD8),
+    surfaceContainerHighest = SolarizedBase2,
+    inverseSurface = SolarizedBase03,
+    inverseOnSurface = SolarizedBase2,
+    inversePrimary = Color(0xFF84B8DE),
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val SolarizedDarkColors = darkColorScheme(
+    primary = SolarizedBlue,
+    onPrimary = SolarizedBase03,
+    primaryContainer = Color(0xFF124B6D),
+    onPrimaryContainer = SolarizedBase2,
+    secondary = SolarizedCyan,
+    onSecondary = SolarizedBase03,
+    secondaryContainer = Color(0xFF12584F),
+    onSecondaryContainer = SolarizedBase2,
+    tertiary = SolarizedViolet,
+    onTertiary = SolarizedBase03,
+    tertiaryContainer = Color(0xFF2E325F),
+    onTertiaryContainer = SolarizedBase2,
+    error = SolarizedRed,
+    onError = SolarizedBase03,
+    errorContainer = Color(0xFF6F1916),
+    onErrorContainer = SolarizedBase2,
+    background = SolarizedBase03,
+    onBackground = SolarizedBase0,
+    surface = SolarizedBase03,
+    onSurface = SolarizedBase0,
+    surfaceVariant = SolarizedBase02,
+    onSurfaceVariant = SolarizedBase1,
+    outline = SolarizedBase01,
+    outlineVariant = Color(0xFF143842),
+    surfaceContainerLowest = SolarizedBase03,
+    surfaceContainerLow = Color(0xFF022E39),
+    surfaceContainer = Color(0xFF03303C),
+    surfaceContainerHigh = Color(0xFF05333F),
+    surfaceContainerHighest = SolarizedBase02,
+    inverseSurface = SolarizedBase2,
+    inverseOnSurface = SolarizedBase01,
+    inversePrimary = Color(0xFF0E5B88),
 )
 
 @Composable
 fun RakuRakuIMETheme(
+    themeMode: ThemeMode = ThemeMode.DYNAMIC,
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        themeMode == ThemeMode.DYNAMIC && DynamicColorAvailable -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> SolarizedDarkColors
+        else -> SolarizedLightColors
     }
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

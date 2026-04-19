@@ -44,6 +44,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     val vibrationIntensity = userPreferences.vibrationIntensity
     val keyboardHeightScale = userPreferences.keyboardHeightScale
     val splitLayoutLandscape = userPreferences.splitLayoutLandscape
+    val themeMode = userPreferences.themeMode
 
     private val _inputMode = MutableStateFlow(InputMode.EZ)
     val inputMode: StateFlow<InputMode> = _inputMode.asStateFlow()

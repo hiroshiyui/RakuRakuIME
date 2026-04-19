@@ -33,6 +33,7 @@ import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
 import org.ghostsinthelab.app.rakurakuime.ui.SettingsScreen
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
+import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +42,8 @@ class MainActivity : ComponentActivity() {
         val userPreferences = UserPreferences(this)
 
         setContent {
-            RakuRakuIMETheme {
+            val themeMode by userPreferences.themeMode.collectAsState(initial = ThemeMode.DYNAMIC)
+            RakuRakuIMETheme(themeMode = themeMode) {
                 var initStatus by remember { mutableStateOf("Checking dictionary...") }
                 var isReady by remember { mutableStateOf(false) }
 

@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
@@ -34,6 +35,7 @@ class UserPreferences(private val context: Context) {
         private val KEY_VIBRATION_INTENSITY = floatPreferencesKey("vibration_intensity")
         private val KEY_KEYBOARD_HEIGHT_SCALE = floatPreferencesKey("keyboard_height_scale")
         private val KEY_SPLIT_LAYOUT_LANDSCAPE = booleanPreferencesKey("split_layout_landscape")
+        private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
     val vibrationEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
@@ -52,6 +54,12 @@ class UserPreferences(private val context: Context) {
         prefs[KEY_SPLIT_LAYOUT_LANDSCAPE] ?: true
     }
 
+    val themeMode: Flow<ThemeMode> = context.dataStore.data.map { prefs ->
+        prefs[KEY_THEME_MODE]
+            ?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() }
+            ?: ThemeMode.DYNAMIC
+    }
+
     suspend fun setVibrationEnabled(enabled: Boolean) {
         context.dataStore.edit { it[KEY_VIBRATION_ENABLED] = enabled }
     }
@@ -66,5 +74,9 @@ class UserPreferences(private val context: Context) {
 
     suspend fun setSplitLayoutLandscape(split: Boolean) {
         context.dataStore.edit { it[KEY_SPLIT_LAYOUT_LANDSCAPE] = split }
+    }
+
+    suspend fun setThemeMode(mode: ThemeMode) {
+        context.dataStore.edit { it[KEY_THEME_MODE] = mode.name }
     }
 }

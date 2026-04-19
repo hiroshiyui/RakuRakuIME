@@ -39,6 +39,9 @@ import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
+import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import org.ghostsinthelab.app.rakurakuime.ui.keyboard.*
 import org.ghostsinthelab.app.rakurakuime.util.HapticHelper
 
@@ -92,7 +95,8 @@ class RakuRakuImeService : InputMethodService() {
             setViewTreeViewModelStoreOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)
             setContent {
-                RakuRakuIMETheme {
+                val themeMode by viewModel.themeMode.collectAsState(initial = ThemeMode.DYNAMIC)
+                RakuRakuIMETheme(themeMode = themeMode) {
                     KeyboardTheme {
                         KeyboardScreen(
                             viewModel = viewModel,

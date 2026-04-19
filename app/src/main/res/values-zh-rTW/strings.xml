@@ -26,6 +26,10 @@
     <string name="settings_ime_status_enabled">已啟用</string>
     <string name="settings_ime_status_disabled">尚未啟用</string>
     <string name="settings_ime_enable_button">開啟系統鍵盤管理設定</string>
+    <string name="settings_theme">佈景主題</string>
+    <string name="settings_theme_dynamic">動態配色（Material You）</string>
+    <string name="settings_theme_solarized">Solarized</string>
+    <string name="settings_theme_dynamic_unavailable">動態配色需要 Android 12 或更新版本。</string>
     <string name="settings_vibration">按鍵震動</string>
     <string name="settings_split_landscape">橫向時分割鍵盤</string>
     <string name="settings_keyboard_height">鍵盤高度比例</string>

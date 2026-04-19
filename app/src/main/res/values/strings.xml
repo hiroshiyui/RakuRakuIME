@@ -8,6 +8,10 @@
     <string name="settings_ime_status_enabled">Enabled</string>
     <string name="settings_ime_status_disabled">Not enabled</string>
     <string name="settings_ime_enable_button">Open System Keyboard Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dynamic">Dynamic (Material You)</string>
+    <string name="settings_theme_solarized">Solarized</string>
+    <string name="settings_theme_dynamic_unavailable">Dynamic color requires Android 12 or later.</string>
     <string name="settings_vibration">Keypress Vibration</string>
     <string name="settings_split_landscape">Split Keyboard in Landscape</string>
     <string name="settings_keyboard_height">Keyboard Height Scale</string>

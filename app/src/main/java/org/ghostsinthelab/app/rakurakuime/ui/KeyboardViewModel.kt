@@ -34,6 +34,19 @@ import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
 
 /**
+ * Shift-key state machine.
+ *
+ * * [NONE] — default, letters render lowercase.
+ * * [SHIFTED] — "one-shot": next letter/alternate is uppercase, then
+ *   auto-releases back to [NONE] via [KeyboardViewModel.consumeShift].
+ * * [CAPS_LOCK] — sticky uppercase, stays until the user taps shift again.
+ *
+ * The shift key cycles NONE -> SHIFTED -> CAPS_LOCK -> NONE, so a quick
+ * double-tap lands in [CAPS_LOCK] and a single tap remains one-shot.
+ */
+enum class ShiftState { NONE, SHIFTED, CAPS_LOCK }
+
+/**
  * Supported input modes for the RakuRaku IME.
  */
 enum class InputMode {
@@ -94,9 +107,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     /** List of predicted English words based on the current buffer. */
     val englishCandidates: StateFlow<List<String>> = _englishCandidates.asStateFlow()
 
-    private val _isShifted = MutableStateFlow(false)
-    /** Whether the keyboard is currently in a shifted (uppercase/alternative) state. */
-    val isShifted: StateFlow<Boolean> = _isShifted.asStateFlow()
+    private val _shiftState = MutableStateFlow(ShiftState.NONE)
+    /** Tri-state shift: none / one-shot / caps lock. */
+    val shiftState: StateFlow<ShiftState> = _shiftState.asStateFlow()
 
     private val _composingText = MutableStateFlow("")
     /** The active keystroke sequence being typed in EZ mode. */
@@ -156,8 +169,28 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /**
+     * Advance the shift key's tri-state: NONE -> SHIFTED -> CAPS_LOCK -> NONE.
+     * Quick double-tap thus lands in [ShiftState.CAPS_LOCK]; a third tap
+     * releases it.
+     */
     fun toggleShift() {
-        _isShifted.value = !_isShifted.value
+        _shiftState.value = when (_shiftState.value) {
+            ShiftState.NONE -> ShiftState.SHIFTED
+            ShiftState.SHIFTED -> ShiftState.CAPS_LOCK
+            ShiftState.CAPS_LOCK -> ShiftState.NONE
+        }
+    }
+
+    /**
+     * Call after a letter or alternate key press has consumed the shift
+     * state. If shift was a one-shot ([ShiftState.SHIFTED]), it falls back
+     * to [ShiftState.NONE]; [ShiftState.CAPS_LOCK] is sticky and unaffected.
+     */
+    fun consumeShift() {
+        if (_shiftState.value == ShiftState.SHIFTED) {
+            _shiftState.value = ShiftState.NONE
+        }
     }
 
     fun setInputMode(mode: InputMode) {

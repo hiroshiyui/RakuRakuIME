@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import org.ghostsinthelab.app.rakurakuime.data.EmojiDictionary
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
+import org.ghostsinthelab.app.rakurakuime.ui.ShiftState
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 
 @Composable
@@ -55,7 +56,8 @@ fun KeyboardScreen(
     val hasNext by viewModel.hasNextPage.collectAsState()
     val isSelecting by viewModel.isSelecting.collectAsState()
     val inputMode by viewModel.inputMode.collectAsState()
-    val isShifted by viewModel.isShifted.collectAsState()
+    val shiftState by viewModel.shiftState.collectAsState()
+    val isShifted = shiftState != ShiftState.NONE
     val heightScale by viewModel.keyboardHeightScale.collectAsState(initial = 1.0f)
     val splitLayoutLandscape by viewModel.splitLayoutLandscape.collectAsState(initial = true)
     val emojiCategory by viewModel.emojiCategory.collectAsState()
@@ -133,6 +135,8 @@ fun KeyboardScreen(
                                         onAlternateSelected = { alt ->
                                             onKeyPress()
                                             inputConnection()?.commitText(if (isShifted) alt.uppercase() else alt.lowercase(), 1)
+                                            // Auto-release one-shot shift after we've applied it.
+                                            viewModel.consumeShift()
                                         },
                                         onClick = {
                                             onKeyPress()
@@ -191,14 +195,19 @@ fun KeyboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            // Last row has a shift key on the left.
+                            // Last row starts with the tri-state shift key:
+                            //   NONE        → ⇧ on the default key background
+                            //   SHIFTED     → ⇧ on the function-key background (one-shot)
+                            //   CAPS_LOCK   → ⇪ on the function-key background (sticky)
                             if (rowIndex == EnglishLayout.ROWS.lastIndex) {
+                                val shiftLabel = if (shiftState == ShiftState.CAPS_LOCK) "⇪" else "⇧"
+                                val shiftActive = shiftState != ShiftState.NONE
                                 KeyButton(
-                                    keyDef = KeyDefinition(if (isShifted) "⇪" else "⇧"),
+                                    keyDef = KeyDefinition(shiftLabel),
                                     modifier = Modifier.weight(1.5f),
                                     keyHeight = scaledKeyHeight,
-                                    backgroundColorOverride = if (isShifted) colors.functionKeyBackground else colors.keyBackground,
-                                    textColorOverride = if (isShifted) colors.functionKeyTextColor else colors.keyTextColor,
+                                    backgroundColorOverride = if (shiftActive) colors.functionKeyBackground else colors.keyBackground,
+                                    textColorOverride = if (shiftActive) colors.functionKeyTextColor else colors.keyTextColor,
                                     onClick = {
                                         onKeyPress()
                                         viewModel.toggleShift()
@@ -231,6 +240,9 @@ fun KeyboardScreen(
                                             // Accumulate into a composing buffer so the
                                             // candidate bar can offer predictions.
                                             viewModel.onEnglishKeyPress(display)
+                                            // One-shot shift auto-releases after the
+                                            // letter that used it; CAPS_LOCK is sticky.
+                                            viewModel.consumeShift()
                                         }
                                     )
                                 }

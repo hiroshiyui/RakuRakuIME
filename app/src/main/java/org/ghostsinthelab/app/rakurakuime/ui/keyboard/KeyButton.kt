@@ -19,7 +19,9 @@
 package org.ghostsinthelab.app.rakurakuime.ui.keyboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import kotlin.math.abs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -83,75 +85,100 @@ fun KeyButton(
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .pointerInput(Unit) {
+                // Defer the key action until a clean release — so scroll gestures,
+                // finger-drag-away, and pointer cancellations all skip the commit.
+                // Mirrors MeaninglessKeyboard commit 9499e314 ("Defer key action to
+                // finger-up to prevent accidental input while scrolling"), adapted
+                // to keep the swipe-up and long-press-alternates behaviors.
                 coroutineScope {
                     val scope = this
-                    awaitPointerEventScope {
-                        while (true) {
-                            val down = awaitFirstDown(requireUnconsumed = false)
-                            isPressed = true
-                            showAlternates = false
-                            activeAlternateIndex = -1
-                            val startY = down.position.y
-                            val startX = down.position.x
-                            var gestureHandled = false
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        isPressed = true
+                        showAlternates = false
+                        activeAlternateIndex = -1
+                        val startY = down.position.y
+                        val startX = down.position.x
+                        var gestureHandled = false
 
-                            val longPressJob = scope.launch {
-                                kotlinx.coroutines.delay(400)
-                                if (isPressed && !gestureHandled && keyDef.alternates.isNotEmpty()) {
-                                    showAlternates = true
-                                    activeAlternateIndex = 0
-                                }
+                        val longPressJob = scope.launch {
+                            kotlinx.coroutines.delay(400)
+                            if (isPressed && !gestureHandled && keyDef.alternates.isNotEmpty()) {
+                                showAlternates = true
+                                activeAlternateIndex = 0
                             }
+                        }
 
-                            var released = false
-                            try {
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Main)
-                                    val change = event.changes.firstOrNull() ?: break
-                                    if (change.changedToUp()) {
+                        var released = false
+                        try {
+                            while (true) {
+                                val event = awaitPointerEvent(PointerEventPass.Main)
+                                val change = event.changes.firstOrNull() ?: break
+
+                                // A scrollable ancestor claimed the gesture — abandon
+                                // this press without committing (equivalent to
+                                // tryAwaitRelease returning false in detectTapGestures).
+                                if (change.isConsumed) {
+                                    gestureHandled = true
+                                    isPressed = false
+                                    longPressJob.cancel()
+                                    break
+                                }
+
+                                if (change.changedToUp()) {
+                                    released = true
+                                    break
+                                }
+
+                                if (showAlternates) {
+                                    val dx = change.position.x - startX
+                                    val itemWidthPx = with(density) { 40.dp.toPx() }
+                                    val steps = (dx / itemWidthPx).toInt()
+                                    activeAlternateIndex = (steps).coerceIn(0, keyDef.alternates.lastIndex)
+                                } else {
+                                    val dy = change.position.y - startY
+                                    val dx = change.position.x - startX
+                                    if (!gestureHandled && dy < -swipeThresholdPx) {
+                                        // Swipe up → commit uppercase.
+                                        gestureHandled = true
+                                        isPressed = false
+                                        longPressJob.cancel()
+                                        currentOnSwipeUp?.invoke()
+                                        // Consume remaining until up.
+                                        while (true) {
+                                            val ev = awaitPointerEvent(PointerEventPass.Main)
+                                            if (ev.changes.all { it.changedToUp() }) break
+                                        }
                                         released = true
                                         break
-                                    }
-
-                                    if (showAlternates) {
-                                        val dx = change.position.x - startX
-                                        val itemWidthPx = with(density) { 40.dp.toPx() }
-                                        val steps = (dx / itemWidthPx).toInt()
-                                        activeAlternateIndex = (steps).coerceIn(0, keyDef.alternates.lastIndex)
-                                    } else {
-                                        val dy = change.position.y - startY
-                                        if (!gestureHandled && dy < -swipeThresholdPx) {
-                                            gestureHandled = true
-                                            isPressed = false
-                                            longPressJob.cancel()
-                                            currentOnSwipeUp?.invoke()
-                                            // Consume remaining until up
-                                            while (true) {
-                                                val ev = awaitPointerEvent(PointerEventPass.Main)
-                                                if (ev.changes.all { it.changedToUp() }) break
-                                            }
-                                            released = true
-                                            break
-                                        }
+                                    } else if (!gestureHandled &&
+                                        (dy > swipeThresholdPx || abs(dx) > swipeThresholdPx)) {
+                                        // Finger dragged out of the key (scrolling or
+                                        // sweeping away) — cancel the press silently.
+                                        gestureHandled = true
+                                        isPressed = false
+                                        longPressJob.cancel()
+                                        break
                                     }
                                 }
-                            } catch (_: Exception) {
-                                released = false
                             }
+                        } catch (_: Exception) {
+                            released = false
+                        }
 
-                            longPressJob.cancel()
-                            isPressed = false
-                            
-                            val wasShowingAlternates = showAlternates
-                            val finalActiveIndex = activeAlternateIndex
-                            showAlternates = false
-                            
-                            if (released && !gestureHandled) {
-                                if (wasShowingAlternates && finalActiveIndex in keyDef.alternates.indices) {
-                                    currentOnAlternateSelected?.invoke(keyDef.alternates[finalActiveIndex])
-                                } else {
-                                    currentOnClick()
-                                }
+                        longPressJob.cancel()
+                        isPressed = false
+
+                        val wasShowingAlternates = showAlternates
+                        val finalActiveIndex = activeAlternateIndex
+                        showAlternates = false
+
+                        // Fire the action ONLY on a confirmed, uncancelled release.
+                        if (released && !gestureHandled) {
+                            if (wasShowingAlternates && finalActiveIndex in keyDef.alternates.indices) {
+                                currentOnAlternateSelected?.invoke(keyDef.alternates[finalActiveIndex])
+                            } else {
+                                currentOnClick()
                             }
                         }
                     }
@@ -172,13 +199,16 @@ fun KeyButton(
             )
         }
         
-        // Main character label (qwertyChar) at bottom-right
+        // Main character label (qwertyChar). Smaller when it plays second fiddle
+        // to an EZ root in the same key; larger when it is the only label.
+        val hasEzRoot = keyDef.ezRoot.isNotEmpty()
         Text(
             text = displayLabel,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Normal,
+            fontSize = if (hasEzRoot) 12.sp else 20.sp,
+            fontWeight = if (hasEzRoot) FontWeight.Normal else FontWeight.Medium,
             color = textColor,
-            modifier = if (keyDef.ezRoot.isNotEmpty()) {
+            textAlign = TextAlign.Center,
+            modifier = if (hasEzRoot) {
                 Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 5.dp, bottom = 2.dp)

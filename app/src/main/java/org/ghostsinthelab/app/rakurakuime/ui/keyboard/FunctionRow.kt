@@ -83,12 +83,13 @@ fun FunctionRow(
 
         // Switch IME (Globe)
         KeyButton(
-            keyDef = KeyDefinition("🌐"),
+            keyDef = KeyDefinition(""),
             modifier = Modifier.weight(1f),
             keyHeight = keyHeight,
             backgroundColorOverride = colors.functionKeyBackground,
             textColorOverride = colors.functionKeyTextColor,
             contentDescription = stringResource(R.string.a11y_key_switch_ime),
+            keycapDrawableRes = R.drawable.outline_language_24,
             onClick = onSwitchIme
         )
 

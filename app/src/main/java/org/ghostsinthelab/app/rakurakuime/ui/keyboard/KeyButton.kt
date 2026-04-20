@@ -142,6 +142,11 @@ fun KeyButton(
     // place of the text labels if one is available. EZ layout opts in; other
     // layouts (English, Numbers, Emoji, function row) stay text-based.
     useKeycapDrawable: Boolean = false,
+    // Explicit drawable override for the key face. When non-zero, always
+    // rendered instead of text or the keycode_* auto-lookup. Useful for
+    // function keys that want a glyph outside the EZ-keycap set (e.g. the
+    // Material "language" icon on the Switch-IME key).
+    @DrawableRes keycapDrawableRes: Int = 0,
     onSwipeUp: (() -> Unit)? = null,
     onAlternateSelected: ((String) -> Unit)? = null,
     onClick: () -> Unit,
@@ -287,11 +292,13 @@ fun KeyButton(
         // it already contains the EZ root glyph + Latin/symbol label. The key
         // falls through to the text path below for anything unmapped (🌐, EN,
         // ?123, 😀, 中, etc.).
-        val keycapDrawable = if (useKeycapDrawable) {
-            keycapDrawableFor(keyDef.qwertyChar).takeIf { it != 0 }
+        val keycapDrawable = when {
+            keycapDrawableRes != 0 -> keycapDrawableRes
+            useKeycapDrawable -> keycapDrawableFor(keyDef.qwertyChar).takeIf { it != 0 }
                 ?: keycapDrawableFor(displayLabel).takeIf { it != 0 }
                 ?: 0
-        } else 0
+            else -> 0
+        }
         val useDrawable = keycapDrawable != 0
 
         if (useDrawable) {

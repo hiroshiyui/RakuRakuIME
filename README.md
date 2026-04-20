@@ -64,6 +64,11 @@ The `ezbig.utf-8.cin` dictionary data is licensed separately under:
 
 We express our gratitude to 高衡緒 and 輕鬆資訊企業社 for their historical contributions to Chinese input methods. (Note: 輕鬆資訊企業社 is no longer operational.)
 
+## Acknowledges
+
+- **高衡緒** — 輸入法發明人
+- **蕭易玄** — 輸入法碼表長期維護者
+
 ## Features
 
 - Modern, declarative UI built with **Jetpack Compose**.

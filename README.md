@@ -83,3 +83,8 @@ We express our gratitude to 高衡緒 and 輕鬆資訊企業社 for their histor
 1. Build and install the APK.
 2. Open the app to initialize the dictionary (this parses the `.utf-8.cin` file from assets).
 3. Go to Android Settings > System > Languages & input > On-screen keyboard and enable **RakuRakuIME**.
+
+## Related Resources
+
+- [輕鬆輸入法字詞編碼表整理工程](https://github.com/hiroshiyui/EzIM_Tables_Project)
+- [輕鬆輸入法之家](https://eshensh.net/ez/)

@@ -130,6 +130,7 @@ fun KeyboardScreen(
                                         isUppercase = isShifted,
                                         modifier = Modifier.weight(1f),
                                         keyHeight = scaledKeyHeight,
+                                        useKeycapDrawable = true,
                                         onSwipeUp = {
                                             onKeyPress()
                                             inputConnection()?.commitText(item.qwertyChar.uppercase(), 1)

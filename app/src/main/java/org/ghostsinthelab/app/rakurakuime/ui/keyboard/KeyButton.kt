@@ -18,11 +18,14 @@
 
 package org.ghostsinthelab.app.rakurakuime.ui.keyboard
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import kotlin.math.abs
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,10 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -49,10 +55,71 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RobotoSlab
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+
+// Maps a key's qwertyChar (or symbolic label like "⌫") to a pre-rendered
+// keycap vector drawable imported from EzIM_Tables_Project. The drawables
+// already include both the EZ root glyph and the Latin/symbol label, so when
+// one is returned we draw it in place of the text labels.
+@DrawableRes
+private fun keycapDrawableFor(label: String): Int = when (label) {
+    "`" -> R.drawable.keycode_grave
+    "1" -> R.drawable.keycode_1
+    "2" -> R.drawable.keycode_2
+    "3" -> R.drawable.keycode_3
+    "4" -> R.drawable.keycode_4
+    "5" -> R.drawable.keycode_5
+    "6" -> R.drawable.keycode_6
+    "7" -> R.drawable.keycode_7
+    "8" -> R.drawable.keycode_8
+    "9" -> R.drawable.keycode_9
+    "0" -> R.drawable.keycode_0
+    "-" -> R.drawable.keycode_minus
+    "=" -> R.drawable.keycode_equals
+    "q", "Q" -> R.drawable.keycode_q
+    "w", "W" -> R.drawable.keycode_w
+    "e", "E" -> R.drawable.keycode_e
+    "r", "R" -> R.drawable.keycode_r
+    "t", "T" -> R.drawable.keycode_t
+    "y", "Y" -> R.drawable.keycode_y
+    "u", "U" -> R.drawable.keycode_u
+    "i", "I" -> R.drawable.keycode_i
+    "o", "O" -> R.drawable.keycode_o
+    "p", "P" -> R.drawable.keycode_p
+    "[" -> R.drawable.keycode_left_bracket
+    "]" -> R.drawable.keycode_right_bracket
+    "a", "A" -> R.drawable.keycode_a
+    "s", "S" -> R.drawable.keycode_s
+    "d", "D" -> R.drawable.keycode_d
+    "f", "F" -> R.drawable.keycode_f
+    "g", "G" -> R.drawable.keycode_g
+    "h", "H" -> R.drawable.keycode_h
+    "j", "J" -> R.drawable.keycode_j
+    "k", "K" -> R.drawable.keycode_k
+    "l", "L" -> R.drawable.keycode_l
+    ";" -> R.drawable.keycode_semicolon
+    "'" -> R.drawable.keycode_apostrophe
+    "z", "Z" -> R.drawable.keycode_z
+    "x", "X" -> R.drawable.keycode_x
+    "c", "C" -> R.drawable.keycode_c
+    "v", "V" -> R.drawable.keycode_v
+    "b", "B" -> R.drawable.keycode_b
+    "n", "N" -> R.drawable.keycode_n
+    "m", "M" -> R.drawable.keycode_m
+    "," -> R.drawable.keycode_comma
+    "." -> R.drawable.keycode_period
+    "/" -> R.drawable.keycode_slash
+    "\\" -> R.drawable.keycode_backslash
+    " " -> R.drawable.keycode_space
+    "⌫" -> R.drawable.keycode_del
+    "⏎" -> R.drawable.keycode_enter
+    "⇧", "⇪" -> R.drawable.keycode_shift_left
+    else -> 0
+}
 
 @Composable
 fun KeyButton(
@@ -71,6 +138,10 @@ fun KeyButton(
     // Pass an explicit value for symbolic keys (⇧, ⌫, ⏎, 🌐) where
     // reading the glyph literally would not help a screen-reader user.
     contentDescription: String? = null,
+    // When true, render a pre-rendered vector keycap (keycode_* drawable) in
+    // place of the text labels if one is available. EZ layout opts in; other
+    // layouts (English, Numbers, Emoji, function row) stay text-based.
+    useKeycapDrawable: Boolean = false,
     onSwipeUp: (() -> Unit)? = null,
     onAlternateSelected: ((String) -> Unit)? = null,
     onClick: () -> Unit,
@@ -212,10 +283,31 @@ fun KeyButton(
             },
         contentAlignment = Alignment.Center,
     ) {
+        // Prefer a pre-rendered vector keycap when we have one for this key;
+        // it already contains the EZ root glyph + Latin/symbol label. The key
+        // falls through to the text path below for anything unmapped (🌐, EN,
+        // ?123, 😀, 中, etc.).
+        val keycapDrawable = if (useKeycapDrawable) {
+            keycapDrawableFor(keyDef.qwertyChar).takeIf { it != 0 }
+                ?: keycapDrawableFor(displayLabel).takeIf { it != 0 }
+                ?: 0
+        } else 0
+        val useDrawable = keycapDrawable != 0
+
+        if (useDrawable) {
+            Image(
+                painter = painterResource(id = keycapDrawable),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                colorFilter = ColorFilter.tint(textColor),
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
         // EZ Root (or free-form word) label. Positioned by rootLabelAlignment;
         // padding flips to match so it hugs the chosen edge without squeezing
         // the central qwertyChar.
-        if (keyDef.ezRoot.isNotEmpty()) {
+        if (!useDrawable && keyDef.ezRoot.isNotEmpty()) {
             val rootPadding = when (rootLabelAlignment) {
                 Alignment.BottomCenter -> Modifier.padding(bottom = 4.dp)
                 Alignment.TopCenter -> Modifier.padding(top = 4.dp)
@@ -245,7 +337,7 @@ fun KeyButton(
         // default so their coverage is preserved.
         val hasEzRoot = keyDef.ezRoot.isNotEmpty()
         val useSlabFont = displayLabel.isNotEmpty() && displayLabel.all { it.code in 0x20..0x7E }
-        Text(
+        if (!useDrawable) Text(
             text = displayLabel,
             fontSize = if (hasEzRoot) 12.sp else 20.sp,
             fontFamily = if (useSlabFont) RobotoSlab else null,
@@ -275,15 +367,25 @@ fun KeyButton(
                         .background(colors.keyBackground),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val previewText = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel
-                    val previewSlab = previewText.isNotEmpty() && previewText.all { it.code in 0x20..0x7E }
-                    Text(
-                        text = previewText,
-                        fontSize = 32.sp,
-                        fontFamily = if (previewSlab) RobotoSlab else null,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.keyTextColor,
-                    )
+                    if (useDrawable) {
+                        Image(
+                            painter = painterResource(id = keycapDrawable),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.tint(colors.keyTextColor),
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        val previewText = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel
+                        val previewSlab = previewText.isNotEmpty() && previewText.all { it.code in 0x20..0x7E }
+                        Text(
+                            text = previewText,
+                            fontSize = 32.sp,
+                            fontFamily = if (previewSlab) RobotoSlab else null,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.keyTextColor,
+                        )
+                    }
                 }
             }
         }

@@ -19,3 +19,5 @@ local.properties
 # GitHub Release, not stored in the repo.
 /app/debug/
 /app/release/
+.idea/inspectionProfiles/
+.idea/misc.xml

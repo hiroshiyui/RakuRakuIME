@@ -102,7 +102,7 @@ fun SettingsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -119,12 +119,16 @@ fun SettingsScreen(
                 color = if (imeEnabled) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.error
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Button(onClick = {
+        }
+        Button(
+            onClick = {
                 context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
-            }) {
-                Text(stringResource(R.string.settings_ime_enable_button))
-            }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 8.dp)
+        ) {
+            Text(stringResource(R.string.settings_ime_enable_button))
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))

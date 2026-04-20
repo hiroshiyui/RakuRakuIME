@@ -21,6 +21,7 @@ package org.ghostsinthelab.app.rakurakuime
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,8 +38,9 @@ import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
+
         val userPreferences = UserPreferences(this)
 
         setContent {
@@ -67,8 +69,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val insetsModifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
                     if (!isReady) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Box(modifier = insetsModifier, contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 CircularProgressIndicator()
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -78,7 +83,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         SettingsScreen(
                             userPreferences = userPreferences,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = insetsModifier
                         )
                     }
                 }

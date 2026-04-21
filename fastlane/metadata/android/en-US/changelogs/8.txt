@@ -1,0 +1,1 @@
+Disable AGP's "Dependency metadata" signing block so the release APK passes F-Droid's scanner and can be reproducibly built.

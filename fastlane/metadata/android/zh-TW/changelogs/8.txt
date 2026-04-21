@@ -1,0 +1,1 @@
+關閉 AGP 的「Dependency metadata」簽章區塊，讓發行版 APK 可通過 F-Droid 掃描並達成可重現建置。

@@ -27,7 +27,14 @@ Builds:
     gradle:
       - yes
 
+  - versionName: 1.0.6
+    versionCode: 8
+    commit: 653620545f25d424dcf21277f2ecc931138f63e9
+    subdir: app
+    gradle:
+      - yes
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.5
-CurrentVersionCode: 7
+CurrentVersion: 1.0.6
+CurrentVersionCode: 8

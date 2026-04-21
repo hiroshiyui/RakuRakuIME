@@ -91,8 +91,57 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+// Captures showcase screenshots (settings + keyboard modes) without letting
+// the test runner uninstall the app afterwards — AGP's connectedAndroidTest
+// task always uninstalls, which wipes the app's external files dir, so we
+// drive `am instrument` ourselves.
+val adbPath: String = run {
+    val sdk = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+    if (sdk != null) "$sdk/platform-tools/adb" else "adb"
+}
+val screenshotRemoteDir = "/sdcard/Android/data/org.ghostsinthelab.app.rakurakuime/files/screenshots"
+val screenshotLocalDir = layout.buildDirectory.dir("reports/screenshots")
+
+val runKeyboardScreenshotTest = tasks.register<Exec>("runKeyboardScreenshotTest") {
+    group = "verification"
+    description = "Run KeyboardScreenshotTest without uninstalling the app afterwards."
+    dependsOn("installDebug", "installDebugAndroidTest")
+    commandLine(
+        adbPath, "shell", "am", "instrument", "-w",
+        "-e", "class", "org.ghostsinthelab.app.rakurakuime.KeyboardScreenshotTest",
+        "org.ghostsinthelab.app.rakurakuime.test/androidx.test.runner.AndroidJUnitRunner",
+    )
+}
+
+tasks.register<Exec>("screenshotKeyboard") {
+    group = "verification"
+    description = "Run KeyboardScreenshotTest, pull the PNGs, and copy them into fastlane/."
+    dependsOn(runKeyboardScreenshotTest)
+    val local = screenshotLocalDir.get().asFile
+    doFirst { local.mkdirs() }
+    commandLine(adbPath, "pull", screenshotRemoteDir, local.absolutePath)
+    doLast {
+        val pulled = File(local, "screenshots")
+        val mapping = mapOf(
+            "settings.png" to "01_settings.png",
+            "keyboard_ez.png" to "02_ez_keyboard.png",
+            "keyboard_english.png" to "03_english_keyboard.png",
+            "keyboard_emoji.png" to "04_emoji_keyboard.png",
+        )
+        val fastlaneRoot = rootProject.file("fastlane/metadata/android")
+        for (locale in listOf("zh-TW", "en-US")) {
+            val dstDir = File(fastlaneRoot, "$locale/images/phoneScreenshots").apply { mkdirs() }
+            for ((src, dst) in mapping) {
+                File(pulled, src).copyTo(File(dstDir, dst), overwrite = true)
+            }
+        }
+        logger.lifecycle("Screenshots pulled to: $local and copied into fastlane/ for zh-TW and en-US")
+    }
 }

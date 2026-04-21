@@ -61,6 +61,12 @@ android {
     buildFeatures {
         compose = true
     }
+    // F-Droid's scanner rejects APKs containing AGP's "Dependency metadata"
+    // signing block (an encrypted, Google-signed blob of the dependency list).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 // Name every build artifact as "<applicationId>-<versionName>", so the

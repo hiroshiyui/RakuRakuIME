@@ -1,0 +1,5 @@
+1.0.5 版更新。
+
+僅為打包調整：從 settings.gradle.kts 移除 org.gradle.toolchains
+.foojay-resolver-convention 外掛，以符合 F-Droid 掃描器規範。
+功能與 1.0.4 版完全相同。

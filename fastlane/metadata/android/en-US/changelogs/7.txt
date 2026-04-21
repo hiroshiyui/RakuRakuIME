@@ -1,0 +1,5 @@
+Release 1.0.5.
+
+Packaging-only update: removed the org.gradle.toolchains.foojay-
+resolver-convention plugin from settings.gradle.kts so F-Droid's
+scanner accepts the build. No user-facing changes from 1.0.4.

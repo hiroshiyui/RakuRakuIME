@@ -7,7 +7,7 @@
 #   * an RFP (Request For Packaging) issue at
 #     https://gitlab.com/fdroid/rfp/-/issues, or
 #   * a merge request that adds the file directly to `fdroiddata/metadata/`.
-# Tag/commit references below assume release 1.0.4.
+# Tag/commit references below assume release 1.0.5.
 #
 # Author metadata (AuthorEmail, AuthorWebSite) is deliberately aligned
 # with the other app in this author's fdroiddata footprint:
@@ -30,14 +30,14 @@ RepoType: git
 Repo: https://github.com/hiroshiyui/RakuRakuIME.git
 
 Builds:
-  - versionName: 1.0.4
-    versionCode: 6
-    commit: 1.0.4
+  - versionName: 1.0.5
+    versionCode: 7
+    commit: 1.0.5
     subdir: app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.4
-CurrentVersionCode: 6
+CurrentVersion: 1.0.5
+CurrentVersionCode: 7

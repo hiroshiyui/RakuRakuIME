@@ -135,8 +135,11 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     var onUpdateComposingText: ((String) -> Unit)? = null
 
     private fun updateInlineComposing() {
-        val text = _preEditBuffer.value + _composingText.value
-        onUpdateComposingText?.invoke(text)
+        // Only push the already-selected pre-edit characters into the target
+        // editor's composing region; the in-progress EZ roots live in the
+        // candidate bar instead so unselected keystrokes never leak into the
+        // user's document.
+        onUpdateComposingText?.invoke(_preEditBuffer.value)
     }
 
     private val PAGE_SIZE = 10

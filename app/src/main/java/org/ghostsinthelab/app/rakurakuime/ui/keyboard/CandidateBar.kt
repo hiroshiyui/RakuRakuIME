@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -47,6 +48,7 @@ fun CandidateBar(
     onCandidateSelected: (String) -> Unit,
     onPrevPage: () -> Unit,
     onNextPage: () -> Unit,
+    composingRoots: String = "",
 ) {
     val colors = KeyboardTheme.current
 
@@ -57,6 +59,39 @@ fun CandidateBar(
             .background(colors.candidateBarBackground),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // In-progress EZ roots shown at the start of the bar — not committed
+        // to the target editor, so the user's document only ever receives
+        // the chosen character/phrase.
+        if (composingRoots.isNotEmpty()) {
+            Text(
+                text = composingRoots,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = colors.composingRootsColor,
+                modifier = Modifier.padding(horizontal = 12.dp),
+            )
+            // Engraved "dented" separator: a darker hairline paired with a
+            // lighter highlight line, giving the appearance of a groove
+            // etched into the bar background.
+            Row(
+                modifier = Modifier.fillMaxHeight(0.5f),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.rootLabelColor.copy(alpha = 0.35f)),
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(Color.White.copy(alpha = 0.55f)),
+                )
+            }
+        }
+
         // Prev button
         if (hasPrev) {
             val prevDescription = stringResource(R.string.a11y_candidate_prev_page)

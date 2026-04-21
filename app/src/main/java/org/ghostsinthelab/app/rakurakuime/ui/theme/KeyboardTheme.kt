@@ -37,6 +37,7 @@ data class KeyboardThemeColors(
     val functionKeyTextColor: Color,
     val candidateBarBackground: Color,
     val candidateTextColor: Color,
+    val composingRootsColor: Color,
     val rootLabelColor: Color,
 )
 
@@ -49,6 +50,7 @@ fun KeyboardThemeColors(colorScheme: ColorScheme): KeyboardThemeColors = Keyboar
     functionKeyTextColor = colorScheme.onSecondaryContainer,
     candidateBarBackground = colorScheme.surfaceContainer,
     candidateTextColor = colorScheme.onSurface,
+    composingRootsColor = colorScheme.primary,
     rootLabelColor = colorScheme.onSurfaceVariant,
 )
 

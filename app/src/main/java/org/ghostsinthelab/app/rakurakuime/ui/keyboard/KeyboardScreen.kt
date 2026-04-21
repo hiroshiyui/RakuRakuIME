@@ -95,7 +95,8 @@ fun KeyboardScreen(
                 }
             },
             onPrevPage = { viewModel.prevPage() },
-            onNextPage = { viewModel.nextPage() }
+            onNextPage = { viewModel.nextPage() },
+            composingRoots = if (inputMode == InputMode.EZ) composingText else "",
         )
 
         Spacer(modifier = Modifier.height(4.dp))

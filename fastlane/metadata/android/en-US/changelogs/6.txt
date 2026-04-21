@@ -1,0 +1,23 @@
+Release 1.0.4.
+
+* EZ composing roots now render inside the candidate bar (theme-accent
+  coloured) instead of leaking into the target editor. Only the chosen
+  character or phrase is committed. An engraved "dented" separator
+  divides the roots from the candidate list.
+* Key-press preview popup no longer wraps multi-character labels like
+  "?123" onto two lines — the preview auto-grows horizontally and uses
+  a smaller single-line font for multi-char glyphs.
+* Mode-cycle key now shows "輕" (from 輕鬆輸入法) for the EZ layout
+  instead of the generic "中".
+* Enter key commits the current pre-edit / English word when the
+  buffer is non-empty; sends a real Enter keystroke only when there
+  is nothing to commit.
+* Candidate bar shows muted "…" overflow indicators at either edge
+  when more candidates are off-screen.
+* Soft keyboard stays visible even when a hardware keyboard is
+  attached.
+* System navigation bar is tinted to match the keyboard background
+  (Gboard-style), with matching light/dark icon appearance.
+* Extra breathing room below the bottom function-key row so the
+  close/switch-IME keys are less prone to mis-taps near the system
+  navigation area.

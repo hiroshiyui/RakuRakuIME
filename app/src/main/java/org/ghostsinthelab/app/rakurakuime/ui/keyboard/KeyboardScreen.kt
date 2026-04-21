@@ -432,19 +432,23 @@ fun KeyboardScreen(
             },
             onEnter = {
                 onKeyPress()
-                if (inputMode == InputMode.ENGLISH) {
+                val committed = if (inputMode == InputMode.ENGLISH) {
                     val buffer = viewModel.commitEnglishBuffer()
                     if (buffer.isNotEmpty()) {
                         inputConnection()?.commitText(buffer, 1)
-                    }
+                        true
+                    } else false
                 } else {
                     val textToCommit = viewModel.commitAll()
                     if (textToCommit.isNotEmpty()) {
                         inputConnection()?.commitText(textToCommit, 1)
-                    }
+                        true
+                    } else false
                 }
-                inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
-                inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+                if (!committed) {
+                    inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+                    inputConnection()?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+                }
             },
             onToggleShift = { 
                 onKeyPress()

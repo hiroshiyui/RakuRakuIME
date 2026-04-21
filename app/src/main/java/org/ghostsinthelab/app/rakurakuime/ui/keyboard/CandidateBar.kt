@@ -23,6 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -75,32 +76,60 @@ fun CandidateBar(
         }
 
         // Candidates list
-        LazyRow(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(horizontal = 8.dp)
-        ) {
-            itemsIndexed(candidates) { index, candidate ->
-                val selKey = if (index < 9) (index + 1).toString() else if (index == 9) "0" else ""
-                Row(
-                    modifier = Modifier
-                        .clickable { onCandidateSelected(candidate) }
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    if (selKey.isNotEmpty()) {
+        val listState = rememberLazyListState()
+        Box(modifier = Modifier.weight(1f)) {
+            LazyRow(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                itemsIndexed(candidates) { index, candidate ->
+                    val selKey = if (index < 9) (index + 1).toString() else if (index == 9) "0" else ""
+                    Row(
+                        modifier = Modifier
+                            .clickable { onCandidateSelected(candidate) }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        if (selKey.isNotEmpty()) {
+                            Text(
+                                text = selKey,
+                                fontSize = 10.sp,
+                                color = colors.rootLabelColor,
+                                modifier = Modifier.padding(end = 4.dp, bottom = 2.dp)
+                            )
+                        }
                         Text(
-                            text = selKey,
-                            fontSize = 10.sp,
-                            color = colors.rootLabelColor,
-                            modifier = Modifier.padding(end = 4.dp, bottom = 2.dp)
+                            text = candidate,
+                            fontSize = 20.sp,
+                            color = colors.candidateTextColor
                         )
                     }
-                    Text(
-                        text = candidate,
-                        fontSize = 20.sp,
-                        color = colors.candidateTextColor
-                    )
+                }
+            }
+            if (listState.canScrollBackward) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .fillMaxHeight()
+                        .background(colors.candidateBarBackground)
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "…", color = colors.rootLabelColor.copy(alpha = 0.45f), fontSize = 20.sp)
+                }
+            }
+            if (listState.canScrollForward) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .background(colors.candidateBarBackground)
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "…", color = colors.rootLabelColor.copy(alpha = 0.45f), fontSize = 20.sp)
                 }
             }
         }

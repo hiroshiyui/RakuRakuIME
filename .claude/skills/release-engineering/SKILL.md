@@ -23,19 +23,23 @@ Bump manually by editing `app/build.gradle.kts`. No `bumpPatchVersion` Gradle ta
    - Increment `versionCode` by 1.
    - Update `versionName` per the change's scope (patch / minor / major).
 3. **Update docs if needed** — `README.md`, `TODOs.md`.
-4. **Run verification** before tagging:
+4. **Run verification** before committing:
    ```bash
    ./gradlew :app:lint
    ./gradlew :app:testDebugUnitTest        # if unit tests exist
    ./gradlew :app:assembleDebug
    ./gradlew :app:assembleRelease          # release build (minification per build.gradle.kts)
    ```
-5. **Build signed APKs** — signing requires a keystore passphrase. **Do not run the signed build automatically.** Prompt the user to build via Android Studio (Build → Generate Signed APK) or with their local signing config, then wait for confirmation. The artifacts land in `app/release/*.apk` and `app/debug/*.apk`, with matching `.asc` signature files.
-6. **Create release commit** — subject: `Release <versionName>`.
-7. **Tag the release** — lightweight tag matching `versionName` (e.g. `1.0.4`), no `v` prefix:
+5. **Create release commit** — subject: `Release <versionName>`. **This must happen before signing.**
+6. **Tag the release** — lightweight tag matching `versionName` (e.g. `1.0.4`), no `v` prefix:
    ```bash
    git tag <versionName>
    ```
+7. **Build signed APKs from the tagged release commit.** Signing requires a keystore passphrase — **do not run the signed build automatically.** Before prompting the user, explicitly remind them:
+
+   > ⚠️ **Build the signed APKs from the `<versionName>` commit (`git rev-parse <versionName>`).** The APK embeds a VCS-info block with the commit SHA; if you sign from a dirty or pre-commit working tree, F-Droid's reproducible build will produce a different checksum than the binary attached to the GitHub release, and the `AllowedAPKSigningKeys` match will fail downstream.
+
+   Confirm `git status` is clean and `git rev-parse HEAD` matches the tag before asking the user to sign. The artifacts land in `app/release/*.apk` and `app/debug/*.apk`, with matching `.asc` signature files.
 8. **Push** commit and tag after the user confirms (user's standing preference: push without pausing for confirmation when a release is fully prepared):
    ```bash
    git push origin main
@@ -106,6 +110,7 @@ Notes:
 - Single remote: `origin` → `git@github.com:hiroshiyui/RakuRakuIME.git`. No mirror.
 - The release APK requires a signing config the user maintains outside version control.
 - Force-push to `main` is never done without explicit user authorisation.
-- Release sequence is always: bump → verify → sign → commit → tag → push → `gh release create` → update `fdroid.yml` + `fdroiddata/…` → add `changelogs/<versionCode>.txt`.
+- Release sequence is always: bump → verify → commit → tag → **sign from the tagged commit** → push → `gh release create` → update `fdroid.yml` + `fdroiddata/…` → add `changelogs/<versionCode>.txt`.
+- **Reproducible-build reminder.** F-Droid rebuilds the APK from the commit pinned in `Builds:` and compares checksums against the binary on the GitHub release. Signing from a dirty or pre-commit working tree silently breaks that match because the APK's VCS-info block embeds the HEAD SHA. Always sign AFTER the release commit+tag is in place.
 
 ## Task: $ARGUMENTS

@@ -83,7 +83,10 @@ class RakuRakuImeService : InputMethodService() {
 
     // Keep the on-screen keyboard visible even when a hardware keyboard is
     // attached; otherwise the framework hides the input view by default.
-    override fun onEvaluateInputViewShown(): Boolean = true
+    override fun onEvaluateInputViewShown(): Boolean {
+        super.onEvaluateInputViewShown()
+        return true
+    }
 
     override fun onCreateInputView(): View {
         window?.window?.decorView?.let { decorView ->

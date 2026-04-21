@@ -55,7 +55,7 @@ fun FunctionRow(
             InputMode.EZ -> KeyDefinition("EN")
             InputMode.ENGLISH -> KeyDefinition("?123")
             InputMode.NUMBER -> KeyDefinition("\uD83D\uDE00") // 😀
-            InputMode.EMOJI -> KeyDefinition("中")
+            InputMode.EMOJI -> KeyDefinition("輕")
         }
         val modeKeyDescription = when (inputMode) {
             InputMode.EZ -> stringResource(R.string.a11y_key_mode_to_english)

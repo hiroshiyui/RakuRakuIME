@@ -368,10 +368,12 @@ fun KeyButton(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp, 60.dp)
+                        .height(60.dp)
+                        .widthIn(min = 50.dp)
                         .shadow(4.dp, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
-                        .background(colors.keyBackground),
+                        .background(colors.keyBackground)
+                        .padding(horizontal = 12.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (useDrawable) {
@@ -385,12 +387,18 @@ fun KeyButton(
                     } else {
                         val previewText = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel
                         val previewSlab = previewText.isNotEmpty() && previewText.all { it.code in 0x20..0x7E }
+                        // Multi-char labels (e.g. "?123", "EN", "中") stay
+                        // on one line at a smaller size so the preview box
+                        // can grow horizontally via widthIn without wrapping.
+                        val previewFontSize = if (previewText.length > 1) 22.sp else 32.sp
                         Text(
                             text = previewText,
-                            fontSize = 32.sp,
+                            fontSize = previewFontSize,
                             fontFamily = if (previewSlab) RobotoSlab else null,
                             fontWeight = FontWeight.Bold,
                             color = colors.keyTextColor,
+                            maxLines = 1,
+                            softWrap = false,
                         )
                     }
                 }

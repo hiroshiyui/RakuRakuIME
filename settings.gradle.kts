@@ -29,9 +29,10 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
+// The foojay-resolver-convention plugin is intentionally omitted: nothing in
+// this project configures a Java toolchain, and F-Droid's scanner flags it
+// as a "usual suspect" because it downloads JDK binaries over the network at
+// build time, which violates F-Droid's reproducible-build policy.
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {

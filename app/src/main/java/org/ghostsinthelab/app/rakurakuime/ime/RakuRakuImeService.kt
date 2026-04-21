@@ -19,11 +19,16 @@
 package org.ghostsinthelab.app.rakurakuime.ime
 
 import android.inputmethodservice.InputMethodService
+import android.os.Build
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -95,6 +100,21 @@ class RakuRakuImeService : InputMethodService() {
                 val themeMode by viewModel.themeMode.collectAsState(initial = ThemeMode.DYNAMIC)
                 RakuRakuIMETheme(themeMode = themeMode) {
                     KeyboardTheme {
+                        // Tint the system navigation bar to match the keyboard
+                        // background (Gboard-style), with a matching light/dark
+                        // icon appearance so the gesture pill stays legible.
+                        val navBarColor = KeyboardTheme.current.keyboardBackground
+                        SideEffect {
+                            window?.window?.let { win ->
+                                @Suppress("DEPRECATION")
+                                win.navigationBarColor = navBarColor.toArgb()
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    win.isNavigationBarContrastEnforced = false
+                                }
+                                WindowCompat.getInsetsController(win, win.decorView)
+                                    .isAppearanceLightNavigationBars = navBarColor.luminance() > 0.5f
+                            }
+                        }
                         KeyboardScreen(
                             viewModel = viewModel,
                             // Lazy accessor so the Compose tree always sees

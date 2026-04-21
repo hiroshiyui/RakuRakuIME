@@ -77,7 +77,6 @@ fun KeyboardScreen(
             .fillMaxWidth()
             .background(colors.keyboardBackground)
             .navigationBarsPadding()
-            .padding(bottom = 8.dp)
     ) {
         // Candidate Bar — sources differ per mode. English uses the in-memory
         // trie (non-paginated); EZ uses the paged Room-backed candidate list.
@@ -460,5 +459,7 @@ fun KeyboardScreen(
             },
             onSwitchIme = onSwitchIme
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }

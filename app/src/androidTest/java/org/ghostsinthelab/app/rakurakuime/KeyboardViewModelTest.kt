@@ -77,6 +77,31 @@ class KeyboardViewModelTest {
     }
 
     @Test
+    fun appendToPreEdit_exitsSelectionMode() {
+        // Simulate the user entering candidate-selection: pretend a
+        // non-empty candidate list exists and space has been pressed.
+        // (We can't call updateCandidates directly without hitting the
+        // DB, so drive isSelecting via enterSelectionMode's side door:
+        // it requires candidates.value to be non-empty. Instead, use
+        // the real keypress path far enough to populate candidates.)
+        viewModel.onKeyPress("a")
+        // Wait briefly for the coroutine-driven candidate update to
+        // land so enterSelectionMode can flip the flag.
+        Thread.sleep(300)
+        viewModel.enterSelectionMode()
+        assertTrue(
+            "precondition: isSelecting must be true before the punctuation insert",
+            viewModel.isSelecting.value,
+        )
+
+        viewModel.appendToPreEdit("，")
+
+        // Punctuation must break the selection flow so the next digit
+        // press commits a digit instead of selecting candidate N.
+        assertEquals(false, viewModel.isSelecting.value)
+    }
+
+    @Test
     fun commitPreEditOnly_returnsPreEditAndDropsIncompleteRoots() {
         viewModel.appendToPreEdit("你好")
         viewModel.onKeyPress("a")  // in-progress EZ root — should be dropped

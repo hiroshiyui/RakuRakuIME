@@ -471,6 +471,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     fun appendToPreEdit(text: String) {
         if (text.isEmpty()) return
         _preEditBuffer.value = _preEditBuffer.value + text
+        // A punctuation insert breaks any active candidate-selection
+        // flow: otherwise the next digit keypress would still be read
+        // as "select candidate N" against the stale candidate list.
+        _isSelecting.value = false
         updateInlineComposing()
     }
 

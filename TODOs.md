@@ -60,29 +60,19 @@ changes (commits `5cce2df` → `bcf47fe`).
 
 ### Medium
 
-- [ ] **M1 — `appendToPreEdit` leaves `_isSelecting` + candidates stale**
-    - **Where:** `KeyboardViewModel.kt:411-416`.
-    - **Issue:** if the user has entered candidate-selection mode
-      (space pressed once, `_isSelecting = true`, candidate bar
-      showing) and then long-presses a key to pick a punctuation
-      alternate, `appendToPreEdit` mutates `_preEditBuffer` but leaves
-      `_isSelecting` and `_candidates` untouched. The next digit
-      press is still interpreted by `KeyboardScreen.kt:152` as
-      "select candidate N" instead of committing the digit.
-    - **Fix:** set `_isSelecting.value = false` inside
-      `appendToPreEdit` (punctuation breaks the selection flow).
-    - **Test:** extend `KeyboardViewModelTest` with an
-      "appendToPreEdit_exitsSelectionMode" case.
+- [x] **M1 — `appendToPreEdit` leaves `_isSelecting` + candidates stale**
+    - **Landed:** `appendToPreEdit` now clears `_isSelecting` so a
+      punctuation insert breaks the candidate-selection flow;
+      subsequent digit keypresses commit a digit instead of selecting
+      a stale candidate. New
+      `KeyboardViewModelTest.appendToPreEdit_exitsSelectionMode`
+      guards the behavior.
 
-- [ ] **M2 — `onToggleMode` flush path is a binary `if` over 4 modes**
-    - **Where:** `KeyboardScreen.kt:468-483`.
-    - **Issue:** readability — `if (inputMode == ENGLISH) … else …`
-      reads as if only two modes exist, yet NUMBER and EMOJI also
-      route through the `else` (safely, because both buffers are
-      empty there). A `when (inputMode)` makes the intent explicit.
-    - **Fix:** rewrite as `when (inputMode) { ENGLISH -> …; EZ -> …;
-      NUMBER, EMOJI -> "" }` and skip the `commitText` call entirely
-      for NUMBER/EMOJI to avoid the no-op `clearComposing()` → empty
+- [x] **M2 — `onToggleMode` flush path is a binary `if` over 4 modes**
+    - **Landed:** rewrote the flush as an exhaustive
+      `when (inputMode)` covering all four cases; NUMBER and EMOJI
+      return an empty string directly, skipping the no-op
+      `commitPreEditOnly()` → `clearComposing()` → empty
       `onUpdateComposingText` round-trip.
 
 ### Low / Informational

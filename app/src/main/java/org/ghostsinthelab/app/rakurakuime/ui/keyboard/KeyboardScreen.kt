@@ -478,14 +478,12 @@ fun KeyboardScreen(
                 onKeyPress()
                 // Flush any pending composition into the target editor before
                 // switching layouts so the user doesn't silently lose text
-                // they've already picked (EZ pre-edit / English buffer).
-                val pending = if (inputMode == InputMode.ENGLISH) {
-                    viewModel.commitEnglishBuffer()
-                } else {
-                    // EZ mode: commit already-selected pre-edit characters
-                    // but drop any in-progress roots — those keystrokes are
-                    // meaningless in the destination layout.
-                    viewModel.commitPreEditOnly()
+                // they've already picked. NUMBER and EMOJI hold no buffer,
+                // so there's nothing to commit for them.
+                val pending = when (inputMode) {
+                    InputMode.ENGLISH -> viewModel.commitEnglishBuffer()
+                    InputMode.EZ -> viewModel.commitPreEditOnly()
+                    InputMode.NUMBER, InputMode.EMOJI -> ""
                 }
                 if (pending.isNotEmpty()) {
                     inputConnection()?.commitText(pending, 1)

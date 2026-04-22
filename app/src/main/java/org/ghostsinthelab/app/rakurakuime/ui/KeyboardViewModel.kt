@@ -375,6 +375,19 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
+     * Appends arbitrary text (e.g. a punctuation/symbol chosen from a key's
+     * alternate popup in EZ mode) to the pre-edit buffer, so it stays in the
+     * composing region instead of being committed to the editor immediately.
+     * In-progress EZ roots in [_composingText] are left untouched; the user
+     * can still finish or abandon the sequence.
+     */
+    fun appendToPreEdit(text: String) {
+        if (text.isEmpty()) return
+        _preEditBuffer.value = _preEditBuffer.value + text
+        updateInlineComposing()
+    }
+
+    /**
      * Commits the selected candidate to the pre-edit buffer and clears the composing state.
      * Also updates the frequency of the candidate in the database for future sorting.
      *
@@ -404,6 +417,19 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
      */
     fun commitAll(): String {
         val text = _preEditBuffer.value + _composingText.value
+        clearComposing()
+        return text
+    }
+
+    /**
+     * Returns only the already-selected pre-edit characters, dropping any
+     * in-progress EZ roots in [_composingText]. Used when switching input
+     * modes: the user has committed to those characters by picking them,
+     * but raw keystrokes that haven't resolved to a candidate yet would be
+     * meaningless in the next layout.
+     */
+    fun commitPreEditOnly(): String {
+        val text = _preEditBuffer.value
         clearComposing()
         return text
     }

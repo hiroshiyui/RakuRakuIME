@@ -137,7 +137,12 @@ fun KeyboardScreen(
                                         },
                                         onAlternateSelected = { alt ->
                                             onKeyPress()
-                                            inputConnection()?.commitText(if (isShifted) alt.uppercase() else alt.lowercase(), 1)
+                                            // Route punctuation/symbols from the alternates popup
+                                            // into the pre-edit buffer so they stay in the composing
+                                            // region and can still be edited/committed with the rest
+                                            // of the in-progress text, rather than being dumped
+                                            // straight into the target editor.
+                                            viewModel.appendToPreEdit(if (isShifted) alt.uppercase() else alt.lowercase())
                                             // Auto-release one-shot shift after we've applied it.
                                             viewModel.consumeShift()
                                         },
@@ -454,9 +459,23 @@ fun KeyboardScreen(
                 onKeyPress()
                 viewModel.toggleShift() 
             },
-            onToggleMode = { mode -> 
+            onToggleMode = { mode ->
                 onKeyPress()
-                viewModel.setInputMode(mode) 
+                // Flush any pending composition into the target editor before
+                // switching layouts so the user doesn't silently lose text
+                // they've already picked (EZ pre-edit / English buffer).
+                val pending = if (inputMode == InputMode.ENGLISH) {
+                    viewModel.commitEnglishBuffer()
+                } else {
+                    // EZ mode: commit already-selected pre-edit characters
+                    // but drop any in-progress roots — those keystrokes are
+                    // meaningless in the destination layout.
+                    viewModel.commitPreEditOnly()
+                }
+                if (pending.isNotEmpty()) {
+                    inputConnection()?.commitText(pending, 1)
+                }
+                viewModel.setInputMode(mode)
             },
             onSwitchIme = onSwitchIme
         )

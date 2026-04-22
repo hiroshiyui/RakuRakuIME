@@ -69,17 +69,14 @@ Attach both release and debug APKs plus their `.asc` signatures (established pat
 
 ## F-Droid Metadata
 
-After cutting a GitHub release, update F-Droid metadata. Two parallel files must stay in sync:
-
-1. **In-repo reference copy:** `fdroid.yml` (at the repo root).
-2. **F-Droid's `fdroiddata` repo:** `/home/yhh/MyProjects/fdroiddata/metadata/org.ghostsinthelab.app.rakurakuime.yml`.
-
-For each file, update:
-- The latest `Builds:` entry — set `versionName`, `versionCode`, and `commit` to the new release (the `commit` field references the tag name).
-- `CurrentVersion:` and `CurrentVersionCode:`.
-- The "Tag/commit references below assume release …" comment at the top of the in-repo `fdroid.yml` (not present in the `fdroiddata` copy).
-
-The changes in `/home/yhh/MyProjects/fdroiddata/` live in a separate git repo — remind the user to commit and push that one themselves; this skill's `commit-and-push` only covers the RakuRakuIME repo.
+Nothing to do here. The app is published on F-Droid and the
+`fdroiddata` metadata file
+(`/home/yhh/MyProjects/fdroiddata/metadata/org.ghostsinthelab.app.rakurakuime.yml`)
+is refreshed automatically by F-Droid's `AutoUpdateMode: Version` +
+`UpdateCheckMode: Tags`, picking up each new `Builds:` entry from
+the tagged release. Do not edit that file by hand, and do not
+reintroduce the old in-repo `fdroid.yml` reference copy — it was
+removed once F-Droid took over as the source of truth.
 
 ## Fastlane Metadata
 
@@ -110,7 +107,7 @@ Notes:
 - Single remote: `origin` → `git@github.com:hiroshiyui/RakuRakuIME.git`. No mirror.
 - The release APK requires a signing config the user maintains outside version control.
 - Force-push to `main` is never done without explicit user authorisation.
-- Release sequence is always: bump → verify → commit → tag → **sign from the tagged commit** → push → `gh release create` → update `fdroid.yml` + `fdroiddata/…` → add `changelogs/<versionCode>.txt`.
+- Release sequence is always: bump → verify → commit → tag → **sign from the tagged commit** → push → `gh release create`. Fastlane changelogs land inside the bump commit (`changelogs/<versionCode>.txt`); F-Droid's `fdroiddata` entry updates automatically off the new tag.
 - **Reproducible-build reminder.** F-Droid rebuilds the APK from the commit pinned in `Builds:` and compares checksums against the binary on the GitHub release. Signing from a dirty or pre-commit working tree silently breaks that match because the APK's VCS-info block embeds the HEAD SHA. Always sign AFTER the release commit+tag is in place.
 
 ## Task: $ARGUMENTS

@@ -1,0 +1,19 @@
+- EZ: picking a punctuation/symbol from a key's long-press popup
+  now keeps it in the pre-edit buffer instead of committing it
+  straight to the editor.
+- Switching between keyboard layouts now commits the already-
+  selected pre-edit characters first (incomplete EZ roots are
+  dropped since they're meaningless in the next layout).
+- English: keycaps show the shifted alternate (e.g. ! above 1,
+  : above ;) at the top-left of each symbol key.
+- IME now auto-picks the most useful layout for the target field:
+  numeric/phone/date fields → Numbers; email/URI/password fields
+  → English.
+- Password fields, fields with TYPE_TEXT_FLAG_NO_SUGGESTIONS, and
+  fields with IME_FLAG_NO_PERSONALIZED_LEARNING now run English in
+  "asciiOnly" mode — no prediction bar, no composing buffer, no
+  learned frequencies — so typed prefixes never surface on screen
+  or feed the prediction trie.
+- Fix: inserting a punctuation while in candidate-selection mode
+  no longer leaves the selection flag stuck; the next digit press
+  commits a digit instead of selecting a stale candidate.

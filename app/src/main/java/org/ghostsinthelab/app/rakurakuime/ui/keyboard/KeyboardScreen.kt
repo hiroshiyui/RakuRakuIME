@@ -64,6 +64,7 @@ fun KeyboardScreen(
     val splitLayoutLandscape by viewModel.splitLayoutLandscape.collectAsState(initial = true)
     val emojiCategory by viewModel.emojiCategory.collectAsState()
     val englishCandidates by viewModel.englishCandidates.collectAsState()
+    val asciiOnly by viewModel.asciiOnly.collectAsState()
     val colors = KeyboardTheme.current
 
     val scaledKeyHeight = KeyboardLayout.KEY_HEIGHT * heightScale
@@ -82,7 +83,13 @@ fun KeyboardScreen(
         // trie (non-paginated); EZ uses the paged Room-backed candidate list.
         val isEnglish = inputMode == InputMode.ENGLISH
         CandidateBar(
-            candidates = if (isEnglish) englishCandidates else pagedCandidates,
+            // asciiOnly fields (passwords) must never surface suggestions on
+            // the candidate bar, even if a stale list lingered in state.
+            candidates = when {
+                isEnglish && asciiOnly -> emptyList()
+                isEnglish -> englishCandidates
+                else -> pagedCandidates
+            },
             hasPrev = if (isEnglish) false else hasPrev,
             hasNext = if (isEnglish) false else hasNext,
             onCandidateSelected = { candidate ->
@@ -289,13 +296,15 @@ fun KeyboardScreen(
                                             },
                                             onClick = {
                                                 onKeyPress()
-                                                if (isLetter) {
+                                                if (isLetter && !asciiOnly) {
                                                     // Accumulate into the composing buffer so
                                                     // the candidate bar can offer predictions.
                                                     viewModel.onEnglishKeyPress(display)
                                                 } else {
-                                                    // Digits and inline punctuation terminate
-                                                    // the current word.
+                                                    // asciiOnly (password) fields and non-letter
+                                                    // keys both commit directly — no buffer, no
+                                                    // prediction, no prefix ever lands in the
+                                                    // candidate bar.
                                                     commitNonLetter(display)
                                                 }
                                                 // One-shot shift auto-releases after the key

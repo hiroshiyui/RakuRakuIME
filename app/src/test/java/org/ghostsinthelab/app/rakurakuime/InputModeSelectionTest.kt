@@ -19,9 +19,12 @@
 package org.ghostsinthelab.app.rakurakuime
 
 import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -108,5 +111,88 @@ class InputModeSelectionTest {
     @Test
     fun zero_defaultsToEz() {
         assertEquals(InputMode.EZ, KeyboardViewModel.pickInputModeFor(0))
+    }
+
+    // --- isAsciiOnlyFor: password variations trigger no-prediction mode ---
+
+    @Test
+    fun passwordVariation_isAsciiOnly() {
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        assertTrue(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun webPasswordVariation_isAsciiOnly() {
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+        assertTrue(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun visiblePasswordVariation_isAsciiOnly() {
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        assertTrue(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun emailVariation_isNotAsciiOnly() {
+        // Email still benefits from prediction.
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        assertFalse(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun uriVariation_isNotAsciiOnly() {
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+        assertFalse(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun plainText_isNotAsciiOnly() {
+        assertFalse(KeyboardViewModel.isAsciiOnlyFor(InputType.TYPE_CLASS_TEXT))
+    }
+
+    @Test
+    fun numberClass_isNotAsciiOnly() {
+        assertFalse(KeyboardViewModel.isAsciiOnlyFor(InputType.TYPE_CLASS_NUMBER))
+    }
+
+    @Test
+    fun noSuggestionsFlag_isAsciiOnly() {
+        // App-declared opt-out via TYPE_TEXT_FLAG_NO_SUGGESTIONS must
+        // engage asciiOnly even on a plain text field.
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        assertTrue(KeyboardViewModel.isAsciiOnlyFor(t))
+    }
+
+    @Test
+    fun imeNoPersonalizedLearning_isAsciiOnly() {
+        // App-declared opt-out via imeOptions must engage asciiOnly
+        // regardless of inputType (privacy-sensitive / incognito forms).
+        assertTrue(
+            KeyboardViewModel.isAsciiOnlyFor(
+                InputType.TYPE_CLASS_TEXT,
+                EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING,
+            )
+        )
+    }
+
+    @Test
+    fun imeNoPersonalizedLearning_overridesEmail() {
+        // Even an email field honors IME_FLAG_NO_PERSONALIZED_LEARNING.
+        val t = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        assertTrue(
+            KeyboardViewModel.isAsciiOnlyFor(t, EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING)
+        )
+    }
+
+    @Test
+    fun imeOptionsWithoutPrivacyFlag_isNotAsciiOnly() {
+        // Unrelated imeOptions bits (e.g. IME_ACTION_*) must not trigger.
+        assertFalse(
+            KeyboardViewModel.isAsciiOnlyFor(
+                InputType.TYPE_CLASS_TEXT,
+                EditorInfo.IME_ACTION_SEND,
+            )
+        )
     }
 }

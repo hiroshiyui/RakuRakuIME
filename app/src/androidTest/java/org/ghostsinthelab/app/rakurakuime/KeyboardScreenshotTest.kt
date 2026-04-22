@@ -110,6 +110,12 @@ class KeyboardScreenshotTest {
         capture(File(outDir, "settings.png"))
 
         // 2. Keyboard over a generic EditText, starting in EZ mode.
+        // Compose the phrase "貓咪" via its EZ roots ",wrd" so the
+        // candidate bar and pre-edit buffer both show the phrase-
+        // composing flow in action — a blank keyboard wouldn't
+        // communicate what this IME does. Keys are looked up by their
+        // Chinese-root content descriptions (KeyboardLayout.kt row
+        // definitions).
         testCtx.startActivity(
             Intent(testCtx, ScreenshotHostActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -118,16 +124,45 @@ class KeyboardScreenshotTest {
         device.findObject(By.clazz("android.widget.EditText"))?.click()
         device.waitForIdle(1_500)
         Thread.sleep(1_500)
+        tapImeKey("，")  // , → 貓 (animal radical)
+        tapImeKey("田")  // w
+        tapImeKey("口")  // r
+        tapImeKey("木")  // d → completes the ",wrd" keystroke to 貓咪
         capture(File(outDir, "keyboard_ez.png"))
+        // Reset composing state for the next mode. One backspace per
+        // root we just entered (the exact count depends on how the IME
+        // resolves partial pre-edits; 4 matches our 4 roots safely).
+        repeat(4) { tapFunctionRow(R.string.a11y_key_backspace) }
 
-        // 3. English keyboard — tap the mode key (EZ → ENGLISH).
+        // 3. English keyboard — tap the mode key (EZ → ENGLISH). Type a
+        // short prefix so the word-prediction candidate bar is visible.
         tapModeKey(descOnCurrentMode = appCtx.getString(R.string.a11y_key_mode_to_english))
+        // KeyButton.isUppercase defaults to true, so the English letter
+        // keys render and expose uppercase content descriptions even
+        // without shift. Match that casing when looking up the key.
+        tapImeKey("T"); tapImeKey("H"); tapImeKey("E")
         capture(File(outDir, "keyboard_english.png"))
+        tapFunctionRow(R.string.a11y_key_backspace)
+        tapFunctionRow(R.string.a11y_key_backspace)
+        tapFunctionRow(R.string.a11y_key_backspace)
 
         // 4. Emoji keyboard — ENGLISH → NUMBER → EMOJI.
         tapModeKey(descOnCurrentMode = appCtx.getString(R.string.a11y_key_mode_to_numbers))
         tapModeKey(descOnCurrentMode = appCtx.getString(R.string.a11y_key_mode_to_emoji))
         capture(File(outDir, "keyboard_emoji.png"))
+    }
+
+    private fun tapImeKey(description: String) {
+        val bounds = findNodeBoundsInImeWindow(description)
+            ?: error("IME key with description '$description' not found in IME window")
+        device.click(bounds.centerX(), bounds.centerY())
+        device.waitForIdle(500)
+        Thread.sleep(400)
+    }
+
+    private fun tapFunctionRow(descriptionRes: Int) {
+        val appCtx = InstrumentationRegistry.getInstrumentation().targetContext
+        tapImeKey(appCtx.getString(descriptionRes))
     }
 
     private fun tapModeKey(descOnCurrentMode: String) {

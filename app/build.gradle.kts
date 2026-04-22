@@ -69,6 +69,26 @@ android {
     }
 }
 
+// Baseline profiles merged from AAR dependencies are not byte-reproducible
+// across builds, which breaks F-Droid's reproducible-build verification
+// (both assets/dexopt/baseline.prof and, via R8 profile-guided rewriting,
+// classes.dex end up differing). Disable baseline-profile packaging and
+// R8's profile-guided dex layout entirely.
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.experimentalProperties.put(
+            "android.experimental.art-profile-r8-rewriting", false
+        )
+        variant.experimentalProperties.put(
+            "android.experimental.r8.dex-startup-optimization", false
+        )
+    }
+}
+
+tasks.matching { it.name.contains("ArtProfile") }.configureEach {
+    enabled = false
+}
+
 // Name every build artifact as "<applicationId>-<versionName>", so the
 // release APK lands as e.g. org.ghostsinthelab.app.rakurakuime-0.0.1-release.apk
 // instead of the generic app-release.apk. Placed after the android block so

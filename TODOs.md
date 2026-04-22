@@ -48,9 +48,24 @@ out — see `git log` for the full history of what's landed.
     - **Design sketch:**
         - Separate Room entity (e.g. `UserPhrase`) with the same
           `(keystroke, text)` shape as `Dictionary` plus a
-          user-origin flag; DAO merges user phrases into
+          user-origin flag and a `frequency` column; DAO merges
+          user phrases into
           `getCharacters(keystroke)` / `getCharactersByPrefix(prefix)`
           so the candidate bar surfaces them transparently.
+        - Frequency tracking: `selectCandidate(...)` must bump the
+          user-phrase frequency on commit just like it does for
+          bundled entries via `incrementFrequencyExact`, so the
+          user's own phrases rise through the candidate list with
+          use. Back it with the same Backup/Restore contract below
+          so learned ordering survives reinstalls.
+        - Initial frequency: seed each new user phrase with a
+          frequency above the typical bundled-entry max (audit the
+          shipped distribution once, then pick a safe floor — e.g.
+          max(bundled) + 100) so the user's own entries surface
+          ahead of shipped candidates on first use. Rationale: if
+          the user went to the trouble of adding a phrase, they
+          almost certainly want it to win ties against the bundled
+          corpus by default.
         - Root-suggestion engine: per character in the phrase,
           enumerate the possible roots by cross-referencing the
           bundled `Dictionary` table (every row where `text ==
@@ -97,6 +112,37 @@ out — see `git log` for the full history of what's landed.
         - Importer should validate the header, refuse mismatched
           `applicationId`, merge into the existing DB (don't silently
           wipe), and surface per-row counts in the result toast.
+        - **Input validation on import (treat the file as
+          untrusted):** users can pick any file via SAF, including a
+          crafted or corrupted one, so the importer must defend
+          against it end-to-end:
+            - Cap the accepted file size before reading (e.g.
+              50 MiB) so a malicious file can't force the app to
+              allocate unbounded memory or fill the device.
+            - Cap per-row string lengths (keystroke ≤ ~16 chars,
+              phrase text ≤ ~64 chars, frequency within `Int`
+              range and non-negative); reject rows that exceed
+              them.
+            - Validate keystroke characters against the EZ root
+              set — the same validator the CRUD UI uses — and
+              reject rows with stray bytes, control chars, or
+              unexpected Unicode categories in the phrase text.
+            - Sniff for zip bombs / nested archives if the export
+              format is zipped; stream-decompress with a hard
+              limit on total uncompressed bytes rather than
+              buffering the whole archive.
+            - Use parameterised inserts (Room DAO only, no raw SQL
+              string concatenation with imported data).
+            - Parse JSON / proto with a strict decoder — reject
+              unknown fields on a schema version the app doesn't
+              understand, rather than silently dropping them.
+            - Surface the first validation error to the user and
+              abort the whole import; never apply a partial
+              restore that could leave the DB in a surprising
+              state.
+            - Never eval / reflect / load classes from imported
+              content (obvious, but worth stating: this is a
+              plain-data format).
         - Settings UI: two buttons under a new "Backup" section,
           next to the existing "Re-import Dictionary" / "Reset
           Learning" actions.

@@ -115,25 +115,21 @@ val adbPath: String = run {
 val screenshotRemoteDir = "/sdcard/Android/data/org.ghostsinthelab.app.rakurakuime/files/screenshots"
 val screenshotLocalDir = layout.buildDirectory.dir("reports/screenshots")
 
-val runKeyboardScreenshotTest = tasks.register<Exec>("runKeyboardScreenshotTest") {
-    group = "verification"
-    description = "Run KeyboardScreenshotTest without uninstalling the app afterwards."
-    dependsOn("installDebug", "installDebugAndroidTest")
-    commandLine(
-        adbPath, "shell", "am", "instrument", "-w",
-        "-e", "class", "org.ghostsinthelab.app.rakurakuime.KeyboardScreenshotTest",
-        "org.ghostsinthelab.app.rakurakuime.test/androidx.test.runner.AndroidJUnitRunner",
-    )
-}
+// Locales to capture. Left: the `persist.sys.locale` tag we push to the
+// device. Right: the fastlane locale folder under
+// fastlane/metadata/android/ that the resulting PNGs land in.
+val screenshotLocales = listOf(
+    "en-US" to "en-US",
+    "zh-Hant-TW" to "zh-TW",
+)
 
-tasks.register<Exec>("screenshotKeyboard") {
+tasks.register("screenshotKeyboard") {
     group = "verification"
-    description = "Run KeyboardScreenshotTest, pull the PNGs, and copy them into fastlane/."
-    dependsOn(runKeyboardScreenshotTest)
-    val local = screenshotLocalDir.get().asFile
-    doFirst { local.mkdirs() }
-    commandLine(adbPath, "pull", screenshotRemoteDir, local.absolutePath)
+    description = "Capture showcase screenshots in en-US and zh-Hant-TW, copying each set into its matching fastlane locale folder."
+    dependsOn("installDebug", "installDebugAndroidTest")
+
     doLast {
+        val local = screenshotLocalDir.get().asFile.apply { mkdirs() }
         val pulled = File(local, "screenshots")
         val mapping = mapOf(
             "settings.png" to "01_settings.png",
@@ -142,12 +138,68 @@ tasks.register<Exec>("screenshotKeyboard") {
             "keyboard_emoji.png" to "04_emoji_keyboard.png",
         )
         val fastlaneRoot = rootProject.file("fastlane/metadata/android")
-        for (locale in listOf("zh-TW", "en-US")) {
-            val dstDir = File(fastlaneRoot, "$locale/images/phoneScreenshots").apply { mkdirs() }
+
+        // Gradle 9 removed `project.exec`; we shell out directly instead of
+        // going through `ExecOperations` since this is a side-effectful task
+        // that already can't use the configuration cache.
+        fun adb(vararg args: String) {
+            val cmd = listOf(adbPath) + args
+            val process = ProcessBuilder(cmd).inheritIO().start()
+            val code = process.waitFor()
+            check(code == 0) { "adb ${args.joinToString(" ")} exited with code $code" }
+        }
+        fun adbShell(vararg args: String) = adb("shell", *args)
+        fun adbReadProp(name: String): String {
+            val process = ProcessBuilder(adbPath, "shell", "getprop", name)
+                .redirectErrorStream(true)
+                .start()
+            val out = process.inputStream.bufferedReader().readText()
+            val code = process.waitFor()
+            check(code == 0) { "adb getprop $name exited with code $code" }
+            return out.trim()
+        }
+        val packageName = "org.ghostsinthelab.app.rakurakuime"
+
+        // Per-app locale override via `cmd locale set-app-locales` (API 33+).
+        // Preferred over `setprop persist.sys.locale` + `stop; start` because:
+        //   * it works on user-build emulators (setprop is restricted),
+        //   * it doesn't reboot the device, so each run is ~20s not ~60s,
+        //   * only this app's resources are affected — the next MainActivity
+        //     launch (and the IME service, which is in the same package)
+        //     renders under the requested locale. Pass an empty string to
+        //     clear the override and fall back to the device default.
+        fun setAppLocale(locale: String) {
+            adbShell("cmd", "locale", "set-app-locales", packageName, "--locales", locale)
+            // Force-stop so the next launch starts fresh under the new
+            // override; otherwise a still-resident process keeps its old
+            // Configuration.
+            adbShell("am", "force-stop", packageName)
+            Thread.sleep(500)
+        }
+
+        for ((appLocale, fastlaneLocale) in screenshotLocales) {
+            logger.lifecycle("→ Capturing $fastlaneLocale (app locale=$appLocale)")
+            setAppLocale(appLocale)
+
+            adbShell(
+                "am", "instrument", "-w",
+                "-e", "class", "org.ghostsinthelab.app.rakurakuime.KeyboardScreenshotTest",
+                "org.ghostsinthelab.app.rakurakuime.test/androidx.test.runner.AndroidJUnitRunner",
+            )
+
+            pulled.deleteRecursively()
+            adb("pull", screenshotRemoteDir, local.absolutePath)
+
+            val dstDir = File(fastlaneRoot, "$fastlaneLocale/images/phoneScreenshots").apply { mkdirs() }
             for ((src, dst) in mapping) {
                 File(pulled, src).copyTo(File(dstDir, dst), overwrite = true)
             }
+            logger.lifecycle("   Copied into fastlane/metadata/android/$fastlaneLocale/")
         }
-        logger.lifecycle("Screenshots pulled to: $local and copied into fastlane/ for zh-TW and en-US")
+
+        // Clear the per-app override so developers don't find the app
+        // stuck in whichever locale we captured last.
+        logger.lifecycle("Clearing per-app locale override")
+        setAppLocale("")
     }
 }

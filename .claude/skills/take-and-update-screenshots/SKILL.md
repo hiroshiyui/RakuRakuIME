@@ -12,19 +12,31 @@ You are refreshing the showcase screenshots for RakuRaku IME (輕鬆輸入法):
 3. `03_english_keyboard.png` — English keyboard
 4. `04_emoji_keyboard.png` — Emoji picker
 
-All four are produced by a single Gradle task, which:
+All four are produced by a single Gradle task, which runs once per
+locale (en-US, then zh-Hant-TW):
 
+- sets the **per-app** locale override via
+  `cmd locale set-app-locales <pkg> --locales <tag>` (API 33+), then
+  `am force-stop` so the next launch comes up under the new
+  Configuration,
 - runs the instrumented `KeyboardScreenshotTest`,
 - writes PNGs to `app/build/reports/screenshots/screenshots/`,
-- and copies them into both
-  `fastlane/metadata/android/zh-TW/images/phoneScreenshots/` and
-  `fastlane/metadata/android/en-US/images/phoneScreenshots/` under the
-  existing `01_…`–`04_…` filenames.
+- copies them into the matching
+  `fastlane/metadata/android/<locale>/images/phoneScreenshots/`
+  folder under the existing `01_…`–`04_…` filenames.
+
+After both locales are captured, the task clears the override
+(`--locales ""`) so the app falls back to the device locale on the
+developer's emulator.
 
 The task uses `adb shell am instrument` rather than
 `connectedAndroidTest` so the app is not uninstalled after the run —
 otherwise the app's external-files dir (where screenshots land) gets
 wiped before we can pull them.
+
+Per-app locale switching avoids a zygote restart, so the whole
+per-locale cycle completes in well under a minute (a recent clean
+run took 44 s end-to-end).
 
 ## Preconditions
 
@@ -33,12 +45,12 @@ wiped before we can pull them.
 - The device screen is unlocked. The test's `@Before` wakes the device
   and dismisses the keyguard, but a lockscreen password cannot be
   bypassed — ask the user to unlock first if needed.
-- Locale: the test matches the mode key by `R.string.a11y_key_mode_to_*`
-  resolved against the app resources, so any locale on the device will
-  work — but the screenshot *content* inherits the device locale. If
-  the device is zh-TW, both locale folders end up with zh-TW shots. Warn
-  the user when the device locale does not match what they expect, and
-  offer to skip the copy step and stage only the matching locale.
+- Locale: the Gradle task drives the per-app locale itself (en-US
+  and zh-Hant-TW, in that order) via
+  `adb shell cmd locale set-app-locales`, so the caller doesn't need
+  to pre-configure anything. The device needs to be API 33+ for
+  `cmd locale` to exist — the current project emulator runs
+  API 36, so this is non-issue in practice.
 
 ## Workflow
 
@@ -48,21 +60,27 @@ wiped before we can pull them.
    ```bash
    ./gradlew :app:screenshotKeyboard
    ```
-   This installs `:app:installDebug` + `:app:installDebugAndroidTest`,
-   runs the test, pulls the PNGs, and copies them into both fastlane
-   locale folders.
-3. **Spot-check the results.** Read at least `01_settings.png` and
-   `02_ez_keyboard.png` from
-   `app/build/reports/screenshots/screenshots/` to confirm they aren't
-   blank/black (sleeping screen) or caught mid-animation ("Preparing
-   dictionary…" splash still visible). If they look wrong, ask the user
-   to wake/unlock the device and re-run — don't blindly commit.
+   For each locale (en-US, then zh-Hant-TW) this: installs the app +
+   test APK (idempotent), pushes `persist.sys.locale`, restarts
+   zygote, waits for boot, runs the test, pulls the PNGs, and copies
+   them into the matching `fastlane/metadata/android/<locale>/…`
+   folder. Takes ~2–3 minutes total.
+3. **Spot-check the results.** After the task finishes, read at least
+   one shot from each locale (e.g.
+   `fastlane/metadata/android/en-US/images/phoneScreenshots/01_settings.png`
+   and `fastlane/metadata/android/zh-TW/images/phoneScreenshots/01_settings.png`)
+   to confirm they aren't blank/black (sleeping screen), caught
+   mid-animation ("Preparing dictionary…" splash), or stuck with the
+   previous locale's strings. If they look wrong, ask the user to
+   wake/unlock the device and re-run — don't blindly commit.
 4. **Review the diff.**
    ```bash
    git status
    git diff --stat fastlane/metadata/
    ```
-   Expect four modified PNGs per locale directory.
+   Expect four modified PNGs per locale directory, with distinct file
+   sizes between the two folders (identical sizes = the locale switch
+   silently no-op'd).
 5. **Stop there unless the user asks to commit.** Do not run
    `commit-and-push` yourself — the user usually reviews the new
    screenshots visually in Android Studio's Git tool before committing.

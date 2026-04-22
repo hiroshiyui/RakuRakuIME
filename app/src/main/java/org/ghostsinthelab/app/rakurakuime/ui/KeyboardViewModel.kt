@@ -281,13 +281,43 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
      */
     fun updateEditorInfo(info: android.view.inputmethod.EditorInfo?) {
         _inputType.value = info?.inputType ?: android.text.InputType.TYPE_CLASS_TEXT
-        // Switch to NUMBER mode automatically if needed
-        val inputClass = _inputType.value and android.text.InputType.TYPE_MASK_CLASS
-        if (inputClass == android.text.InputType.TYPE_CLASS_NUMBER || 
-            inputClass == android.text.InputType.TYPE_CLASS_PHONE) {
-            _inputMode.value = InputMode.NUMBER
-        } else {
-            _inputMode.value = InputMode.EZ
+        _inputMode.value = pickInputModeFor(_inputType.value)
+    }
+
+    companion object {
+        /**
+         * Maps a text field's `android:inputType` to the layout that will be
+         * most useful on first show. Numeric/phone/datetime fields land on
+         * [InputMode.NUMBER]; text fields whose content is, by convention,
+         * ASCII-only (email addresses, URIs, passwords) land on
+         * [InputMode.ENGLISH]; everything else defaults to [InputMode.EZ].
+         * The user can still cycle modes manually via the function-row key.
+         *
+         * Kept as a pure Int → InputMode function (no Android runtime state)
+         * so it can be exercised by host-side JVM unit tests.
+         */
+        @JvmStatic
+        fun pickInputModeFor(inputType: Int): InputMode {
+            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+            if (inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
+                inputClass == android.text.InputType.TYPE_CLASS_PHONE ||
+                inputClass == android.text.InputType.TYPE_CLASS_DATETIME) {
+                return InputMode.NUMBER
+            }
+            if (inputClass == android.text.InputType.TYPE_CLASS_TEXT) {
+                val variation = inputType and android.text.InputType.TYPE_MASK_VARIATION
+                val asciiOnly = when (variation) {
+                    android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+                    android.text.InputType.TYPE_TEXT_VARIATION_URI,
+                    android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD -> true
+                    else -> false
+                }
+                if (asciiOnly) return InputMode.ENGLISH
+            }
+            return InputMode.EZ
         }
     }
 

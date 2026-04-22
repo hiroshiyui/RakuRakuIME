@@ -272,8 +272,14 @@ fun KeyboardScreen(
                                         val ch = item.qwertyChar
                                         val isLetter = ch.length == 1 && ch[0].isLetter()
                                         val display = if (isShifted && isLetter) ch.uppercase() else ch
+                                        // Non-letter keys that carry a shifted alternate (e.g.
+                                        // 1/!, ;/:, [/{) advertise it at the top-left corner so
+                                        // users can see what a long-press will yield. Pass it via
+                                        // ezRoot — KeyButton already renders that at top-start
+                                        // and demotes the main label to bottom-end.
+                                        val shiftedLabel = if (!isLetter) item.alternates.firstOrNull().orEmpty() else ""
                                         KeyButton(
-                                            keyDef = KeyDefinition(display, "", item.alternates),
+                                            keyDef = KeyDefinition(display, shiftedLabel, item.alternates),
                                             modifier = Modifier.weight(1f),
                                             keyHeight = scaledKeyHeight,
                                             onAlternateSelected = { alt ->

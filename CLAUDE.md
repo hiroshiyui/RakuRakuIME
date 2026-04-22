@@ -9,6 +9,10 @@ Kotlin + Jetpack Compose + Room (FTS4) + DataStore, **minSdk 26**, single-activi
 
 For the EZ Input Method's input-semantics domain knowledge (radical roots, phrase composing rules, hybrid keystroke sequences, selection logic), read **`GEMINI.md`** first — don't duplicate that content here or in new docs.
 
+The authoritative EZ tables / rule spec lives in a sibling repo. Consult it when reasoning about root-suggestion logic, phrase composing, or dictionary-table shape:
+
+<https://github.com/hiroshiyui/EzIM_Tables_Project/blob/main/CLAUDE.md>
+
 ## Common commands
 
 ```bash

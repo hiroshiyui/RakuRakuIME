@@ -300,84 +300,6 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _asciiOnly.value = isAsciiOnlyFor(_inputType.value, imeOptions)
     }
 
-    companion object {
-        /**
-         * Maps a text field's `android:inputType` to the layout that will be
-         * most useful on first show. Numeric/phone/datetime fields land on
-         * [InputMode.NUMBER]; text fields whose content is, by convention,
-         * ASCII-only (email addresses, URIs, passwords) land on
-         * [InputMode.ENGLISH]; everything else defaults to [InputMode.EZ].
-         * The user can still cycle modes manually via the function-row key.
-         *
-         * Kept as a pure Int → InputMode function (no Android runtime state)
-         * so it can be exercised by host-side JVM unit tests.
-         */
-        @JvmStatic
-        fun pickInputModeFor(inputType: Int): InputMode {
-            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
-            if (inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
-                inputClass == android.text.InputType.TYPE_CLASS_PHONE ||
-                inputClass == android.text.InputType.TYPE_CLASS_DATETIME) {
-                return InputMode.NUMBER
-            }
-            if (inputClass == android.text.InputType.TYPE_CLASS_TEXT) {
-                val variation = inputType and android.text.InputType.TYPE_MASK_VARIATION
-                val englishFriendly = when (variation) {
-                    android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
-                    android.text.InputType.TYPE_TEXT_VARIATION_URI,
-                    android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
-                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
-                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD -> true
-                    else -> false
-                }
-                if (englishFriendly) return InputMode.ENGLISH
-            }
-            return InputMode.EZ
-        }
-
-        /**
-         * True when the English layout should run in "asciiOnly"
-         * (no-prediction) mode: no composing buffer, no candidate bar
-         * entries, no learned-frequency writes, so typed prefixes never
-         * surface on screen or feed the prediction trie.
-         *
-         * Triggers, in order:
-         *  * Password variations (`TYPE_TEXT_VARIATION_PASSWORD`,
-         *    `_WEB_PASSWORD`, `_VISIBLE_PASSWORD`) — the hidden-field
-         *    case that motivated this flag.
-         *  * `TYPE_TEXT_FLAG_NO_SUGGESTIONS` on `inputType` — the app
-         *    has explicitly opted out of suggestions (e.g., a search
-         *    field for IDs, a 2FA code entry).
-         *  * `IME_FLAG_NO_PERSONALIZED_LEARNING` on `imeOptions` — the
-         *    app has asked the IME not to personalise / learn from this
-         *    field (privacy-sensitive forms, incognito surfaces).
-         *    Available since API 26, matching our `minSdk`.
-         *
-         * Email / URI fields do not trigger asciiOnly on their own —
-         * they're still ASCII but benefit from word prediction.
-         */
-        @JvmStatic
-        fun isAsciiOnlyFor(inputType: Int, imeOptions: Int = 0): Boolean {
-            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
-            if (inputClass == android.text.InputType.TYPE_CLASS_TEXT) {
-                val variation = inputType and android.text.InputType.TYPE_MASK_VARIATION
-                if (variation == android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD ||
-                    variation == android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ||
-                    variation == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-                    return true
-                }
-                if ((inputType and android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) != 0) {
-                    return true
-                }
-            }
-            if ((imeOptions and android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) != 0) {
-                return true
-            }
-            return false
-        }
-    }
-
     /**
      * Handles a key press in EZ input mode.
      * Appends the character to the composing buffer and updates the candidate list.
@@ -532,5 +454,83 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _candidatePage.value = 0
         _isSelecting.value = false
         updateInlineComposing()
+    }
+
+    companion object {
+        /**
+         * Maps a text field's `android:inputType` to the layout that will be
+         * most useful on first show. Numeric/phone/datetime fields land on
+         * [InputMode.NUMBER]; text fields whose content is, by convention,
+         * ASCII-only (email addresses, URIs, passwords) land on
+         * [InputMode.ENGLISH]; everything else defaults to [InputMode.EZ].
+         * The user can still cycle modes manually via the function-row key.
+         *
+         * Kept as a pure Int → InputMode function (no Android runtime state)
+         * so it can be exercised by host-side JVM unit tests.
+         */
+        @JvmStatic
+        fun pickInputModeFor(inputType: Int): InputMode {
+            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+            if (inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
+                inputClass == android.text.InputType.TYPE_CLASS_PHONE ||
+                inputClass == android.text.InputType.TYPE_CLASS_DATETIME) {
+                return InputMode.NUMBER
+            }
+            if (inputClass == android.text.InputType.TYPE_CLASS_TEXT) {
+                val variation = inputType and android.text.InputType.TYPE_MASK_VARIATION
+                val englishFriendly = when (variation) {
+                    android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+                    android.text.InputType.TYPE_TEXT_VARIATION_URI,
+                    android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                    android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD -> true
+                    else -> false
+                }
+                if (englishFriendly) return InputMode.ENGLISH
+            }
+            return InputMode.EZ
+        }
+
+        /**
+         * True when the English layout should run in "asciiOnly"
+         * (no-prediction) mode: no composing buffer, no candidate bar
+         * entries, no learned-frequency writes, so typed prefixes never
+         * surface on screen or feed the prediction trie.
+         *
+         * Triggers, in order:
+         *  * Password variations (`TYPE_TEXT_VARIATION_PASSWORD`,
+         *    `_WEB_PASSWORD`, `_VISIBLE_PASSWORD`) — the hidden-field
+         *    case that motivated this flag.
+         *  * `TYPE_TEXT_FLAG_NO_SUGGESTIONS` on `inputType` — the app
+         *    has explicitly opted out of suggestions (e.g., a search
+         *    field for IDs, a 2FA code entry).
+         *  * `IME_FLAG_NO_PERSONALIZED_LEARNING` on `imeOptions` — the
+         *    app has asked the IME not to personalise / learn from this
+         *    field (privacy-sensitive forms, incognito surfaces).
+         *    Available since API 26, matching our `minSdk`.
+         *
+         * Email / URI fields do not trigger asciiOnly on their own —
+         * they're still ASCII but benefit from word prediction.
+         */
+        @JvmStatic
+        fun isAsciiOnlyFor(inputType: Int, imeOptions: Int = 0): Boolean {
+            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+            if (inputClass == android.text.InputType.TYPE_CLASS_TEXT) {
+                val variation = inputType and android.text.InputType.TYPE_MASK_VARIATION
+                if (variation == android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD ||
+                    variation == android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ||
+                    variation == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+                    return true
+                }
+                if ((inputType and android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) != 0) {
+                    return true
+                }
+            }
+            if ((imeOptions and android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) != 0) {
+                return true
+            }
+            return false
+        }
     }
 }

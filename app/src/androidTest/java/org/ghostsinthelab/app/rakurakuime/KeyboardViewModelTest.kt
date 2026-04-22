@@ -127,10 +127,19 @@ class KeyboardViewModelTest {
     fun setInputMode_nonEz_clearsPreEdit() {
         // Guards against future regressions: clearComposing must still fire
         // on layout change so stale state doesn't leak into the next session.
+        // Set up the fullest possible EZ state — pre-edit text, in-progress
+        // roots with candidates, and active selection mode — so the
+        // assertions catch any piece that a future refactor forgets to clear.
         viewModel.appendToPreEdit("abc")
+        viewModel.onKeyPress("a")
+        Thread.sleep(300)
+        viewModel.enterSelectionMode()
+
         viewModel.setInputMode(InputMode.ENGLISH)
 
         assertEquals("", viewModel.preEditBuffer.value)
         assertTrue(viewModel.composingText.value.isEmpty())
+        assertTrue(viewModel.candidates.value.isEmpty())
+        assertEquals(false, viewModel.isSelecting.value)
     }
 }

@@ -1,0 +1,4 @@
+- Build: drop the auto-generated baseline profile from the release
+  APK so F-Droid's reproducible-build verification matches. No
+  user-visible change; startup profile-guided optimization is
+  disabled in exchange for byte-for-byte reproducibility.

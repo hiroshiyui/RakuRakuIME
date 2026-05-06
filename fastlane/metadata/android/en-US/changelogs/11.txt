@@ -1,0 +1,10 @@
+- New: next-character predictions in EZ mode. After picking a
+  candidate, the bar surfaces likely follow-up characters mined
+  from the bundled phrase corpus (e.g. 信 → 件 / 箱 / 封 / 賴 /
+  任). Predictions are tap-only, with no 1–0 shortcut labels so
+  EZ digit roots keep their normal keystroke meaning; any new
+  keystroke dismisses the strip.
+- Build: bump Android Gradle Plugin to 9.2.1 and the Gradle
+  wrapper to 9.4.1.
+- Polish: refresh the app launcher icon and drop a few orphaned
+  foreground bitmaps.

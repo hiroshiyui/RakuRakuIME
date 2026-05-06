@@ -141,6 +141,24 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     /** Whether the user is currently navigating the candidate list. */
     val isSelecting: StateFlow<Boolean> = _isSelecting.asStateFlow()
 
+    private val _nextCharPredictions = MutableStateFlow<List<String>>(emptyList())
+    /**
+     * Single characters likely to follow the most recently selected EZ
+     * candidate, mined from multi-character entries in the bundled corpus.
+     * Surfaced in the candidate bar — without numeric shortcut labels — so
+     * the digit-root keys (`1`, `q` etc.) keep their normal EZ meaning.
+     */
+    val nextCharPredictions: StateFlow<List<String>> = _nextCharPredictions.asStateFlow()
+
+    private var predictionJob: kotlinx.coroutines.Job? = null
+
+    private fun clearNextCharPredictions() {
+        predictionJob?.cancel()
+        if (_nextCharPredictions.value.isNotEmpty()) {
+            _nextCharPredictions.value = emptyList()
+        }
+    }
+
     // Callback for InputMethodService to update the composing region
     var onUpdateComposingText: ((String) -> Unit)? = null
 
@@ -309,6 +327,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _composingText.value = newText
         _candidatePage.value = 0
         _isSelecting.value = false
+        // Any new keystroke starts a fresh composing sequence — the post-
+        // selection prediction strip is opportunistic and dismisses on input.
+        clearNextCharPredictions()
         updateInlineComposing()
         updateCandidates(newText)
     }
@@ -323,6 +344,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             _composingText.value = newText
             _candidatePage.value = 0
             _isSelecting.value = false
+            clearNextCharPredictions()
             updateInlineComposing()
             if (newText.isEmpty()) {
                 _candidates.value = emptyList()
@@ -333,6 +355,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         } else if (_preEditBuffer.value.isNotEmpty()) {
             _preEditBuffer.value = _preEditBuffer.value.dropLast(1)
             _isSelecting.value = false
+            clearNextCharPredictions()
             updateInlineComposing()
             return true
         }
@@ -397,6 +420,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         // flow: otherwise the next digit keypress would still be read
         // as "select candidate N" against the stale candidate list.
         _isSelecting.value = false
+        clearNextCharPredictions()
         updateInlineComposing()
     }
 
@@ -409,11 +433,16 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
      */
     fun selectCandidate(candidate: String): String {
         val currentRoots = _composingText.value
-        viewModelScope.launch {
-            // Increment frequency for the exact keystroke the user committed on.
-            db.dictionaryDao().incrementFrequencyExact(candidate, keystroke = currentRoots)
+        if (currentRoots.isNotEmpty()) {
+            viewModelScope.launch {
+                // Increment frequency for the exact keystroke the user committed on.
+                // Skipped when there's no active keystroke (i.e. the user picked
+                // from the next-character prediction strip), since predictions
+                // aren't keyed off a specific dictionary row.
+                db.dictionaryDao().incrementFrequencyExact(candidate, keystroke = currentRoots)
+            }
         }
-        
+
         val newPreEdit = _preEditBuffer.value + candidate
         _preEditBuffer.value = newPreEdit
         _composingText.value = ""
@@ -421,7 +450,29 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _candidatePage.value = 0
         _isSelecting.value = false
         updateInlineComposing()
+        // Mine the bundled phrase corpus for likely next characters following
+        // the last char of what was just selected (handles single-char picks
+        // and multi-char phrases uniformly).
+        updateNextCharPredictions(candidate.takeLast(1))
         return newPreEdit
+    }
+
+    private fun updateNextCharPredictions(prev: String) {
+        predictionJob?.cancel()
+        if (prev.isEmpty()) {
+            _nextCharPredictions.value = emptyList()
+            return
+        }
+        predictionJob = viewModelScope.launch {
+            val results = runCatching {
+                db.dictionaryDao().nextCharactersAfter(
+                    likePattern = "$prev%",
+                    prefixLen = prev.length,
+                    limit = 30,
+                )
+            }.getOrElse { emptyList() }
+            _nextCharPredictions.value = results
+        }
     }
 
     /**
@@ -453,6 +504,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _candidates.value = emptyList()
         _candidatePage.value = 0
         _isSelecting.value = false
+        clearNextCharPredictions()
         updateInlineComposing()
     }
 

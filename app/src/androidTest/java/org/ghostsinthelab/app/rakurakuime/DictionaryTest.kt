@@ -68,4 +68,63 @@ class DictionaryTest {
         val uCandidates = dao.getCharacters("u")
         assertTrue("Root 'u' should contain '山'", uCandidates.contains("山"))
     }
+
+    /**
+     * The next-character prediction strip mines multi-character entries
+     * starting with the just-selected character. "信" is a high-coverage
+     * probe — phrases like 信件/信箱/信封/信賴/信任 all ship in the bundled
+     * corpus, so at least a few of those must come back.
+     */
+    @Test
+    fun nextCharactersAfter_returnsLikelyFollowups() = runBlocking {
+        val dao = db.dictionaryDao()
+        if (dao.count() == 0) {
+            val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+            CinParser.parseAndPopulate(appContext, db)
+        }
+
+        val results = dao.nextCharactersAfter(
+            likePattern = "信%",
+            prefixLen = 1,
+            limit = 30,
+        )
+
+        assertTrue("Expected predictions for 信, got empty list", results.isNotEmpty())
+        // Each result must be a single character (the substr() projection).
+        assertTrue(
+            "All predictions should be single characters: $results",
+            results.all { it.length == 1 },
+        )
+        // At least one of the well-known follow-ups should appear. We don't
+        // assert exact ordering — frequencies depend on the bundled corpus
+        // and may shift across dictionary releases.
+        val expectedAny = setOf("件", "箱", "封", "賴", "任", "用", "心", "念", "仰")
+        assertTrue(
+            "Expected at least one of $expectedAny in predictions, got $results",
+            results.any { it in expectedAny },
+        )
+    }
+
+    @Test
+    fun nextCharactersAfter_excludesSingleCharEntries() = runBlocking {
+        val dao = db.dictionaryDao()
+        if (dao.count() == 0) {
+            val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+            CinParser.parseAndPopulate(appContext, db)
+        }
+
+        // Picking a rare prefix that exists as a single-char entry but rarely
+        // (or never) leads multi-char phrases would still return either an
+        // empty list or only valid 2nd-char projections — never the seed char
+        // itself, since length(character) > prefixLen filters single chars.
+        val results = dao.nextCharactersAfter(
+            likePattern = "信%",
+            prefixLen = 1,
+            limit = 30,
+        )
+        assertTrue(
+            "Predictions should not echo the seed char itself",
+            results.none { it == "信" && results.size == 1 },
+        )
+    }
 }

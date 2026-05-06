@@ -64,6 +64,7 @@ fun KeyboardScreen(
     val splitLayoutLandscape by viewModel.splitLayoutLandscape.collectAsState(initial = true)
     val emojiCategory by viewModel.emojiCategory.collectAsState()
     val englishCandidates by viewModel.englishCandidates.collectAsState()
+    val nextCharPredictions by viewModel.nextCharPredictions.collectAsState()
     val asciiOnly by viewModel.asciiOnly.collectAsState()
     val colors = KeyboardTheme.current
 
@@ -82,16 +83,23 @@ fun KeyboardScreen(
         // Candidate Bar — sources differ per mode. English uses the in-memory
         // trie (non-paginated); EZ uses the paged Room-backed candidate list.
         val isEnglish = inputMode == InputMode.ENGLISH
+        // In EZ mode, when there are no real candidates for an in-progress
+        // keystroke, fall through to the next-character prediction strip
+        // populated after the previous candidate selection. Predictions are
+        // tap-only (numericLabels = false) so the EZ digit roots aren't
+        // shadowed by 1–0 selection shortcuts.
+        val showingPredictions =
+            inputMode == InputMode.EZ && pagedCandidates.isEmpty() && nextCharPredictions.isNotEmpty()
+        val barCandidates: List<String> = when {
+            isEnglish && asciiOnly -> emptyList()
+            isEnglish -> englishCandidates
+            showingPredictions -> nextCharPredictions
+            else -> pagedCandidates
+        }
         CandidateBar(
-            // asciiOnly fields (passwords) must never surface suggestions on
-            // the candidate bar, even if a stale list lingered in state.
-            candidates = when {
-                isEnglish && asciiOnly -> emptyList()
-                isEnglish -> englishCandidates
-                else -> pagedCandidates
-            },
-            hasPrev = if (isEnglish) false else hasPrev,
-            hasNext = if (isEnglish) false else hasNext,
+            candidates = barCandidates,
+            hasPrev = if (isEnglish || showingPredictions) false else hasPrev,
+            hasNext = if (isEnglish || showingPredictions) false else hasNext,
             onCandidateSelected = { candidate ->
                 onKeyPress()
                 if (isEnglish) {
@@ -104,6 +112,7 @@ fun KeyboardScreen(
             onPrevPage = { viewModel.prevPage() },
             onNextPage = { viewModel.nextPage() },
             composingRoots = if (inputMode == InputMode.EZ) composingText else "",
+            numericLabels = !showingPredictions,
         )
 
         Spacer(modifier = Modifier.height(4.dp))

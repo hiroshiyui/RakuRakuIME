@@ -57,4 +57,26 @@ interface DictionaryDao {
 
     @Query("UPDATE dictionary SET frequency = 0")
     suspend fun resetFrequencies()
+
+    /**
+     * Returns up to [limit] characters that most often follow [prefix] in the
+     * bundled phrase corpus, ordered by aggregate frequency. Drives the
+     * post-selection next-character prediction strip in EZ mode: after the
+     * user picks "信", we mine multi-character entries beginning with "信"
+     * (e.g. 信件, 信箱, 信封) and surface their second characters.
+     *
+     * The LIKE scan is unindexed but only fires on candidate selection — not
+     * per keystroke — and the corpus is ~130k rows, so it stays well under a
+     * frame on modern devices.
+     */
+    @Query("""
+        SELECT substr(character, :prefixLen + 1, 1) AS next_char
+        FROM dictionary
+        WHERE character LIKE :likePattern
+          AND length(character) > :prefixLen
+        GROUP BY next_char
+        ORDER BY SUM(frequency) DESC, next_char
+        LIMIT :limit
+    """)
+    suspend fun nextCharactersAfter(likePattern: String, prefixLen: Int, limit: Int): List<String>
 }

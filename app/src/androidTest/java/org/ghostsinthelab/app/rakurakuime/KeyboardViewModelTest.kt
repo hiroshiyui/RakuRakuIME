@@ -123,6 +123,124 @@ class KeyboardViewModelTest {
         assertEquals("", viewModel.composingText.value)
     }
 
+    /**
+     * Polls a state flow until [predicate] holds or the deadline elapses.
+     * Used to wait for the async prediction job (DB-backed coroutine) to
+     * settle without baking arbitrary `Thread.sleep` durations into the
+     * assertion path.
+     */
+    private fun <T> awaitState(
+        flow: kotlinx.coroutines.flow.StateFlow<T>,
+        timeoutMs: Long = 1500,
+        intervalMs: Long = 25,
+        predicate: (T) -> Boolean,
+    ): T {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (predicate(flow.value)) return flow.value
+            Thread.sleep(intervalMs)
+        }
+        return flow.value
+    }
+
+    @Test
+    fun selectCandidate_populatesNextCharPredictions() {
+        // Pick a high-coverage seed: 信 leads many phrases (信件, 信箱, …) so
+        // the prediction strip must come back non-empty for any reasonable
+        // shipped dictionary.
+        viewModel.selectCandidate("信")
+
+        val predictions = awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+        assertTrue(
+            "Expected non-empty next-char predictions after selecting '信', got $predictions",
+            predictions.isNotEmpty(),
+        )
+        assertTrue(
+            "Predictions must be single characters: $predictions",
+            predictions.all { it.length == 1 },
+        )
+    }
+
+    @Test
+    fun selectCandidate_usesLastCharOfPhrase() {
+        // Multi-char picks (phrase candidates) must seed predictions off the
+        // last character — that's the boundary the user just landed on.
+        viewModel.selectCandidate("人信")
+
+        val predictions = awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+        assertTrue(
+            "Phrase pick should still produce predictions seeded by last char",
+            predictions.isNotEmpty(),
+        )
+    }
+
+    @Test
+    fun onKeyPress_clearsPredictions() {
+        viewModel.selectCandidate("信")
+        awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+
+        // Any new EZ keystroke starts a fresh composing sequence; the
+        // opportunistic prediction strip must dismiss so the digit-root
+        // shortcut conflict can't bite.
+        viewModel.onKeyPress("a")
+
+        assertTrue(
+            "Predictions should be cleared on new keystroke, got ${viewModel.nextCharPredictions.value}",
+            viewModel.nextCharPredictions.value.isEmpty(),
+        )
+    }
+
+    @Test
+    fun onBackspace_clearsPredictions() {
+        viewModel.selectCandidate("信")
+        awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+
+        viewModel.onBackspace()
+
+        assertTrue(
+            "Predictions should be cleared on backspace",
+            viewModel.nextCharPredictions.value.isEmpty(),
+        )
+    }
+
+    @Test
+    fun appendToPreEdit_clearsPredictions() {
+        viewModel.selectCandidate("信")
+        awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+
+        viewModel.appendToPreEdit("，")
+
+        assertTrue(
+            "Punctuation insert should dismiss the prediction strip",
+            viewModel.nextCharPredictions.value.isEmpty(),
+        )
+    }
+
+    @Test
+    fun setInputMode_nonEz_clearsPredictions() {
+        viewModel.selectCandidate("信")
+        awaitState(viewModel.nextCharPredictions) { it.isNotEmpty() }
+
+        viewModel.setInputMode(InputMode.ENGLISH)
+
+        assertTrue(
+            "Switching out of EZ must drop the prediction strip alongside other composing state",
+            viewModel.nextCharPredictions.value.isEmpty(),
+        )
+    }
+
+    @Test
+    fun selectCandidate_appendsToPreEditEvenWithoutComposingRoots() {
+        // Picking from the prediction strip means composingText is empty.
+        // The pick must still land in the pre-edit buffer; the no-keystroke
+        // branch only skips the frequency increment, not the buffer update.
+        viewModel.selectCandidate("信")
+        viewModel.selectCandidate("件")
+
+        assertEquals("信件", viewModel.preEditBuffer.value)
+        assertEquals("", viewModel.composingText.value)
+    }
+
     @Test
     fun setInputMode_nonEz_clearsPreEdit() {
         // Guards against future regressions: clearComposing must still fire

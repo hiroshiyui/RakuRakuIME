@@ -49,6 +49,11 @@ fun CandidateBar(
     onPrevPage: () -> Unit,
     onNextPage: () -> Unit,
     composingRoots: String = "",
+    // When false, suppress the 1–0 selection-key labels above each candidate.
+    // Used by the post-selection next-character prediction strip — those
+    // entries are tap-only so the EZ digit roots (`1`, `q` etc.) keep their
+    // normal keystroke meaning instead of being hijacked as shortcuts.
+    numericLabels: Boolean = true,
 ) {
     val colors = KeyboardTheme.current
 
@@ -120,7 +125,7 @@ fun CandidateBar(
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
                 itemsIndexed(candidates) { index, candidate ->
-                    val selKey = if (index < 9) (index + 1).toString() else if (index == 9) "0" else ""
+                    val selKey = if (!numericLabels) "" else if (index < 9) (index + 1).toString() else if (index == 9) "0" else ""
                     Row(
                         modifier = Modifier
                             .clickable { onCandidateSelected(candidate) }

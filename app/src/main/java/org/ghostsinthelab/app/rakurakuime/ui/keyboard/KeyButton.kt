@@ -21,6 +21,7 @@ package org.ghostsinthelab.app.rakurakuime.ui.keyboard
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import kotlin.math.abs
@@ -149,14 +150,19 @@ fun KeyButton(
     @DrawableRes keycapDrawableRes: Int = 0,
     onSwipeUp: (() -> Unit)? = null,
     onAlternateSelected: ((String) -> Unit)? = null,
+    // Fires after a 400ms hold when the key has no built-in alternates
+    // popup (i.e. keyDef.alternates is empty). Lets callers attach
+    // their own long-press menus (e.g. the mode key's input-mode picker)
+    // without conflicting with the swipe-up / drag-out gestures.
+    onLongPress: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val currentOnClick by rememberUpdatedState(onClick)
     val currentOnSwipeUp by rememberUpdatedState(onSwipeUp)
     val currentOnAlternateSelected by rememberUpdatedState(onAlternateSelected)
+    val currentOnLongPress by rememberUpdatedState(onLongPress)
     var isPressed by remember { mutableStateOf(false) }
     var showAlternates by remember { mutableStateOf(false) }
-    var activeAlternateIndex by remember { mutableStateOf(-1) }
     val colors = KeyboardTheme.current
     val backgroundColor = backgroundColorOverride ?: if (isPressed && !showAlternates) colors.keyPressedBackground else colors.keyBackground
     val textColor = textColorOverride ?: colors.keyTextColor
@@ -168,6 +174,7 @@ fun KeyButton(
     val resolvedContentDescription = contentDescription
         ?: keyDef.ezRoot.ifEmpty { displayLabel }
 
+    val stickyPopups = LocalStickyPopups.current
     val density = LocalDensity.current
     val popupOffsetY = with(density) { -(keyHeight + 12.dp).roundToPx() }
     val swipeThresholdPx = with(density) { 24.dp.toPx() }
@@ -196,18 +203,36 @@ fun KeyButton(
                     val scope = this
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
+                        // Any sticky popup (this key's alternates, the mode
+                        // picker, etc.) is dismissed by the next keypress
+                        // anywhere in the keyboard. The press itself proceeds
+                        // normally so the user can keep typing through it.
+                        if (stickyPopups.isOpen) {
+                            stickyPopups.dismiss()
+                        }
                         isPressed = true
-                        showAlternates = false
-                        activeAlternateIndex = -1
                         val startY = down.position.y
                         val startX = down.position.x
                         var gestureHandled = false
 
                         val longPressJob = scope.launch {
                             kotlinx.coroutines.delay(400)
-                            if (isPressed && !gestureHandled && keyDef.alternates.isNotEmpty()) {
-                                showAlternates = true
-                                activeAlternateIndex = 0
+                            if (isPressed && !gestureHandled) {
+                                if (keyDef.alternates.isNotEmpty()) {
+                                    // Sticky: open popup, drop the press, let
+                                    // the user tap an alternate to commit.
+                                    gestureHandled = true
+                                    isPressed = false
+                                    stickyPopups.openExclusive { showAlternates = false }
+                                    showAlternates = true
+                                } else if (currentOnLongPress != null) {
+                                    // Sticky long-press handler (no built-in
+                                    // alternates): suppress the trailing click
+                                    // and hand control to the caller's menu.
+                                    gestureHandled = true
+                                    isPressed = false
+                                    currentOnLongPress?.invoke()
+                                }
                             }
                         }
 
@@ -227,41 +252,38 @@ fun KeyButton(
                                     break
                                 }
 
+                                // Long-press took over (alternates / onLongPress);
+                                // drain remaining events until finger-up so the
+                                // next gesture starts cleanly.
+                                if (gestureHandled) break
+
                                 if (change.changedToUp()) {
                                     released = true
                                     break
                                 }
 
-                                if (showAlternates) {
-                                    val dx = change.position.x - startX
-                                    val itemWidthPx = with(density) { 40.dp.toPx() }
-                                    val steps = (dx / itemWidthPx).toInt()
-                                    activeAlternateIndex = (steps).coerceIn(0, keyDef.alternates.lastIndex)
-                                } else {
-                                    val dy = change.position.y - startY
-                                    val dx = change.position.x - startX
-                                    if (!gestureHandled && dy < -swipeThresholdPx) {
-                                        // Swipe up → commit uppercase.
-                                        gestureHandled = true
-                                        isPressed = false
-                                        longPressJob.cancel()
-                                        currentOnSwipeUp?.invoke()
-                                        // Consume remaining until up.
-                                        while (true) {
-                                            val ev = awaitPointerEvent(PointerEventPass.Main)
-                                            if (ev.changes.all { it.changedToUp() }) break
-                                        }
-                                        released = true
-                                        break
-                                    } else if (!gestureHandled &&
-                                        (dy > swipeThresholdPx || abs(dx) > swipeThresholdPx)) {
-                                        // Finger dragged out of the key (scrolling or
-                                        // sweeping away) — cancel the press silently.
-                                        gestureHandled = true
-                                        isPressed = false
-                                        longPressJob.cancel()
-                                        break
+                                val dy = change.position.y - startY
+                                val dx = change.position.x - startX
+                                if (dy < -swipeThresholdPx) {
+                                    // Swipe up → commit uppercase.
+                                    gestureHandled = true
+                                    isPressed = false
+                                    longPressJob.cancel()
+                                    currentOnSwipeUp?.invoke()
+                                    // Consume remaining until up.
+                                    while (true) {
+                                        val ev = awaitPointerEvent(PointerEventPass.Main)
+                                        if (ev.changes.all { it.changedToUp() }) break
                                     }
+                                    released = true
+                                    break
+                                } else if (dy > swipeThresholdPx || abs(dx) > swipeThresholdPx) {
+                                    // Finger dragged out of the key (scrolling or
+                                    // sweeping away) — cancel the press silently.
+                                    gestureHandled = true
+                                    isPressed = false
+                                    longPressJob.cancel()
+                                    break
                                 }
                             }
                         } catch (_: Exception) {
@@ -271,17 +293,11 @@ fun KeyButton(
                         longPressJob.cancel()
                         isPressed = false
 
-                        val wasShowingAlternates = showAlternates
-                        val finalActiveIndex = activeAlternateIndex
-                        showAlternates = false
-
-                        // Fire the action ONLY on a confirmed, uncancelled release.
+                        // Alternates commit via tap inside the popup, not on
+                        // gesture release. Fire onClick only on a clean release
+                        // that wasn't swallowed by long-press / cancellation.
                         if (released && !gestureHandled) {
-                            if (wasShowingAlternates && finalActiveIndex in keyDef.alternates.indices) {
-                                currentOnAlternateSelected?.invoke(keyDef.alternates[finalActiveIndex])
-                            } else {
-                                currentOnClick()
-                            }
+                            currentOnClick()
                         }
                     }
                 }
@@ -377,12 +393,15 @@ fun KeyButton(
                     contentAlignment = Alignment.Center,
                 ) {
                     if (useDrawable) {
+                        // Fixed-size keycap so the popup wraps tightly to it.
+                        // fillMaxSize here would expand the popup to the full
+                        // screen width (the Box has only widthIn(min = …)).
                         Image(
                             painter = painterResource(id = keycapDrawable),
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
                             colorFilter = ColorFilter.tint(colors.keyTextColor),
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.size(48.dp),
                         )
                     } else {
                         val previewText = if (keyDef.ezRoot.isNotEmpty()) keyDef.ezRoot else displayLabel
@@ -420,13 +439,15 @@ fun KeyButton(
                         .padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    keyDef.alternates.forEachIndexed { index, alt ->
-                        val isSelected = index == activeAlternateIndex
+                    keyDef.alternates.forEach { alt ->
                         Box(
                             modifier = Modifier
                                 .size(40.dp, 50.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) colors.keyPressedBackground else androidx.compose.ui.graphics.Color.Transparent),
+                                .clickable {
+                                    stickyPopups.dismiss()
+                                    currentOnAlternateSelected?.invoke(alt)
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             val altText = if (isUppercase) alt.uppercase() else alt.lowercase()

@@ -18,12 +18,27 @@
 
 package org.ghostsinthelab.app.rakurakuime.ui.keyboard
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import org.ghostsinthelab.app.rakurakuime.R
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
@@ -63,23 +78,83 @@ fun FunctionRow(
             InputMode.NUMBER -> stringResource(R.string.a11y_key_mode_to_emoji)
             InputMode.EMOJI -> stringResource(R.string.a11y_key_mode_to_chinese)
         }
-        KeyButton(
-            keyDef = modeKeyDef,
-            modifier = Modifier.weight(1.5f),
-            keyHeight = keyHeight,
-            backgroundColorOverride = colors.functionKeyBackground,
-            textColorOverride = colors.functionKeyTextColor,
-            contentDescription = modeKeyDescription,
-            onClick = {
-                val next = when (inputMode) {
-                    InputMode.EZ -> InputMode.ENGLISH
-                    InputMode.ENGLISH -> InputMode.NUMBER
-                    InputMode.NUMBER -> InputMode.EMOJI
-                    InputMode.EMOJI -> InputMode.EZ
+        var showModeMenu by remember { mutableStateOf(false) }
+        val stickyPopups = LocalStickyPopups.current
+        val density = LocalDensity.current
+        // Float the menu just above the function row, mirroring the offset
+        // used by KeyButton's preview / alternates popups.
+        val modeMenuOffsetY = with(density) { -(keyHeight + 12.dp).roundToPx() }
+
+        Box(modifier = Modifier.weight(1.5f)) {
+            KeyButton(
+                keyDef = modeKeyDef,
+                modifier = Modifier.fillMaxWidth(),
+                keyHeight = keyHeight,
+                backgroundColorOverride = colors.functionKeyBackground,
+                textColorOverride = colors.functionKeyTextColor,
+                contentDescription = modeKeyDescription,
+                onClick = {
+                    val next = when (inputMode) {
+                        InputMode.EZ -> InputMode.ENGLISH
+                        InputMode.ENGLISH -> InputMode.NUMBER
+                        InputMode.NUMBER -> InputMode.EMOJI
+                        InputMode.EMOJI -> InputMode.EZ
+                    }
+                    onToggleMode(next)
+                },
+                onLongPress = {
+                    stickyPopups.openExclusive { showModeMenu = false }
+                    showModeMenu = true
                 }
-                onToggleMode(next)
+            )
+
+            if (showModeMenu) {
+                // Sticky picker — stays visible until the user taps an entry.
+                // Non-focusable Popup keeps text-input focus on the editor;
+                // touches inside the popup bounds still reach the menu items.
+                Popup(
+                    alignment = Alignment.TopStart,
+                    offset = IntOffset(0, modeMenuOffsetY),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .shadow(8.dp, RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.keyBackground)
+                            .padding(vertical = 4.dp)
+                    ) {
+                        val entries = listOf(
+                            InputMode.EZ to stringResource(R.string.mode_picker_ez),
+                            InputMode.ENGLISH to stringResource(R.string.mode_picker_english),
+                            InputMode.NUMBER to stringResource(R.string.mode_picker_numbers),
+                            InputMode.EMOJI to stringResource(R.string.mode_picker_emoji),
+                        )
+                        entries.forEach { (mode, label) ->
+                            val isCurrent = mode == inputMode
+                            Box(
+                                modifier = Modifier
+                                    .clickable {
+                                        stickyPopups.dismiss()
+                                        if (!isCurrent) onToggleMode(mode)
+                                    }
+                                    .background(
+                                        if (isCurrent) colors.keyPressedBackground
+                                        else androidx.compose.ui.graphics.Color.Transparent
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                            ) {
+                                Text(
+                                    text = label,
+                                    fontSize = 16.sp,
+                                    fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                                    color = colors.keyTextColor,
+                                )
+                            }
+                        }
+                    }
+                }
             }
-        )
+        }
 
         // Switch IME (Globe)
         KeyButton(

@@ -25,12 +25,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,6 +43,25 @@ import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
 import org.ghostsinthelab.app.rakurakuime.ui.ShiftState
 import org.ghostsinthelab.app.rakurakuime.ui.theme.KeyboardTheme
+
+// Coordinates the keyboard's sticky popups (long-press alternates, mode
+// picker). Only one is open at a time; any keypress in the keyboard
+// dismisses it via the gesture-start hook in KeyButton.
+class StickyPopupController {
+    private var dismissCurrent: (() -> Unit)? = null
+    val isOpen: Boolean get() = dismissCurrent != null
+    fun openExclusive(dismiss: () -> Unit) {
+        dismissCurrent?.invoke()
+        dismissCurrent = dismiss
+    }
+    fun dismiss() {
+        val d = dismissCurrent
+        dismissCurrent = null
+        d?.invoke()
+    }
+}
+
+val LocalStickyPopups = staticCompositionLocalOf { StickyPopupController() }
 
 @Composable
 fun KeyboardScreen(
@@ -67,6 +88,7 @@ fun KeyboardScreen(
     val nextCharPredictions by viewModel.nextCharPredictions.collectAsState()
     val asciiOnly by viewModel.asciiOnly.collectAsState()
     val colors = KeyboardTheme.current
+    val stickyPopups = remember { StickyPopupController() }
 
     val scaledKeyHeight = KeyboardLayout.KEY_HEIGHT * heightScale
     
@@ -74,11 +96,13 @@ fun KeyboardScreen(
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     val shouldSplit = isLandscape && splitLayoutLandscape
 
+    CompositionLocalProvider(LocalStickyPopups provides stickyPopups) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(colors.keyboardBackground)
             .navigationBarsPadding()
+            .padding(bottom = 8.dp)
     ) {
         // Candidate Bar — sources differ per mode. English uses the in-memory
         // trie (non-paginated); EZ uses the paged Room-backed candidate list.
@@ -503,5 +527,6 @@ fun KeyboardScreen(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+    }
     }
 }

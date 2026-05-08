@@ -38,6 +38,10 @@
     <string name="a11y_key_mode_to_numbers">Switch to numbers</string>
     <string name="a11y_key_mode_to_emoji">Switch to emoji</string>
     <string name="a11y_key_mode_to_chinese">Switch to Chinese</string>
+    <string name="mode_picker_ez">EZ Input</string>
+    <string name="mode_picker_english">English</string>
+    <string name="mode_picker_numbers">Numbers</string>
+    <string name="mode_picker_emoji">Emoji</string>
     <string name="a11y_candidate_prev_page">Previous candidates</string>
     <string name="a11y_candidate_next_page">Next candidates</string>
     <string name="a11y_emoji_tab_smileys">Smileys</string>

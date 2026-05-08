@@ -55,6 +55,10 @@
     <string name="a11y_key_mode_to_numbers">切換至數字輸入</string>
     <string name="a11y_key_mode_to_emoji">切換至表情符號</string>
     <string name="a11y_key_mode_to_chinese">切換回中文輸入</string>
+    <string name="mode_picker_ez">輕鬆輸入</string>
+    <string name="mode_picker_english">英文</string>
+    <string name="mode_picker_numbers">數字符號</string>
+    <string name="mode_picker_emoji">表情符號</string>
     <string name="a11y_candidate_prev_page">上一頁候選字</string>
     <string name="a11y_candidate_next_page">下一頁候選字</string>
     <string name="a11y_emoji_tab_smileys">表情</string>

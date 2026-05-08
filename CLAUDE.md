@@ -54,7 +54,7 @@ Packages under `app/src/main/java/org/ghostsinthelab/app/rakurakuime/`:
 
 The keyboard is state-first. A single `AndroidViewModel` owns every state flow the UI reads:
 
-- `inputMode: StateFlow<InputMode>` — one of `EZ | NUMBER | ENGLISH | EMOJI`. `FunctionRow`'s mode key cycles through them. `updateEditorInfo(...)` auto-switches to `NUMBER` for numeric `EditorInfo.inputType`.
+- `inputMode: StateFlow<InputMode>` — one of `EZ | NUMBER | ENGLISH | EMOJI`. `FunctionRow`'s mode key tap-cycles through them; long-pressing the same key opens a sticky picker that lets the user jump straight to any mode. `updateEditorInfo(...)` auto-switches to `NUMBER` for numeric `EditorInfo.inputType`.
 - EZ composing state: `composingText` (in-progress keystroke sequence), `preEditBuffer` (already-selected Chinese characters still in composing region), paginated `pagedCandidates` / `hasPrevPage` / `hasNextPage`.
 - `nextCharPredictions: StateFlow<List<String>>` — opportunistic post-selection strip. `selectCandidate(...)` fires `DictionaryDao.nextCharactersAfter(...)` against the bundled phrase corpus, seeded by the last char of the pick (so single-char and phrase picks behave the same). The strip renders in `CandidateBar` only when `pagedCandidates` is empty, with `numericLabels = false` so the EZ digit roots (`1`, `q`, …) keep their normal keystroke meaning instead of being shadowed by 1–0 selection shortcuts. Cleared on `onKeyPress` / `onBackspace` / `appendToPreEdit` / `clearComposing` / non-EZ `setInputMode` so the strip never lingers past a state change.
 - English composing state: `englishBuffer` + `englishCandidates`, fed by `EnglishDictionary.prefixLookup`. `setInputMode(mode)` clears the non-active buffer; selecting an English candidate commits `<word> ` and capitalises the first letter if the buffer's first char was uppercase.
@@ -78,7 +78,24 @@ The `onUpdateComposingText` callback is wired by the service to `InputConnection
 
 ### Key input handling — `KeyButton`
 
-Custom pointer-input loop (not `detectTapGestures`) because it must support tap, swipe-up, and long-press-alternates-drag. The commit rule is: fire `onClick` / `onAlternateSelected` only when the loop ends with `released && !gestureHandled`. Cancellation paths that clear `released`: the scrollable ancestor consuming the pointer (`change.isConsumed`), or the finger dragging > `swipeThresholdPx` downward or sideways. See the MK reference comment in the file.
+Custom pointer-input loop (not `detectTapGestures`) because it must support tap, swipe-up, and long-press-to-open-sticky-popup. The commit rule is: fire `onClick` only when the loop ends with `released && !gestureHandled`. Cancellation paths that clear `released`: the scrollable ancestor consuming the pointer (`change.isConsumed`), or the finger dragging > `swipeThresholdPx` downward or sideways. See the MK reference comment in the file.
+
+Long-press semantics are split based on what the key carries:
+
+- If `keyDef.alternates` is non-empty, the 400 ms hold opens the alternates popup — sticky and tap-to-pick (the user can lift their finger and choose at leisure). `onAlternateSelected` fires from the popup's clickable items, not from gesture release.
+- Otherwise, if the caller passed an `onLongPress`, it fires on the same 400 ms timeout and the trailing click is suppressed. `FunctionRow`'s mode key uses this to open its mode picker.
+
+Accessibility: the outer `Box` uses `Modifier.semantics(mergeDescendants = true)` with an explicit `contentDescription` and `Role.Button`, so TalkBack announces each key once instead of reading every inner `Text` separately. The merge boundary (rather than `clearAndSetSemantics`) keeps the per-Text labels in the unmerged tree so `KeyButtonLabelTest` can find them with `useUnmergedTree = true`.
+
+### Sticky popups — `StickyPopupController`
+
+Defined in `KeyboardScreen.kt` and provided via `LocalStickyPopups` around the keyboard tree. Coordinates the keyboard's transient overlays so only one is open at a time:
+
+- Opening any popup (alternates, mode picker) calls `openExclusive { dismiss }`, which immediately invokes the prior popup's dismiss callback. Registration is cleared *before* the callback runs so a callback can re-open a new popup without being clobbered by the outer dismiss.
+- Every `KeyButton` checks `isOpen` at gesture start and calls `dismiss()` if true, then proceeds with its normal press logic. So tapping any key — including the originating key — both dismisses the popup *and* fires that key's action; this matches user intent better than swallowing the press.
+- Tapping a popup item calls `dismiss()` then fires the corresponding selection (`onAlternateSelected(alt)` / `onToggleMode(mode)`).
+
+Popups are non-focusable Compose `Popup`s so editor focus stays on the target text field; outside-tap-to-dismiss is therefore not handled by the popup itself but by the next keypress through the controller.
 
 ## Assets bundled into the APK
 

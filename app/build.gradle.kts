@@ -125,6 +125,47 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+// Builds app/src/main/assets/databases/ime_database.db from scratch using
+// the bundled CIN and the MOE 字頻 / 詞頻 corpus CSVs. Run on demand:
+//
+//   ./gradlew :app:buildImeDb
+//
+// The produced .db is committed to git; this task only refreshes it when
+// the inputs (CIN, CSVs, exported v3 schema) change. Rationale and
+// internals: see buildSrc/src/main/kotlin/ImeDbBuilder.kt.
+tasks.register("buildImeDb") {
+    group = "build"
+    description = "Rebuild the prebuilt Room asset (ime_database.db) from CIN + 字頻／詞頻 CSVs."
+
+    val cin = layout.projectDirectory.file("src/main/assets/ezbig.utf-8.cin").asFile
+    val charCsv = layout.projectDirectory.file("src/main/assets/85rest01.csv").asFile
+    val phraseCsv = layout.projectDirectory.file("src/main/assets/85rest02.csv").asFile
+    val schemaJson = layout.projectDirectory
+        .file("schemas/org.ghostsinthelab.app.rakurakuime.data.ImeDatabase/3.json")
+        .asFile
+    val outDb = layout.projectDirectory
+        .file("src/main/assets/databases/ime_database.db")
+        .asFile
+
+    inputs.files(cin, charCsv, phraseCsv, schemaJson)
+    outputs.file(outDb)
+
+    doLast {
+        ImeDbBuilder.build(
+            cin = cin,
+            charCsv = charCsv,
+            phraseCsv = phraseCsv,
+            schemaJson = schemaJson,
+            output = outDb,
+        )
+        logger.lifecycle(
+            "buildImeDb: wrote {} ({} bytes)",
+            outDb,
+            outDb.length(),
+        )
+    }
+}
+
 // Captures showcase screenshots (settings + keyboard modes) without letting
 // the test runner uninstall the app afterwards — AGP's connectedAndroidTest
 // task always uninstalls, which wipes the app's external files dir, so we

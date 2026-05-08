@@ -101,7 +101,7 @@ Popups are non-focusable Compose `Popup`s so editor focus stays on the target te
 ## Assets bundled into the APK
 
 - `ezbig.utf-8.cin` — EZ dictionary source (高衡緒 / 輕鬆資訊企業社, GPLv2 + EZ public licence).
-- `databases/ime_database.db` — pre-packaged Room DB built from the CIN.
+- `databases/ime_database.db` — pre-packaged Room DB built from the CIN. Rebuild with `python3 tools/rebuild_ime_db.py` from the repo root after touching the CIN, the schema, or `FrequencyCsv.SEED_NUMERATOR`. The script is idempotent and updates `user_version` + `room_master_table.identity_hash` to match the current `@Database(version = N)`.
 - `85rest01.csv`, `85rest02.csv` — MOE 八十五年常用語詞調查 字頻 / 詞頻總表 sourced from the government open-data platform (data.nat.gov.tw/dataset/45518). Original release is Big5; bundled copies are UTF-8 transcoded with `iconv -c -f BIG5 -t UTF-8` (a handful of bytes outside strict Big5 are dropped — the residue is a few non-Chinese characters in the 部首 / 詞目 columns and does not affect the rank-based prior we use). Drives the static priors in candidate ordering. See README attribution.
 - `google_10k_english.txt`, `emoji.json` — English prediction + emoji categories (see README attributions).
 - `res/font/roboto_slab_*.ttf` — alphanumerical keycap font (Roboto Slab, SIL OFL 1.1).

@@ -1,0 +1,11 @@
+- New: candidate ordering is now seeded with corpus-derived
+  weights from the MOE 八十五年常用語詞調查 字頻／詞頻 tables, so
+  fresh installs surface common characters and phrases in a
+  sensible order from the very first use — your own usage still
+  takes over as you type.
+- New: the post-selection next-character strip uses the same
+  phrase-frequency prior as a tiebreaker, so common follow-on
+  characters appear higher.
+- Internal: the bundled `ime_database.db` is now rebuilt by a
+  Gradle task (`./gradlew :app:buildImeDb`) that reproduces
+  Room's exact v3 schema, replacing the previous Python script.

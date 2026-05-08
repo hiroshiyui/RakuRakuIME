@@ -1,0 +1,14 @@
+- New: long-press the mode key for a sticky picker that jumps
+  straight to EZ / English / Numbers / Emoji — no more cycling
+  through three modes to reach the one you want.
+- New: the long-press popup for accented letters and
+  punctuation alternates is now sticky and tap-to-pick. Hold
+  to open, lift your finger, then tap the variant — and any
+  keypress elsewhere dismisses the popup.
+- Polish: extra 8 dp gap below the keyboard so the system
+  navigation globe icon is harder to mis-tap, plus a fix for a
+  press-preview popup that briefly stretched the full screen
+  width on EZ keys.
+- Tests: broaden host-side and instrumented coverage across
+  the data layer (English / emoji / CIN parsers) and the
+  keyboard view-model state machine.

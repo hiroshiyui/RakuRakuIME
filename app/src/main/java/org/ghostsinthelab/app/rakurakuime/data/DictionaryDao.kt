@@ -25,15 +25,29 @@ import androidx.room.Query
 
 @Dao
 interface DictionaryDao {
-    @Query("SELECT character FROM dictionary WHERE keystroke = :keystroke ORDER BY frequency DESC")
+    // Candidate-ordering policy (see also DictionaryEntry / FrequencyCsv):
+    // 1. `frequency` (per-user learning) takes priority — once a user has
+    //    selected a candidate, their behaviour outranks the static prior.
+    // 2. Tied learning is broken by the corpus weights from MOE 字頻／詞頻.
+    //    `character_weight` and `phrase_weight` are mutually exclusive on
+    //    any given row (one is 0 by construction), so summing them gives
+    //    a single static priority.
+    // On a fresh install with all frequencies at 0, ordering effectively
+    // collapses to corpus weight DESC, then primary-key insertion order.
+    @Query(
+        "SELECT character FROM dictionary " +
+            "WHERE keystroke = :keystroke " +
+            "ORDER BY frequency DESC, (character_weight + phrase_weight) DESC"
+    )
     suspend fun getCharacters(keystroke: String): List<String>
 
     @Query("""
-        SELECT dictionary.character 
-        FROM dictionary 
-        JOIN dictionary_fts ON dictionary.id = dictionary_fts.rowid 
-        WHERE dictionary_fts.keystroke MATCH :query 
-        ORDER BY dictionary.frequency DESC 
+        SELECT dictionary.character
+        FROM dictionary
+        JOIN dictionary_fts ON dictionary.id = dictionary_fts.rowid
+        WHERE dictionary_fts.keystroke MATCH :query
+        ORDER BY dictionary.frequency DESC,
+                 (dictionary.character_weight + dictionary.phrase_weight) DESC
         LIMIT 50
     """)
     suspend fun getCharactersByPrefix(query: String): List<String>
@@ -75,7 +89,9 @@ interface DictionaryDao {
         WHERE character LIKE :likePattern
           AND length(character) > :prefixLen
         GROUP BY next_char
-        ORDER BY SUM(frequency) DESC, next_char
+        ORDER BY SUM(frequency) DESC,
+                 SUM(phrase_weight) DESC,
+                 next_char
         LIMIT :limit
     """)
     suspend fun nextCharactersAfter(likePattern: String, prefixLen: Int, limit: Int): List<String>

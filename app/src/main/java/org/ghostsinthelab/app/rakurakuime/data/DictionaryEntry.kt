@@ -18,6 +18,7 @@
 
 package org.ghostsinthelab.app.rakurakuime.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
@@ -31,7 +32,22 @@ data class DictionaryEntry(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val keystroke: String,
     val character: String,
-    val frequency: Int = 0
+    val frequency: Int = 0,
+    /**
+     * Static (corpus-derived) priority for single-character entries.
+     * Seeded from MOE 85年字頻總表 via [FrequencyCsv]; 0 for phrase rows
+     * or characters absent from the survey. See [DictionaryDao] for how
+     * this participates in candidate ordering.
+     */
+    @ColumnInfo(name = "character_weight", defaultValue = "0")
+    val characterWeight: Int = 0,
+    /**
+     * Static (corpus-derived) priority for phrase entries (詞目). Seeded
+     * from MOE 85年詞頻總表; 0 for single-char rows or phrases absent
+     * from the survey.
+     */
+    @ColumnInfo(name = "phrase_weight", defaultValue = "0")
+    val phraseWeight: Int = 0,
 )
 
 @Entity(tableName = "dictionary_fts")

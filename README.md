@@ -47,6 +47,17 @@
 以 SIL Open Font License 1.1 授權。完整授權條款置於
 `app/src/main/assets/OFL.txt`。來源：https://fonts.google.com/specimen/Roboto+Slab
 
+候選字詞排序所使用的字頻／詞頻資料（`85rest01.csv`、`85rest02.csv`）來自
+中華民國教育部《八十五年常用語詞調查報告》之字頻總表與詞頻總表，由
+**政府資料開放平臺**公開釋出（資料集編號 45518）。引用時請標示：
+
+> 中華民國教育部（Ministry of Education, R.O.C.）。《八十五年常用語詞調查報告——字頻總表／詞頻總表》。資料來源：政府資料開放平臺，<https://data.nat.gov.tw/dataset/45518>。
+
+本資料依政府資料開放平臺之開放資料授權條款釋出。原始檔以 Big5 編碼，
+為方便讀取，本專案內附之版本已透過 `iconv -c -f BIG5 -t UTF-8` 轉碼為
+UTF-8（極少數非標準 Big5 位元組於部首／詞目欄位中被略過，不影響本專案
+所用的排序優先序資料）。
+
 ## 授權條款
 
 ### 應用程式

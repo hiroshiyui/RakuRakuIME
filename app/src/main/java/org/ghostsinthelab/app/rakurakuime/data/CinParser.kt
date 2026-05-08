@@ -96,6 +96,10 @@ object CinParser {
     }
 
     suspend fun parseAndPopulate(context: Context, database: ImeDatabase) = withContext(Dispatchers.IO) {
+        // Load corpus weights once. The CSVs are small (only the top
+        // HEAD_BUDGET entries land in the maps, the rest collapse to weight 0)
+        // and reused for every dictionary row below.
+        val weights = FrequencyCsv.loadAll(context)
         var totalInserted = 0
         context.assets.open(ASSET_NAME).use { inputStream ->
             BufferedReader(InputStreamReader(inputStream, "UTF-8")).use { reader ->
@@ -121,7 +125,26 @@ object CinParser {
                             if (parts.size >= 2) {
                                 val keystroke = parts[0]
                                 val character = parts[1]
-                                entries.add(DictionaryEntry(keystroke = keystroke, character = character))
+                                val isSingleChar =
+                                    character.codePointCount(0, character.length) == 1
+                                val charWeight = if (isSingleChar) {
+                                    weights.charWeights[character] ?: 0
+                                } else {
+                                    0
+                                }
+                                val phraseWeight = if (isSingleChar) {
+                                    0
+                                } else {
+                                    weights.phraseWeights[character] ?: 0
+                                }
+                                entries.add(
+                                    DictionaryEntry(
+                                        keystroke = keystroke,
+                                        character = character,
+                                        characterWeight = charWeight,
+                                        phraseWeight = phraseWeight,
+                                    )
+                                )
 
                                 if (entries.size >= 5000) {
                                     database.dictionaryDao().insertAll(entries)

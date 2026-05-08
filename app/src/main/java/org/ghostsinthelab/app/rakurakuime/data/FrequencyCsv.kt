@@ -37,17 +37,29 @@ import java.io.InputStreamReader
  *
  * ## Weight formula
  *
- * `weight = max(0, [HEAD_BUDGET] - rank)`
+ * `weight = floor([SEED_NUMERATOR] / rank)`
  *
- * Rank is the 1-based 序號 column. With `HEAD_BUDGET = 100`, the top-100
- * most-frequent entries get monotonically decreasing seeds 99..1; rank
- * > 100 (the long tail) gets 0. Once the user picks a candidate, the
- * `frequency` column (incremented per selection) eventually overtakes the
- * static seed, so learning still wins long-term.
+ * Rank is the 1-based 序號 column. The reciprocal shape gives a wide
+ * dynamic range: rank 1 ⇒ 10 000, rank 10 ⇒ 1 000, rank 100 ⇒ 100,
+ * rank 1 000 ⇒ 10. Once `rank > [SEED_NUMERATOR]` the formula floors
+ * to 0 and we stop reading the file.
+ *
+ * ### Why reciprocal and not a simple "head budget"
+ *
+ * The original tuning was `max(0, 100 - rank)` — easy to reason about,
+ * but every entry past rank 100 ended up with weight 0. That worked for
+ * direct keystroke → character lookups, but broke the next-character
+ * prediction strip: all next-char groups for a given prefix would tie at
+ * `SUM(phrase_weight) = 0`, and the alphabetical tiebreaker dropped
+ * common follow-ups like 鬆 after 輕 (rank 1 424 — well past 100) to the
+ * bottom of the strip. The reciprocal keeps long-tail entries
+ * differentiated while still letting one user selection overtake the
+ * prior, because [DictionaryDao]'s `ORDER BY` places `frequency DESC`
+ * ahead of the weight columns.
  */
 object FrequencyCsv {
-    /** Highest seed value; entries past this rank receive 0. */
-    const val HEAD_BUDGET = 100
+    /** Numerator of the reciprocal weight formula. */
+    const val SEED_NUMERATOR = 10_000
 
     /** `assets/85rest01.csv` — character frequency (字頻總表). */
     const val CHAR_ASSET = "85rest01.csv"
@@ -83,11 +95,11 @@ object FrequencyCsv {
                     skippedHeader = true
                     val key = cols[1].trim()
                     if (key.isEmpty()) continue
-                    val weight = (HEAD_BUDGET - rank).coerceAtLeast(0)
+                    val weight = if (rank > 0) SEED_NUMERATOR / rank else 0
                     if (weight == 0) {
-                        // Past the head budget: skip storage to keep the map small.
-                        // Once we've seen one zero-weight row, the rest are zero too
-                        // because the CSV is sorted by ascending rank.
+                        // Past the cutoff (rank > SEED_NUMERATOR). The CSV is
+                        // sorted by ascending rank, so every following row is
+                        // also zero — stop reading.
                         break
                     }
                     // Lowest-rank wins on duplicate keys (shouldn't happen in

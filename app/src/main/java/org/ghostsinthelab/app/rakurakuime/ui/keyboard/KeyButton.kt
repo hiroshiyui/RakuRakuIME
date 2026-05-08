@@ -47,9 +47,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -185,10 +185,12 @@ fun KeyButton(
             .widthIn(min = 28.dp)
             .padding(2.dp)
             .clip(RoundedCornerShape(8.dp))
-            // Replace all child semantics with a single Button node so
-            // TalkBack issues one announcement per key instead of reading
-            // every inner Text separately.
-            .clearAndSetSemantics {
+            // Merge child semantics into this node so TalkBack issues a
+            // single button announcement per key. The explicit
+            // contentDescription wins on the merged node, so screen
+            // readers don't get the inner Text labels appended — but the
+            // unmerged tree still exposes those Texts for UI tests.
+            .semantics(mergeDescendants = true) {
                 this.contentDescription = resolvedContentDescription
                 role = Role.Button
             }

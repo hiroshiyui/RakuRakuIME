@@ -56,8 +56,11 @@ class KeyButtonLabelTest {
             }
         }
 
-        composeRule.onNodeWithText("1").assertIsDisplayed()
-        composeRule.onNodeWithText("!").assertIsDisplayed()
+        // KeyButton merges descendant semantics into a single Button
+        // announcement, so the inner Text labels are only reachable on
+        // the unmerged semantics tree.
+        composeRule.onNodeWithText("1", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText("!", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -71,8 +74,8 @@ class KeyButtonLabelTest {
             }
         }
 
-        composeRule.onNodeWithText(";").assertIsDisplayed()
-        composeRule.onNodeWithText(":").assertIsDisplayed()
+        composeRule.onNodeWithText(";", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText(":", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -86,8 +89,8 @@ class KeyButtonLabelTest {
             }
         }
 
-        composeRule.onNodeWithText("[").assertIsDisplayed()
-        composeRule.onNodeWithText("{").assertIsDisplayed()
+        composeRule.onNodeWithText("[", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText("{", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -104,6 +107,6 @@ class KeyButtonLabelTest {
             }
         }
 
-        composeRule.onNodeWithText("q").assertIsDisplayed()
+        composeRule.onNodeWithText("q", useUnmergedTree = true).assertIsDisplayed()
     }
 }

@@ -19,11 +19,15 @@
 package org.ghostsinthelab.app.rakurakuime
 
 import android.app.Application
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.ghostsinthelab.app.rakurakuime.ui.InputMode
 import org.ghostsinthelab.app.rakurakuime.ui.KeyboardViewModel
+import org.ghostsinthelab.app.rakurakuime.ui.ShiftState
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -239,6 +243,202 @@ class KeyboardViewModelTest {
 
         assertEquals("信件", viewModel.preEditBuffer.value)
         assertEquals("", viewModel.composingText.value)
+    }
+
+    // --- Shift state machine ---------------------------------------
+
+    @Test
+    fun toggleShift_cyclesNoneShiftedCapsLockNone() {
+        assertEquals(ShiftState.NONE, viewModel.shiftState.value)
+        viewModel.toggleShift()
+        assertEquals(ShiftState.SHIFTED, viewModel.shiftState.value)
+        viewModel.toggleShift()
+        assertEquals(ShiftState.CAPS_LOCK, viewModel.shiftState.value)
+        viewModel.toggleShift()
+        assertEquals(ShiftState.NONE, viewModel.shiftState.value)
+    }
+
+    @Test
+    fun consumeShift_releasesOneShotOnly() {
+        viewModel.toggleShift()
+        assertEquals(ShiftState.SHIFTED, viewModel.shiftState.value)
+        viewModel.consumeShift()
+        assertEquals(
+            "One-shot SHIFTED must drop to NONE after a single key press",
+            ShiftState.NONE,
+            viewModel.shiftState.value,
+        )
+    }
+
+    @Test
+    fun consumeShift_doesNotReleaseCapsLock() {
+        viewModel.toggleShift()
+        viewModel.toggleShift()
+        assertEquals(ShiftState.CAPS_LOCK, viewModel.shiftState.value)
+        viewModel.consumeShift()
+        assertEquals(
+            "CAPS_LOCK is sticky; consumeShift must leave it alone",
+            ShiftState.CAPS_LOCK,
+            viewModel.shiftState.value,
+        )
+    }
+
+    @Test
+    fun consumeShift_isNoOpWhenNone() {
+        viewModel.consumeShift()
+        assertEquals(ShiftState.NONE, viewModel.shiftState.value)
+    }
+
+    // --- English buffer flow ---------------------------------------
+
+    @Test
+    fun englishKeyPress_appendsAndUpdatesBuffer() {
+        viewModel.onEnglishKeyPress("h")
+        viewModel.onEnglishKeyPress("e")
+        viewModel.onEnglishKeyPress("l")
+        assertEquals("hel", viewModel.englishBuffer.value)
+    }
+
+    @Test
+    fun englishBackspace_returnsTrueAndShortensBuffer() {
+        viewModel.onEnglishKeyPress("h")
+        viewModel.onEnglishKeyPress("i")
+        val handled = viewModel.onEnglishBackspace()
+        assertTrue("Backspace must report it consumed the event", handled)
+        assertEquals("h", viewModel.englishBuffer.value)
+    }
+
+    @Test
+    fun englishBackspace_returnsFalseWhenBufferEmpty() {
+        // The IME relies on this signal to fall through to the editor's
+        // own delete-char behavior. A spurious `true` here would swallow
+        // the user's backspace.
+        assertFalse(viewModel.onEnglishBackspace())
+    }
+
+    @Test
+    fun englishBackspace_emptiesBufferClearsCandidates() {
+        viewModel.onEnglishKeyPress("a")
+        viewModel.onEnglishBackspace()
+        assertEquals("", viewModel.englishBuffer.value)
+        assertTrue(viewModel.englishCandidates.value.isEmpty())
+    }
+
+    @Test
+    fun commitEnglishBuffer_returnsAndClearsBuffer() {
+        viewModel.onEnglishKeyPress("h")
+        viewModel.onEnglishKeyPress("i")
+        val text = viewModel.commitEnglishBuffer()
+        assertEquals("hi", text)
+        assertEquals("", viewModel.englishBuffer.value)
+    }
+
+    @Test
+    fun selectEnglishCandidate_lowercaseBuffer_returnsLowercaseWord() {
+        viewModel.onEnglishKeyPress("h")
+        viewModel.onEnglishKeyPress("e")
+        val cased = viewModel.selectEnglishCandidate("hello")
+        assertEquals("hello", cased)
+        assertEquals("", viewModel.englishBuffer.value)
+    }
+
+    @Test
+    fun selectEnglishCandidate_uppercaseLeading_capitalisesFirstChar() {
+        // The UI passes through the case of the typed buffer; after a
+        // shift+letter the leading char is uppercase, so the committed
+        // word must be capitalised — that's the whole reason the buffer
+        // preserves case end-to-end.
+        viewModel.onEnglishKeyPress("H")
+        viewModel.onEnglishKeyPress("e")
+        val cased = viewModel.selectEnglishCandidate("hello")
+        assertEquals("Hello", cased)
+    }
+
+    @Test
+    fun selectEnglishCandidate_emptyBuffer_returnsWordVerbatim() {
+        // Defensive contract: even with no buffer, the candidate string
+        // must come back unchanged so the caller can commit it directly.
+        val cased = viewModel.selectEnglishCandidate("hello")
+        assertEquals("hello", cased)
+    }
+
+    // --- Emoji category ---------------------------------------------
+
+    @Test
+    fun setEmojiCategory_updatesIndex() {
+        assertEquals(0, viewModel.emojiCategory.value)
+        viewModel.setEmojiCategory(3)
+        assertEquals(3, viewModel.emojiCategory.value)
+    }
+
+    // --- updateEditorInfo: input-mode + asciiOnly side effects -------
+
+    @Test
+    fun updateEditorInfo_numberField_switchesToNumberMode() {
+        val info = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+        }
+        viewModel.updateEditorInfo(info)
+        assertEquals(InputMode.NUMBER, viewModel.inputMode.value)
+        assertFalse(viewModel.asciiOnly.value)
+    }
+
+    @Test
+    fun updateEditorInfo_passwordField_switchesToEnglishAndAsciiOnly() {
+        val info = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        viewModel.updateEditorInfo(info)
+        assertEquals(InputMode.ENGLISH, viewModel.inputMode.value)
+        assertTrue(
+            "Password fields must engage asciiOnly so the prefix never feeds prediction",
+            viewModel.asciiOnly.value,
+        )
+    }
+
+    @Test
+    fun updateEditorInfo_imeNoPersonalizedLearning_engagesAsciiOnly() {
+        val info = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            imeOptions = EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        }
+        viewModel.updateEditorInfo(info)
+        assertTrue(viewModel.asciiOnly.value)
+    }
+
+    @Test
+    fun updateEditorInfo_nullInfo_defaultsToEzTextNoAsciiOnly() {
+        // Some call paths (test screens, edge cases on older Android) hand
+        // us a null EditorInfo; the contract is to fall back to a sensible
+        // EZ default rather than crash.
+        viewModel.updateEditorInfo(null)
+        assertEquals(InputMode.EZ, viewModel.inputMode.value)
+        assertFalse(viewModel.asciiOnly.value)
+    }
+
+    @Test
+    fun setInputMode_nonEnglish_clearsEnglishBuffer() {
+        viewModel.onEnglishKeyPress("a")
+        viewModel.onEnglishKeyPress("b")
+        viewModel.setInputMode(InputMode.EZ)
+        assertEquals(
+            "Switching out of ENGLISH must clear the buffer to avoid leaking it on next entry",
+            "",
+            viewModel.englishBuffer.value,
+        )
+    }
+
+    // --- Pagination -------------------------------------------------
+
+    @Test
+    fun nextPage_prevPage_areBoundedByCandidateSize() {
+        // With no candidates loaded the page index must stay clamped at 0
+        // — no crash, no negative index, no off-the-end paging.
+        assertEquals(0, viewModel.candidatePage.value)
+        viewModel.nextPage()
+        assertEquals(0, viewModel.candidatePage.value)
+        viewModel.prevPage()
+        assertEquals(0, viewModel.candidatePage.value)
     }
 
     @Test

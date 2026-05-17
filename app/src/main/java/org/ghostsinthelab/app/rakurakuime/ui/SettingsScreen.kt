@@ -51,6 +51,7 @@ private fun isImeEnabled(context: Context): Boolean {
 @Composable
 fun SettingsScreen(
     userPreferences: UserPreferences,
+    onOpenUserPhraseManager: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -226,6 +227,18 @@ fun SettingsScreen(
             ) {
                 Text(text = stringResource(R.string.settings_clear_freq))
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onOpenUserPhraseManager,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(R.string.settings_user_phrases))
+            }
+            Text(
+                text = stringResource(R.string.settings_user_phrases_summary),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))

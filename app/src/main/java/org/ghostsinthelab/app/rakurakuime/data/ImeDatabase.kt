@@ -24,8 +24,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [DictionaryEntry::class, DictionaryFts::class],
-    version = 3,
+    entities = [DictionaryEntry::class, DictionaryFts::class, UserPhraseEntry::class],
+    version = 4,
     // Export the schema under app/schemas so future @AutoMigration and
     // manual Migration code has a baseline to diff against. The destructive
     // fallback below remains as a last-resort safety net for upgrades that
@@ -34,6 +34,7 @@ import androidx.room.RoomDatabase
 )
 abstract class ImeDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
+    abstract fun userPhraseDao(): UserPhraseDao
 
     companion object {
         @Volatile
@@ -47,7 +48,7 @@ abstract class ImeDatabase : RoomDatabase() {
                     "ime_database"
                 )
                 .createFromAsset("databases/ime_database.db")
-                .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
                 .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
                 INSTANCE = instance

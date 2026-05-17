@@ -32,9 +32,16 @@ import androidx.compose.ui.unit.dp
 import org.ghostsinthelab.app.rakurakuime.data.CinParser
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.UserPreferences
+import androidx.activity.compose.BackHandler
 import org.ghostsinthelab.app.rakurakuime.ui.SettingsScreen
+import org.ghostsinthelab.app.rakurakuime.ui.UserPhraseManagerScreen
 import org.ghostsinthelab.app.rakurakuime.ui.theme.RakuRakuIMETheme
 import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
+
+private sealed interface MainScreen {
+    object Settings : MainScreen
+    object UserPhrases : MainScreen
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,10 +88,21 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     } else {
-                        SettingsScreen(
-                            userPreferences = userPreferences,
-                            modifier = insetsModifier
-                        )
+                        var screen: MainScreen by remember { mutableStateOf(MainScreen.Settings) }
+                        BackHandler(enabled = screen != MainScreen.Settings) {
+                            screen = MainScreen.Settings
+                        }
+                        when (screen) {
+                            MainScreen.Settings -> SettingsScreen(
+                                userPreferences = userPreferences,
+                                onOpenUserPhraseManager = { screen = MainScreen.UserPhrases },
+                                modifier = insetsModifier,
+                            )
+                            MainScreen.UserPhrases -> UserPhraseManagerScreen(
+                                onBack = { screen = MainScreen.Settings },
+                                modifier = insetsModifier,
+                            )
+                        }
                     }
                 }
             }

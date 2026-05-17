@@ -5,67 +5,28 @@ out — see `git log` for the full history of what's landed.
 
 ## Feature Roadmap
 
-- [ ] **User Phrase Manager**
-    - **What:** a settings screen that lets the user add, edit, and
-      delete their own phrases — keystroke → phrase text pairs that
-      live alongside the bundled dictionary and feed the same
-      candidate lookup. When the user types (or pastes) the phrase
-      text, the screen suggests a ranked list of candidate root
-      keystrokes derived from EZ's composing rules so the common
-      case is one tap, not manual keystroke entry.
-    - **Why:** the bundled `ezbig.utf-8.cin` is read-only for end
-      users; the only personalisation today is learned frequency.
-      Letting users add their own phrases turns RakuRaku into a
-      practical daily-driver IME for names, jargon, and phrases that
-      aren't in the shipped corpus. Auto-suggesting roots is what
-      makes the UX tolerable: hand-deriving a 4-character phrase's
-      root sequence is slow and error-prone even for fluent EZ
-      users.
-    - **Design sketch:**
-        - Separate Room entity (e.g. `UserPhrase`) with the same
-          `(keystroke, text)` shape as `Dictionary` plus a
-          user-origin flag and a `frequency` column; DAO merges
-          user phrases into
-          `getCharacters(keystroke)` / `getCharactersByPrefix(prefix)`
-          so the candidate bar surfaces them transparently.
-        - Frequency tracking: `selectCandidate(...)` must bump the
-          user-phrase frequency on commit just like it does for
-          bundled entries via `incrementFrequencyExact`, so the
-          user's own phrases rise through the candidate list with
-          use. Back it with the same Backup/Restore contract below
-          so learned ordering survives reinstalls.
-        - Initial frequency: seed each new user phrase with a
-          frequency above the typical bundled-entry max (audit the
-          shipped distribution once, then pick a safe floor — e.g.
-          max(bundled) + 100) so the user's own entries surface
-          ahead of shipped candidates on first use. Rationale: if
-          the user went to the trouble of adding a phrase, they
-          almost certainly want it to win ties against the bundled
-          corpus by default.
-        - Root-suggestion engine: per character in the phrase,
-          enumerate the possible roots by cross-referencing the
-          bundled `Dictionary` table (every row where `text ==
-          <char>` gives one or more keystrokes that resolve to that
-          char). Combine across characters per EZ's phrase-composing
-          rules described in
-          <https://github.com/hiroshiyui/EzIM_Tables_Project/blob/main/CLAUDE.md>
-          (hybrid keystroke sequences, radical-root selection,
-          single-char vs. multi-char rules). Rank suggestions by
-          total learned frequency so the user's usual picks surface
-          first.
-        - CRUD UI in `MainActivity`, one entry per row with phrase
-          text + keystroke fields; the keystroke field offers the
-          suggestion chips inline. Validate keystroke characters
-          against the EZ root set on manual entry too.
-        - UI / interaction reference: Guileless Bopomofo's User
-          Phrase Manager at
-          <https://github.com/hiroshiyui/GuilelessBopomofo> —
-          matches the "add / edit / delete user phrases" shape we
-          want, so read its screen + Room wiring before designing
-          ours from scratch. (Guileless is Bopomofo-based so the
-          root-derivation logic doesn't transfer, but the CRUD flow
-          and list-vs-editor layout do.)
-        - Schema bump → requires the L8 migration work above.
+- [x] **User Phrase Manager** — landed as a separate `user_phrases`
+      table (v4 migration), an "always rank first" merge into
+      `KeyboardViewModel.updateCandidates` / `updateNextCharPredictions`,
+      Compose `UserPhraseManagerScreen` with add/delete CRUD, search,
+      and CSV backup/restore (`UserPhraseCsv`). Strict EZ-keystroke
+      validation on entry and restore via `CinParser.validKeystrokeChars`.
+
+- [ ] **User Phrase Manager — follow-ups**
+    - Inline edit (today the row is delete-only; recreate to "edit").
+    - Frequency-of-use tracking on user-phrase commits — currently
+      `selectCandidate(...)` only bumps the bundled `dictionary.frequency`,
+      not the user-phrase row. With the always-rank-first policy this
+      is cosmetic, but useful for ordering among multiple user phrases
+      sharing a prefix.
+    - Phrase-level keystroke awareness in suggestions: `EzKeystrokeLookup`
+      currently builds char-by-char concatenations and ignores the EZ
+      table's phrase-level abbreviation rules (radical-root selection,
+      hybrid sequences — see
+      <https://github.com/hiroshiyui/EzIM_Tables_Project/blob/main/CLAUDE.md>).
+      For a phrase already in the corpus this would surface the canonical
+      keystrokes; for true user-novel phrases the char-by-char form is
+      always valid anyway, so this is a polish item, not a correctness one.
 
 - [ ] **Backup / Restore manager**
     - **What:** export the full dictionary state (bundled entries +

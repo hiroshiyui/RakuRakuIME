@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.MIGRATION_2_3
+import org.ghostsinthelab.app.rakurakuime.data.MIGRATION_3_4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -79,6 +80,51 @@ class MigrationTest {
             assertEquals(0, c.getInt(3)) // character_weight default
             assertEquals(0, c.getInt(4)) // phrase_weight default
             assertTrue("expected exactly one row", !c.moveToNext())
+        }
+    }
+
+    /**
+     * Verifies the v3 → v4 migration:
+     *  - dictionary data is preserved,
+     *  - the new `user_phrases` table exists, is empty, and accepts inserts,
+     *  - the post-migration schema matches schemas/4.json.
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate3To4_createsUserPhrasesTable() {
+        helper.createDatabase(testDb, 3).use { db ->
+            db.execSQL(
+                "INSERT INTO `dictionary` (`keystroke`, `character`, `frequency`, `character_weight`, `phrase_weight`) " +
+                    "VALUES (?, ?, ?, ?, ?)",
+                arrayOf("8", "八", 3, 0, 0),
+            )
+        }
+
+        val migrated = helper.runMigrationsAndValidate(
+            testDb,
+            4,
+            /* validateDroppedTables = */ true,
+            MIGRATION_3_4,
+        )
+
+        // dictionary survives
+        migrated.query("SELECT COUNT(*) FROM dictionary").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals(1, c.getInt(0))
+        }
+        // user_phrases is empty and accepts an insert
+        migrated.query("SELECT COUNT(*) FROM user_phrases").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals(0, c.getInt(0))
+        }
+        migrated.execSQL(
+            "INSERT INTO user_phrases (character, keystroke, created_at) VALUES (?, ?, ?)",
+            arrayOf("輕鬆", "2mm/", 12345L),
+        )
+        migrated.query("SELECT character, keystroke FROM user_phrases").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals("輕鬆", c.getString(0))
+            assertEquals("2mm/", c.getString(1))
         }
     }
 }

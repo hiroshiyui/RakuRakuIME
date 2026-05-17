@@ -83,6 +83,26 @@ interface DictionaryDao {
      * per keystroke — and the corpus is ~130k rows, so it stays well under a
      * frame on modern devices.
      */
+    /**
+     * Returns every EZ encoding registered for the single character
+     * [character], in CIN-file insertion order.
+     *
+     * The order matters: per the 輕鬆輸入法 取碼規則
+     * (https://github.com/hiroshiyui/EzIM_Tables_Project/blob/main/CLAUDE.md)
+     * the per-character pick is "prefer single-key encoding; else prefer
+     * non-all-digit encoding; else the encoding that appears first in the
+     * CIN file". `CinParser` inserts rows in file order and `id` is
+     * autoincrement, so `ORDER BY id ASC` reproduces the file-order
+     * tiebreaker. Multi-char phrase rows are excluded — they would
+     * conflate per-char selection with phrase-level abbreviations.
+     */
+    @Query(
+        "SELECT keystroke FROM dictionary " +
+            "WHERE character = :character AND length(character) = 1 " +
+            "ORDER BY id ASC"
+    )
+    suspend fun encodingsForCharacter(character: String): List<String>
+
     @Query("""
         SELECT substr(character, :prefixLen + 1, 1) AS next_char
         FROM dictionary

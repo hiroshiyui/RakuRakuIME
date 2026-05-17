@@ -21,6 +21,50 @@
     <string name="settings_dict_reimporting">Re-importing...</string>
     <string name="settings_clear_freq">Reset Learning (Frequencies)</string>
     <string name="settings_clear_freq_confirm">This will reset all character frequencies to zero. Continue?</string>
+    <string name="settings_user_phrases">User Phrase Manager</string>
+    <string name="settings_user_phrases_summary">Add, edit, back up your own phrases.</string>
+
+    <!-- User Phrase Manager screen -->
+    <string name="user_phrases_title">User Phrase Manager</string>
+    <string name="user_phrases_back">Back</string>
+    <string name="user_phrases_search_hint">Search phrases or keystrokes</string>
+    <string name="user_phrases_empty">No user phrases yet. Tap + to add one.</string>
+    <string name="user_phrases_search_empty">No phrases match the search.</string>
+    <string name="user_phrases_add">Add Phrase</string>
+    <string name="user_phrases_add_dialog_title">Add User Phrase</string>
+    <string name="user_phrases_field_character">Phrase (字 / 詞)</string>
+    <string name="user_phrases_field_keystroke">EZ Keystrokes</string>
+    <string name="user_phrases_field_keystroke_help">EZ encoding follows phrase length: 1 char takes the full encoding (e.g. 失 = ,k); 2 chars take each char\'s full encoding (信件 = o4oj); 3+ chars take only each char\'s first key (智多星 = ,,a); 5+ chars use the first four only. Tap "Analyse Roots" to derive the canonical keystrokes automatically.</string>
+    <string name="user_phrases_analyse_roots">Analyse Roots</string>
+    <string name="user_phrases_analyse_choose">Choose suggested keystrokes</string>
+    <string name="user_phrases_analyse_no_results">No root suggestions — one or more characters are not in the corpus. Type the keystrokes manually.</string>
+    <string name="user_phrases_analyse_phrase_empty">Enter the phrase first.</string>
+    <string name="user_phrases_input_empty">Phrase and keystrokes are required.</string>
+    <string name="user_phrases_input_invalid_keystroke">Keystrokes contain invalid EZ root keys.</string>
+    <string name="user_phrases_add_failed">Could not add phrase (it may already exist).</string>
+    <string name="user_phrases_add_success">Phrase added.</string>
+    <string name="user_phrases_delete">Delete</string>
+    <string name="user_phrases_delete_title">Delete Phrase</string>
+    <string name="user_phrases_delete_message">Delete \"%1$s\"?</string>
+    <string name="user_phrases_backup">Back Up to CSV</string>
+    <string name="user_phrases_restore">Restore from CSV</string>
+    <string name="user_phrases_reset">Reset All User Phrases</string>
+    <string name="user_phrases_reset_confirm_first">This deletes every user phrase you have added. Continue?</string>
+    <string name="user_phrases_reset_confirm_second">Really delete every user phrase? This cannot be undone.</string>
+    <string name="user_phrases_reset_done">All user phrases deleted.</string>
+    <string name="user_phrases_backup_filename">rakuraku_user_phrases.csv</string>
+    <string name="user_phrases_backup_success">Backed up %1$d phrase(s).</string>
+    <string name="user_phrases_backup_empty">There are no phrases to back up.</string>
+    <string name="user_phrases_backup_failed">Backup failed.</string>
+    <string name="user_phrases_restore_confirm">Add %1$d phrase(s) from this file?</string>
+    <string name="user_phrases_restore_success">Imported %1$d phrase(s).</string>
+    <string name="user_phrases_restore_failed">Restore failed.</string>
+    <string name="user_phrases_restore_no_data">The selected file contains no phrases.</string>
+    <string name="user_phrases_restore_invalid_file">Selected file is not a valid RakuRaku user-phrases CSV.</string>
+    <string name="user_phrases_restore_invalid_header">CSV header must be \"character\",\"keystroke\".</string>
+    <string name="user_phrases_restore_malformed_row">Row %1$d is malformed.</string>
+    <string name="user_phrases_restore_invalid_keystroke">Row %1$d has invalid EZ keystrokes.</string>
+
     <string name="settings_about">About</string>
     <string name="settings_about_inventor">Input Method Inventor: 高衡緒</string>
     <string name="settings_about_org">Organization: 輕鬆資訊企業社 (Inactive)</string>

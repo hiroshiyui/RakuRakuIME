@@ -384,23 +384,36 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             // FTS4 MATCH reserves "-", """, ":", "()", "*" — some EZ keystrokes
             // (e.g. the "-" root) can produce invalid MATCH patterns; we treat
             // any SQLite error as "no completions" rather than crashing.
-            val allPossible = runCatching {
+            val corpusPrefix = runCatching {
                 db.dictionaryDao().getCharactersByPrefix("$keystroke*")
             }.getOrElse { emptyList() }
+            // User phrases always rank ahead of corpus rows for the same
+            // keystrokes, so the user's explicit choices win over learned
+            // frequencies and corpus priors.
+            val userPrefix = db.userPhraseDao().getCharactersByPrefix(keystroke)
 
-            if (allPossible.size == 1) {
-                // Only one possible character or phrase exists for this sequence and its extensions.
-                // Auto-select it to save the user a keystroke.
-                selectCandidate(allPossible[0])
+            // Auto-select only fires from the corpus signal: when the corpus
+            // has exactly one completion (across this keystroke and every
+            // extension) and no user phrase competes. Including user phrases
+            // here is unsafe — the corpus FTS prefix query silently returns
+            // empty for keystrokes containing characters the FTS4 tokenizer
+            // doesn't index (commas, backticks, etc.), so a lone user-phrase
+            // match isn't proof that no corpus extension exists. That blew up
+            // on phrases like a user-added 失智症 stored with a `,`-prefixed
+            // keystroke: pressing just `,` would auto-commit the whole phrase.
+            if (corpusPrefix.size == 1 && userPrefix.isEmpty()) {
+                selectCandidate(corpusPrefix[0])
             } else {
                 // Multiple possibilities exist.
                 // Show exact matches first for the current sequence.
-                val exact = db.dictionaryDao().getCharacters(keystroke)
+                val userExact = db.userPhraseDao().getCharacters(keystroke)
+                val corpusExact = db.dictionaryDao().getCharacters(keystroke)
+                val exact = mergeUnique(userExact, corpusExact)
                 if (exact.isNotEmpty()) {
                     _candidates.value = exact
                 } else {
                     // If no exact match yet, show the prefix matches as candidates.
-                    _candidates.value = allPossible
+                    _candidates.value = mergeUnique(userPrefix, corpusPrefix)
                 }
             }
         }
@@ -464,15 +477,38 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             return
         }
         predictionJob = viewModelScope.launch {
-            val results = runCatching {
+            val corpusNext = runCatching {
                 db.dictionaryDao().nextCharactersAfter(
                     likePattern = "$prev%",
                     prefixLen = prev.length,
                     limit = 30,
                 )
             }.getOrElse { emptyList() }
-            _nextCharPredictions.value = results
+            val userNext = runCatching {
+                db.userPhraseDao().nextCharactersAfter(
+                    likePattern = "$prev%",
+                    prefixLen = prev.length,
+                    limit = 30,
+                )
+            }.getOrElse { emptyList() }
+            _nextCharPredictions.value = mergeUnique(userNext, corpusNext).take(30)
         }
+    }
+
+    /**
+     * Merge two ordered lists preserving the first-occurrence order. Used to
+     * prepend user-phrase results before corpus results while dropping any
+     * duplicate strings (e.g. when the user happens to add a phrase the
+     * corpus already contained).
+     */
+    private fun mergeUnique(first: List<String>, second: List<String>): List<String> {
+        if (first.isEmpty()) return second
+        if (second.isEmpty()) return first
+        val seen = HashSet<String>(first.size + second.size)
+        val out = ArrayList<String>(first.size + second.size)
+        for (s in first) if (seen.add(s)) out.add(s)
+        for (s in second) if (seen.add(s)) out.add(s)
+        return out
     }
 
     /**

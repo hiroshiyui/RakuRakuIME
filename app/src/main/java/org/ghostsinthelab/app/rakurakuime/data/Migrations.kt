@@ -43,3 +43,32 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         )
     }
 }
+
+/**
+ * v3 → v4: introduce the `user_phrases` table backing the User Phrase
+ * Manager. The bundled v3 asset (corpus + FTS shadow) is untouched; the
+ * new table is created empty on first launch after upgrade.
+ *
+ * The unique `(character, keystroke)` index lets `INSERT … OR IGNORE`
+ * dedupe naturally — a user pressing "add" twice on the same pair is a
+ * no-op rather than an error.
+ */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `user_phrases` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`character` TEXT NOT NULL, " +
+                "`keystroke` TEXT NOT NULL, " +
+                "`created_at` INTEGER NOT NULL)"
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_user_phrases_keystroke` " +
+                "ON `user_phrases` (`keystroke`)"
+        )
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_phrases_character_keystroke` " +
+                "ON `user_phrases` (`character`, `keystroke`)"
+        )
+    }
+}

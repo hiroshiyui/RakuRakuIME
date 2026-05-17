@@ -44,8 +44,52 @@ object CinParser {
 
     enum class SyncResult { AlreadyCurrent, Reimported }
 
+    // Cached parse of the CIN `%keyname` block — the canonical EZ root-key
+    // set, used to validate user-entered keystrokes in the User Phrase
+    // Manager. Loaded once per process from the bundled asset.
+    @Volatile
+    private var validKeystrokeCharsCache: Set<Char>? = null
+
     suspend fun assetHash(context: Context): String = withContext(Dispatchers.IO) {
         computeAssetHash(context)
+    }
+
+    /**
+     * Returns the set of single-character LHS tokens declared in the
+     * `%keyname begin … %keyname end` block of [ASSET_NAME]. These are the
+     * legal EZ root keys; any character outside this set in a user-entered
+     * keystroke is a typo and should be rejected.
+     */
+    suspend fun validKeystrokeChars(context: Context): Set<Char> = withContext(Dispatchers.IO) {
+        validKeystrokeCharsCache ?: synchronized(this) {
+            validKeystrokeCharsCache ?: parseKeynameChars(context).also {
+                validKeystrokeCharsCache = it
+            }
+        }
+    }
+
+    private fun parseKeynameChars(context: Context): Set<Char> {
+        val chars = mutableSetOf<Char>()
+        context.assets.open(ASSET_NAME).use { input ->
+            BufferedReader(InputStreamReader(input, "UTF-8")).use { reader ->
+                var inKeyname = false
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    val trimmed = line.trim()
+                    when {
+                        trimmed == "%keyname begin" -> inKeyname = true
+                        trimmed == "%keyname end" -> return chars
+                        inKeyname && trimmed.isNotEmpty() && !trimmed.startsWith("#") -> {
+                            // LHS is a single character (the key); RHS is its glyph.
+                            val token = trimmed.substringBefore(' ').substringBefore('\t')
+                            if (token.length == 1) chars.add(token[0])
+                        }
+                    }
+                    line = reader.readLine()
+                }
+            }
+        }
+        return chars
     }
 
     suspend fun syncWithAsset(context: Context, database: ImeDatabase): SyncResult =

@@ -58,7 +58,7 @@
     <string name="user_phrases_analyse_no_results">無可用之字根組合——其中有字未收錄於詞庫，請手動輸入字根。</string>
     <string name="user_phrases_analyse_phrase_empty">請先輸入字詞。</string>
     <string name="user_phrases_input_empty">字詞與字根序列皆不可空白。</string>
-    <string name="user_phrases_input_invalid_keystroke">字根序列含有非法之輕鬆字根。</string>
+    <string name="user_phrases_input_invalid_keystroke">字根序列含有不合規則之輕鬆字根。</string>
     <string name="user_phrases_add_failed">無法新增此詞語（可能已存在）。</string>
     <string name="user_phrases_add_success">已新增詞語。</string>
     <string name="user_phrases_delete">刪除</string>
@@ -81,7 +81,7 @@
     <string name="user_phrases_restore_invalid_file">所選檔案非有效之 RakuRaku 使用者詞庫 CSV 檔。</string>
     <string name="user_phrases_restore_invalid_header">CSV 標頭必須為 \"character\",\"keystroke\"。</string>
     <string name="user_phrases_restore_malformed_row">第 %1$d 列之格式錯誤。</string>
-    <string name="user_phrases_restore_invalid_keystroke">第 %1$d 列含有非法之輕鬆字根。</string>
+    <string name="user_phrases_restore_invalid_keystroke">第 %1$d 列含有不合規則之輕鬆字根。</string>
 
     <string name="settings_about">關於</string>
     <string name="settings_about_inventor">輸入法發明人：高衡緒</string>

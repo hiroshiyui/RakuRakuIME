@@ -43,6 +43,11 @@
     <string name="user_phrases_input_invalid_keystroke">Keystrokes contain invalid EZ root keys.</string>
     <string name="user_phrases_add_failed">Could not add phrase (it may already exist).</string>
     <string name="user_phrases_add_success">Phrase added.</string>
+    <string name="user_phrases_edit">Edit</string>
+    <string name="user_phrases_edit_dialog_title">Edit User Phrase</string>
+    <string name="user_phrases_edit_save">Save</string>
+    <string name="user_phrases_edit_success">Phrase updated.</string>
+    <string name="user_phrases_edit_failed">Could not update phrase (it may collide with an existing one).</string>
     <string name="user_phrases_delete">Delete</string>
     <string name="user_phrases_delete_title">Delete Phrase</string>
     <string name="user_phrases_delete_message">Delete \"%1$s\"?</string>

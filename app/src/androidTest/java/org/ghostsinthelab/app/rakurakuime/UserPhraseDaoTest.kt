@@ -77,7 +77,7 @@ class UserPhraseDaoTest {
         dao.insert(UserPhraseEntry(character = "信件", keystroke = "o4oj"))
         dao.insert(UserPhraseEntry(character = "信箱", keystroke = "o4hw"))
 
-        assertEquals(listOf("輕鬆"), dao.getCharacters("hujqkho"))
+        assertEquals(listOf("輕鬆"), dao.getCharacters("2mm/"))
         val prefix = dao.getCharactersByPrefix("o4")
         assertTrue(prefix.containsAll(listOf("信件", "信箱")))
     }
@@ -99,5 +99,78 @@ class UserPhraseDaoTest {
         dao.insert(UserPhraseEntry(character = "乙", keystroke = "b"))
         dao.clearAll()
         assertEquals(0, dao.count())
+    }
+
+    @Test
+    fun updateById_changesCharacterAndKeystrokeInPlace() = runBlocking {
+        val dao = db.userPhraseDao()
+        val id = dao.insert(UserPhraseEntry(character = "信件", keystroke = "o4oj"))
+
+        // Bump frequency so we can verify in-place edit preserves it
+        // (delete-recreate would reset the counter).
+        dao.incrementFrequencyExact("信件", "o4oj")
+        dao.incrementFrequencyExact("信件", "o4oj")
+
+        val rows = dao.updateById(id, character = "信箱", keystroke = "o4hw")
+        assertEquals(1, rows)
+
+        val all = dao.enumerateAll()
+        assertEquals(1, all.size)
+        val row = all.first()
+        assertEquals(id, row.id) // id preserved
+        assertEquals("信箱", row.character)
+        assertEquals("o4hw", row.keystroke)
+        assertEquals(2L, row.frequency) // frequency preserved
+    }
+
+    @Test
+    fun updateById_collidesWithExistingRow_returnsZero() = runBlocking {
+        val dao = db.userPhraseDao()
+        dao.insert(UserPhraseEntry(character = "信件", keystroke = "o4oj"))
+        val id2 = dao.insert(UserPhraseEntry(character = "信箱", keystroke = "o4hw"))
+
+        // Try to make row #2 collide with row #1 on the unique index.
+        // `UPDATE OR IGNORE` should leave the table untouched.
+        val rows = dao.updateById(id2, character = "信件", keystroke = "o4oj")
+        assertEquals(0, rows)
+        assertEquals(2, dao.count())
+        // Row #2 is unchanged so the original (信箱, o4hw) still resolves.
+        assertEquals(listOf("信箱"), dao.getCharacters("o4hw"))
+    }
+
+    @Test
+    fun incrementFrequencyExact_bumpsOnlyMatchingRow() = runBlocking {
+        val dao = db.userPhraseDao()
+        dao.insert(UserPhraseEntry(character = "甲", keystroke = "a"))
+        dao.insert(UserPhraseEntry(character = "乙", keystroke = "b"))
+
+        dao.incrementFrequencyExact("甲", "a")
+        dao.incrementFrequencyExact("甲", "a")
+        dao.incrementFrequencyExact("甲", "a")
+        // Non-matching pair is a no-op (mirrors the "bump both DAOs"
+        // policy in KeyboardViewModel.selectCandidate).
+        dao.incrementFrequencyExact("丙", "c")
+
+        val rows = dao.enumerateAll().associateBy { it.character }
+        assertEquals(3L, rows.getValue("甲").frequency)
+        assertEquals(0L, rows.getValue("乙").frequency)
+    }
+
+    @Test
+    fun getCharacters_ordersByFrequencyDescThenCreatedAt() = runBlocking {
+        val dao = db.userPhraseDao()
+        // Same keystroke, three different characters — the unique index is
+        // on (character, keystroke), so this is allowed.
+        dao.insert(UserPhraseEntry(character = "甲", keystroke = "k", createdAt = 100L))
+        dao.insert(UserPhraseEntry(character = "乙", keystroke = "k", createdAt = 200L))
+        dao.insert(UserPhraseEntry(character = "丙", keystroke = "k", createdAt = 300L))
+
+        // No bumps yet → tie on frequency, newest created_at wins.
+        assertEquals(listOf("丙", "乙", "甲"), dao.getCharacters("k"))
+
+        // Bump 甲 twice → it leapfrogs both newer entries.
+        dao.incrementFrequencyExact("甲", "k")
+        dao.incrementFrequencyExact("甲", "k")
+        assertEquals(listOf("甲", "丙", "乙"), dao.getCharacters("k"))
     }
 }

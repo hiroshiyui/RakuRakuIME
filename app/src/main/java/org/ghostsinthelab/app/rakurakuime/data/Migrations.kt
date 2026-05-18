@@ -72,3 +72,20 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
     }
 }
+
+/**
+ * v4 → v5: add a per-row `frequency` counter to `user_phrases`. Existing
+ * rows default to 0; the next time the user commits a user-phrase
+ * candidate, `KeyboardViewModel.selectCandidate` bumps the counter and
+ * subsequent candidate queries sort by it. This only affects the order
+ * *among* user phrases (user phrases as a group are still ranked ahead
+ * of corpus rows by the merge in the ViewModel) — fresh installs see
+ * created-at ordering until enough usage accumulates to differentiate.
+ */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE `user_phrases` ADD COLUMN `frequency` INTEGER NOT NULL DEFAULT 0"
+        )
+    }
+}

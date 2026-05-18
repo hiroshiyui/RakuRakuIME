@@ -12,21 +12,24 @@ out — see `git log` for the full history of what's landed.
       and CSV backup/restore (`UserPhraseCsv`). Strict EZ-keystroke
       validation on entry and restore via `CinParser.validKeystrokeChars`.
 
-- [ ] **User Phrase Manager — follow-ups**
-    - Inline edit (today the row is delete-only; recreate to "edit").
-    - Frequency-of-use tracking on user-phrase commits — currently
-      `selectCandidate(...)` only bumps the bundled `dictionary.frequency`,
-      not the user-phrase row. With the always-rank-first policy this
-      is cosmetic, but useful for ordering among multiple user phrases
-      sharing a prefix.
-    - Phrase-level keystroke awareness in suggestions: `EzKeystrokeLookup`
-      currently builds char-by-char concatenations and ignores the EZ
-      table's phrase-level abbreviation rules (radical-root selection,
-      hybrid sequences — see
-      <https://github.com/hiroshiyui/EzIM_Tables_Project/blob/main/CLAUDE.md>).
-      For a phrase already in the corpus this would surface the canonical
-      keystrokes; for true user-novel phrases the char-by-char form is
-      always valid anyway, so this is a polish item, not a correctness one.
+- [x] **User Phrase Manager — follow-ups**
+    - Inline edit: each row carries an "Edit" button backed by a
+      shared `UserPhraseFormDialog` and
+      `UserPhraseDao.updateById` (`UPDATE OR IGNORE` against the
+      unique `(character, keystroke)` index, so collisions surface
+      a friendly toast).
+    - Frequency-of-use tracking: `user_phrases.frequency` added in
+      v4→v5 migration; `selectCandidate(...)` bumps both DAOs
+      unconditionally — the UPDATE on whichever table doesn't own
+      the row is a no-op, so the ViewModel doesn't need to know
+      which table the candidate came from. User-phrase candidate
+      queries now sort by `frequency DESC, created_at DESC`.
+    - Phrase-level keystroke awareness: `EzKeystrokeLookup` now
+      prepends corpus-known phrase keystrokes (via
+      `DictionaryDao.keystrokesForPhrase`, which doesn't filter to
+      single-char rows) before the per-char fallback. For
+      user-novel phrases the char-by-char rule still runs as
+      before.
 
 - [ ] **Backup / Restore manager**
     - **What:** export the full dictionary state (bundled entries +

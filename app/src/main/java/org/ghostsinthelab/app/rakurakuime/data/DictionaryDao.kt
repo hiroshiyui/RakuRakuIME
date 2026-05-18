@@ -103,6 +103,23 @@ interface DictionaryDao {
     )
     suspend fun encodingsForCharacter(character: String): List<String>
 
+    /**
+     * Returns every keystroke registered for the exact (possibly multi-char)
+     * string [phrase], ordered by learned frequency then CIN-file insertion
+     * order. Unlike [encodingsForCharacter] this does *not* filter to
+     * single-char rows, so it surfaces the canonical phrase-level keystroke
+     * already in the bundled corpus (e.g. 信件 ⇒ `o4oj`). Used by
+     * `EzKeystrokeLookup` to prepend the corpus's own answer ahead of any
+     * char-by-char concatenation suggestion: if the EZ tables already have
+     * a phrase, we surface that exact encoding first.
+     */
+    @Query(
+        "SELECT keystroke FROM dictionary " +
+            "WHERE character = :phrase " +
+            "ORDER BY frequency DESC, id ASC"
+    )
+    suspend fun keystrokesForPhrase(phrase: String): List<String>
+
     @Query("""
         SELECT substr(character, :prefixLen + 1, 1) AS next_char
         FROM dictionary

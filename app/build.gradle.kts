@@ -61,6 +61,12 @@ android {
     buildFeatures {
         compose = true
     }
+    // MigrationTestHelper reads exported schema JSONs from the test APK's
+    // assets at runtime, so the committed schemas folder doubles as an
+    // androidTest assets source.
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
     // F-Droid's scanner rejects APKs containing AGP's "Dependency metadata"
     // signing block (an encrypted, Google-signed blob of the dependency list).
     dependenciesInfo {
@@ -95,6 +101,23 @@ tasks.matching { it.name.contains("ArtProfile") }.configureEach {
 // defaultConfig.applicationId / versionName are populated at read-time.
 base {
     archivesName = "${android.defaultConfig.applicationId}-${android.defaultConfig.versionName}"
+}
+
+// AGP's "consistent resolution" forces the androidTest classpath to use
+// the same kotlinx-serialization version as the main classpath. Lifecycle
+// 2.10.0 transitively pins `kotlinx-serialization-bom:1.7.3 strictly`,
+// which Room 2.8.4's MigrationTestHelper cannot deserialize against (it
+// needs the `typeParametersSerializers()` method added in 1.8.x and
+// throws `AbstractMethodError` otherwise). Bump the BOM across all
+// configurations so debug + androidTest agree on 1.8.1.
+configurations.configureEach {
+    resolutionStrategy {
+        force(
+            "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1",
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1",
+            "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1",
+        )
+    }
 }
 
 dependencies {

@@ -45,4 +45,14 @@ data class UserPhraseEntry(
     val character: String,
     val keystroke: String,
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis(),
+    /**
+     * Per-row use counter, bumped on commit. Used to break ties between
+     * multiple user phrases sharing a prefix — the corpus side has had
+     * learned frequencies since v0, this column does the same for the
+     * user table from v5 on. Older databases (v4) get the column with
+     * `DEFAULT 0` via [MIGRATION_4_5]; the column has no effect on the
+     * "always rank ahead of corpus" policy, it only sorts user phrases
+     * among themselves.
+     */
+    @ColumnInfo(defaultValue = "0") val frequency: Long = 0,
 )

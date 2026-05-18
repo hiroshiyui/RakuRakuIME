@@ -87,12 +87,20 @@ class EzKeystrokeLookupTest {
 
     @Test
     fun suggest_fiveCharPhrase_usesFirstFourHeadsOnly() = runBlocking {
-        // 5+ char rule: take heads of first 4 chars only.
+        // 5+ char rule (per-char fallback): take heads of first 4 chars only.
         // 八一七公報 (from EzIM_Tables_Project CLAUDE.md example):
         //   八(`8`) + 一(`m`) + 七(skip `76` digit-only, take `j'` → `j`)
         //     + 公(`8/` → `8`) = "8mj8". 報 is ignored.
+        //
+        // The corpus *also* has 八一七公報 as a phrase row with several
+        // hand-tuned encodings, so the phrase-level lookup surfaces those
+        // ahead of the per-char rule. Either way, the per-char answer must
+        // still appear in the list as an alternate.
         val results = EzKeystrokeLookup.suggest("八一七公報", db.dictionaryDao())
-        assertEquals("8mj8", results.first())
+        assertTrue(
+            "expected the per-char answer 8mj8 in $results",
+            results.contains("8mj8"),
+        )
     }
 
     @Test
@@ -109,9 +117,14 @@ class EzKeystrokeLookupTest {
 
     @Test
     fun suggest_unknownCharBailsOut() = runBlocking {
-        // Latin letters have no single-char EZ rows — one missing char
-        // should collapse the whole result to empty rather than partial.
-        val results = EzKeystrokeLookup.suggest("信X", db.dictionaryDao())
+        // A truly novel phrase: no exact corpus row (so the phrase-level
+        // path returns nothing) AND a char that has no single-char EZ
+        // row (so the per-char fallback bails out). Latin letters turn
+        // out to *be* in the corpus (the MOE 字頻 dataset slipped some
+        // through), so we pick a Cyrillic char that's unambiguously
+        // absent from a Chinese IME's tables. Contract: drop to empty
+        // so the caller falls back to manual entry.
+        val results = EzKeystrokeLookup.suggest("信Ы", db.dictionaryDao())
         assertEquals(emptyList<String>(), results)
     }
 
@@ -120,5 +133,37 @@ class EzKeystrokeLookupTest {
         // 失智症 has 2 alternates; capping to 1 must return just the canonical.
         val results = EzKeystrokeLookup.suggest("失智症", db.dictionaryDao(), totalLimit = 1)
         assertEquals(listOf(",,`"), results)
+    }
+
+    @Test
+    fun keystrokesForPhrase_returnsCorpusEncodingForKnownPhrase() = runBlocking {
+        // 信件 is stored in the bundled corpus as o4oj (full per-char concat).
+        // Unlike encodingsForCharacter, keystrokesForPhrase does not filter
+        // to single-char rows, so this multi-char row must surface.
+        val keys = db.dictionaryDao().keystrokesForPhrase("信件")
+        assertTrue("expected o4oj for 信件, got $keys", keys.contains("o4oj"))
+    }
+
+    @Test
+    fun keystrokesForPhrase_emptyForUnknownPhrase() = runBlocking {
+        // A truly novel phrase (latin + Chinese) shouldn't exist in the
+        // corpus; the phrase-level path returns empty and the per-char
+        // fallback takes over.
+        assertEquals(
+            emptyList<String>(),
+            db.dictionaryDao().keystrokesForPhrase("信XYZQ"),
+        )
+    }
+
+    @Test
+    fun suggest_phraseLevelKeystrokeLeads() = runBlocking {
+        // For a phrase already in the corpus, the corpus encoding must be
+        // surfaced first — the per-char fallback only runs after the
+        // phrase-level lookup. Both paths happen to yield the same answer
+        // for 信件 (o4oj), so the assertion below is on the first result:
+        // dedup means the corpus row contributes that string before the
+        // DFS gets to it.
+        val results = EzKeystrokeLookup.suggest("信件", db.dictionaryDao())
+        assertEquals("o4oj", results.first())
     }
 }

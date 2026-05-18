@@ -451,8 +451,14 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 // Increment frequency for the exact keystroke the user committed on.
                 // Skipped when there's no active keystroke (i.e. the user picked
                 // from the next-character prediction strip), since predictions
-                // aren't keyed off a specific dictionary row.
+                // aren't keyed off a specific dictionary row. We bump both DAOs
+                // unconditionally — the UPDATE on whichever table doesn't own
+                // this row is a no-op, so we don't need to know which table the
+                // candidate came from. This keeps the merge-prefer-user policy
+                // honest: pick a user phrase, that user-phrase row's counter
+                // goes up next time it's a candidate.
                 db.dictionaryDao().incrementFrequencyExact(candidate, keystroke = currentRoots)
+                db.userPhraseDao().incrementFrequencyExact(candidate, keystroke = currentRoots)
             }
         }
 

@@ -24,6 +24,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.ghostsinthelab.app.rakurakuime.data.ImeDatabase
 import org.ghostsinthelab.app.rakurakuime.data.MIGRATION_2_3
 import org.ghostsinthelab.app.rakurakuime.data.MIGRATION_3_4
+import org.ghostsinthelab.app.rakurakuime.data.MIGRATION_4_5
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -125,6 +126,38 @@ class MigrationTest {
             assertTrue(c.moveToFirst())
             assertEquals("輕鬆", c.getString(0))
             assertEquals("2mm/", c.getString(1))
+        }
+    }
+
+    /**
+     * Verifies the v4 → v5 migration:
+     *  - existing `user_phrases` rows are preserved untouched,
+     *  - the new `frequency` column is added with default 0,
+     *  - the post-migration schema matches schemas/5.json.
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate4To5_addsFrequencyColumnToUserPhrases() {
+        helper.createDatabase(testDb, 4).use { db ->
+            db.execSQL(
+                "INSERT INTO `user_phrases` (`character`, `keystroke`, `created_at`) VALUES (?, ?, ?)",
+                arrayOf("輕鬆", "2mm/", 12345L),
+            )
+        }
+
+        val migrated = helper.runMigrationsAndValidate(
+            testDb,
+            5,
+            /* validateDroppedTables = */ true,
+            MIGRATION_4_5,
+        )
+
+        migrated.query("SELECT character, keystroke, created_at, frequency FROM user_phrases").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals("輕鬆", c.getString(0))
+            assertEquals("2mm/", c.getString(1))
+            assertEquals(12345L, c.getLong(2))
+            assertEquals(0, c.getInt(3))
         }
     }
 }

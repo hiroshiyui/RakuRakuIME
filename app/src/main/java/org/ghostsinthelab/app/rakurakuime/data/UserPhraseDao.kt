@@ -28,7 +28,15 @@ interface UserPhraseDao {
     @Query("SELECT * FROM user_phrases ORDER BY created_at DESC, id DESC")
     suspend fun enumerateAll(): List<UserPhraseEntry>
 
-    @Query("SELECT character FROM user_phrases WHERE keystroke = :keystroke ORDER BY created_at DESC")
+    // Candidate ordering: `frequency DESC` first so heavily-used user phrases
+    // win, then `created_at DESC` so recently-added phrases beat older ties.
+    // The "always-rank-first" merge in KeyboardViewModel preserves this
+    // ordering when prepending user phrases ahead of corpus results.
+    @Query(
+        "SELECT character FROM user_phrases " +
+            "WHERE keystroke = :keystroke " +
+            "ORDER BY frequency DESC, created_at DESC"
+    )
     suspend fun getCharacters(keystroke: String): List<String>
 
     /**
@@ -38,7 +46,7 @@ interface UserPhraseDao {
     @Query(
         "SELECT character FROM user_phrases " +
             "WHERE keystroke LIKE :prefix || '%' " +
-            "ORDER BY length(keystroke) ASC, created_at DESC " +
+            "ORDER BY length(keystroke) ASC, frequency DESC, created_at DESC " +
             "LIMIT 50"
     )
     suspend fun getCharactersByPrefix(prefix: String): List<String>
@@ -54,7 +62,7 @@ interface UserPhraseDao {
         WHERE character LIKE :likePattern
           AND length(character) > :prefixLen
         GROUP BY next_char
-        ORDER BY MAX(created_at) DESC, next_char
+        ORDER BY SUM(frequency) DESC, MAX(created_at) DESC, next_char
         LIMIT :limit
         """
     )
@@ -62,6 +70,21 @@ interface UserPhraseDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entry: UserPhraseEntry): Long
+
+    /**
+     * In-place edit. Used by the manager screen's inline-edit flow so a row
+     * keeps its `id`, `created_at`, and learned `frequency` instead of
+     * forcing a delete-and-recreate cycle (which would reset the counter
+     * and shuffle creation order).
+     *
+     * Returns the number of rows affected; 0 means the unique
+     * `(character, keystroke)` constraint matched another row.
+     */
+    @Query(
+        "UPDATE OR IGNORE user_phrases SET character = :character, keystroke = :keystroke " +
+            "WHERE id = :id"
+    )
+    suspend fun updateById(id: Long, character: String, keystroke: String): Int
 
     @Query("DELETE FROM user_phrases WHERE id = :id")
     suspend fun deleteById(id: Long)
@@ -74,4 +97,17 @@ interface UserPhraseDao {
 
     @Query("SELECT COUNT(id) FROM user_phrases")
     suspend fun count(): Int
+
+    /**
+     * Bump the per-row frequency counter for the exact `(character, keystroke)`
+     * pair the user just committed. Mirrors [DictionaryDao.incrementFrequencyExact]
+     * but on the user table; called unconditionally on every commit so that if
+     * the candidate didn't come from the user table the UPDATE is simply a
+     * no-op (zero rows affected).
+     */
+    @Query(
+        "UPDATE user_phrases SET frequency = frequency + 1 " +
+            "WHERE character = :character AND keystroke = :keystroke"
+    )
+    suspend fun incrementFrequencyExact(character: String, keystroke: String)
 }

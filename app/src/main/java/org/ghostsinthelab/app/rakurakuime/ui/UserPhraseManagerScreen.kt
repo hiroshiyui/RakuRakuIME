@@ -62,6 +62,7 @@ fun UserPhraseManagerScreen(
     var phrases by remember { mutableStateOf<List<UserPhraseEntry>>(emptyList()) }
     var search by remember { mutableStateOf("") }
     var showAddDialog by remember { mutableStateOf(false) }
+    var pendingEdit by remember { mutableStateOf<UserPhraseEntry?>(null) }
     var pendingDelete by remember { mutableStateOf<UserPhraseEntry?>(null) }
     var pendingReset by remember { mutableStateOf(false) }
     var pendingResetSecond by remember { mutableStateOf(false) }
@@ -243,6 +244,7 @@ fun UserPhraseManagerScreen(
                     items(filtered, key = { it.id }) { entry ->
                         UserPhraseRow(
                             entry = entry,
+                            onEdit = { pendingEdit = entry },
                             onDelete = { pendingDelete = entry },
                         )
                         HorizontalDivider()
@@ -253,11 +255,15 @@ fun UserPhraseManagerScreen(
     }
 
     if (showAddDialog) {
-        AddUserPhraseDialog(
+        UserPhraseFormDialog(
+            initialCharacter = "",
+            initialKeystroke = "",
+            title = stringResource(R.string.user_phrases_add_dialog_title),
+            confirmLabel = stringResource(R.string.user_phrases_add),
             validKeystrokeChars = validKeystrokeChars,
             dictionaryDao = db.dictionaryDao(),
             onDismiss = { showAddDialog = false },
-            onAdd = { character, keystroke ->
+            onConfirm = { character, keystroke ->
                 scope.launch {
                     val id = dao.insert(UserPhraseEntry(character = character, keystroke = keystroke))
                     if (id <= 0L) {
@@ -265,6 +271,37 @@ fun UserPhraseManagerScreen(
                     } else {
                         Toast.makeText(context, R.string.user_phrases_add_success, Toast.LENGTH_SHORT).show()
                         showAddDialog = false
+                        reload()
+                    }
+                }
+            },
+        )
+    }
+
+    pendingEdit?.let { entry ->
+        UserPhraseFormDialog(
+            initialCharacter = entry.character,
+            initialKeystroke = entry.keystroke,
+            title = stringResource(R.string.user_phrases_edit_dialog_title),
+            confirmLabel = stringResource(R.string.user_phrases_edit_save),
+            validKeystrokeChars = validKeystrokeChars,
+            dictionaryDao = db.dictionaryDao(),
+            onDismiss = { pendingEdit = null },
+            onConfirm = { character, keystroke ->
+                scope.launch {
+                    // Unchanged ⇒ close the dialog and skip the round-trip.
+                    if (character == entry.character && keystroke == entry.keystroke) {
+                        pendingEdit = null
+                        return@launch
+                    }
+                    val rows = dao.updateById(entry.id, character, keystroke)
+                    if (rows == 0) {
+                        // UPDATE OR IGNORE on the unique (character, keystroke)
+                        // index returned 0 ⇒ another row already owns this pair.
+                        Toast.makeText(context, R.string.user_phrases_edit_failed, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, R.string.user_phrases_edit_success, Toast.LENGTH_SHORT).show()
+                        pendingEdit = null
                         reload()
                     }
                 }
@@ -371,6 +408,7 @@ fun UserPhraseManagerScreen(
 @Composable
 private fun UserPhraseRow(
     entry: UserPhraseEntry,
+    onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
     Row(
@@ -391,6 +429,9 @@ private fun UserPhraseRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        TextButton(onClick = onEdit) {
+            Text(text = stringResource(R.string.user_phrases_edit))
+        }
         TextButton(onClick = onDelete) {
             Text(
                 text = stringResource(R.string.user_phrases_delete),
@@ -402,23 +443,29 @@ private fun UserPhraseRow(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddUserPhraseDialog(
+private fun UserPhraseFormDialog(
+    initialCharacter: String,
+    initialKeystroke: String,
+    title: String,
+    confirmLabel: String,
     validKeystrokeChars: Set<Char>,
     dictionaryDao: DictionaryDao,
     onDismiss: () -> Unit,
-    onAdd: (character: String, keystroke: String) -> Unit,
+    onConfirm: (character: String, keystroke: String) -> Unit,
 ) {
-    var character by remember { mutableStateOf("") }
-    var keystroke by remember { mutableStateOf("") }
-    var suggestions by remember { mutableStateOf<List<String>>(emptyList()) }
-    var suggestionsExpanded by remember { mutableStateOf(false) }
-    var analysing by remember { mutableStateOf(false) }
+    // Keyed on initial values so opening a different row's edit dialog
+    // re-seeds the fields instead of carrying stale state across rows.
+    var character by remember(initialCharacter, initialKeystroke) { mutableStateOf(initialCharacter) }
+    var keystroke by remember(initialCharacter, initialKeystroke) { mutableStateOf(initialKeystroke) }
+    var suggestions by remember(initialCharacter, initialKeystroke) { mutableStateOf<List<String>>(emptyList()) }
+    var suggestionsExpanded by remember(initialCharacter, initialKeystroke) { mutableStateOf(false) }
+    var analysing by remember(initialCharacter, initialKeystroke) { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.user_phrases_add_dialog_title)) },
+        title = { Text(title) },
         text = {
             Column {
                 OutlinedTextField(
@@ -536,8 +583,8 @@ private fun AddUserPhraseDialog(
                     Toast.makeText(context, R.string.user_phrases_input_invalid_keystroke, Toast.LENGTH_LONG).show()
                     return@TextButton
                 }
-                onAdd(c, k)
-            }) { Text(stringResource(R.string.user_phrases_add)) }
+                onConfirm(c, k)
+            }) { Text(confirmLabel) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }

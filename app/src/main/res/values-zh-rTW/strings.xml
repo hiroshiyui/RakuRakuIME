@@ -61,6 +61,11 @@
     <string name="user_phrases_input_invalid_keystroke">字根序列含有不合規則之輕鬆字根。</string>
     <string name="user_phrases_add_failed">無法新增此詞語（可能已存在）。</string>
     <string name="user_phrases_add_success">已新增詞語。</string>
+    <string name="user_phrases_edit">編輯</string>
+    <string name="user_phrases_edit_dialog_title">編輯使用者詞語</string>
+    <string name="user_phrases_edit_save">儲存</string>
+    <string name="user_phrases_edit_success">詞語已更新。</string>
+    <string name="user_phrases_edit_failed">無法更新此詞語（可能與既有之詞語衝突）。</string>
     <string name="user_phrases_delete">刪除</string>
     <string name="user_phrases_delete_title">刪除詞語</string>
     <string name="user_phrases_delete_message">確認刪除「%1$s」？</string>

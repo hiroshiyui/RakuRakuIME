@@ -1,0 +1,177 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "61aa827ae18ba516b374f83e164755df",
+    "entities": [
+      {
+        "tableName": "dictionary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keystroke` TEXT NOT NULL, `character` TEXT NOT NULL, `frequency` INTEGER NOT NULL, `character_weight` INTEGER NOT NULL DEFAULT 0, `phrase_weight` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keystroke",
+            "columnName": "keystroke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "character",
+            "columnName": "character",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "characterWeight",
+            "columnName": "character_weight",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "phraseWeight",
+            "columnName": "phrase_weight",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dictionary_keystroke",
+            "unique": false,
+            "columnNames": [
+              "keystroke"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dictionary_keystroke` ON `${TABLE_NAME}` (`keystroke`)"
+          }
+        ]
+      },
+      {
+        "tableName": "dictionary_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`keystroke` TEXT NOT NULL, `character` TEXT NOT NULL, content=`dictionary`)",
+        "fields": [
+          {
+            "fieldPath": "keystroke",
+            "columnName": "keystroke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "character",
+            "columnName": "character",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "simple",
+          "tokenizerArgs": [],
+          "contentTable": "dictionary",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_BEFORE_UPDATE BEFORE UPDATE ON `dictionary` BEGIN DELETE FROM `dictionary_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_BEFORE_DELETE BEFORE DELETE ON `dictionary` BEGIN DELETE FROM `dictionary_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_AFTER_UPDATE AFTER UPDATE ON `dictionary` BEGIN INSERT INTO `dictionary_fts`(`docid`, `keystroke`, `character`) VALUES (NEW.`rowid`, NEW.`keystroke`, NEW.`character`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_dictionary_fts_AFTER_INSERT AFTER INSERT ON `dictionary` BEGIN INSERT INTO `dictionary_fts`(`docid`, `keystroke`, `character`) VALUES (NEW.`rowid`, NEW.`keystroke`, NEW.`character`); END"
+        ]
+      },
+      {
+        "tableName": "user_phrases",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `character` TEXT NOT NULL, `keystroke` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `frequency` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "character",
+            "columnName": "character",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keystroke",
+            "columnName": "keystroke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_user_phrases_keystroke",
+            "unique": false,
+            "columnNames": [
+              "keystroke"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_phrases_keystroke` ON `${TABLE_NAME}` (`keystroke`)"
+          },
+          {
+            "name": "index_user_phrases_character_keystroke",
+            "unique": true,
+            "columnNames": [
+              "character",
+              "keystroke"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_phrases_character_keystroke` ON `${TABLE_NAME}` (`character`, `keystroke`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61aa827ae18ba516b374f83e164755df')"
+    ]
+  }
+}

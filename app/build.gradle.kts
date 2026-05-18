@@ -40,7 +40,7 @@ android {
     defaultConfig {
         applicationId = "org.ghostsinthelab.app.rakurakuime"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 13
         versionName = "1.0.11"
 
@@ -73,6 +73,7 @@ android {
         includeInApk = false
         includeInBundle = false
     }
+    buildToolsVersion = "37.0.0"
 }
 
 // Baseline profiles merged from AAR dependencies are not byte-reproducible

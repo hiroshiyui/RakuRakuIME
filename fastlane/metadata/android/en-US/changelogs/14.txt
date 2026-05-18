@@ -1,0 +1,21 @@
+- New: User Phrase Manager. Add, edit, search, and delete your
+  own phrases under Settings → User Phrase Manager. Your phrases
+  are always ranked ahead of the bundled corpus for matching
+  keystrokes, with an "Analyse Roots" button that derives the
+  canonical EZ keystrokes from the phrase length and per-char
+  encoding rules. Per-phrase use is tracked so frequently used
+  user phrases overtake older ones on the same prefix. CSV
+  backup / restore included.
+- New: Backup & Restore. Settings → Backup & Restore now exports
+  your user phrases and learned dictionary frequencies as a
+  single .rkbak.gz file, and restores them by merging into the
+  existing database — so reinstalling or switching phones no
+  longer wipes the personal state the app has accumulated.
+  Imports treat the picked file as untrusted: size cap, strict
+  decode, per-row validation, EZ-keystroke check.
+- Improved: keystroke suggestions in the Add-Phrase dialog now
+  surface the corpus's own phrase-level encoding first (e.g.
+  八一七公報 → 8178) instead of starting with the per-char
+  fall-back.
+- Internal: targetSdk bumped to 37; dependencies refreshed
+  (Compose BOM, kotlinx-coroutines).

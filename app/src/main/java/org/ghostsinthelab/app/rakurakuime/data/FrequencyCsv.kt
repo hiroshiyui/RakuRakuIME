@@ -72,43 +72,61 @@ object FrequencyCsv {
      * the 字 / 詞目 column and `weight` is computed from the 序號 column.
      */
     fun load(context: Context, assetName: String): Map<String, Int> {
-        val out = HashMap<String, Int>(8192)
-        context.assets.open(assetName).use { input ->
+        return context.assets.open(assetName).use { input ->
             BufferedReader(InputStreamReader(input, Charsets.UTF_8)).useLines { lines ->
-                var skippedHeader = false
-                for (raw in lines) {
-                    val line = raw.trim()
-                    if (line.isEmpty()) continue
-                    val cols = line.split(',')
-                    if (cols.size < 2) continue
-                    val first = cols[0].trim()
-                    val rank = first.toIntOrNull()
-                    if (rank == null) {
-                        // Header row begins with non-numeric "序號" / "字頻序號".
-                        if (!skippedHeader) {
-                            skippedHeader = true
-                            continue
-                        }
-                        // Stray non-numeric data row — ignore.
-                        continue
-                    }
+                parseLines(lines)
+            }
+        }
+    }
+
+    /**
+     * Pure-Kotlin parser entry point — no Android dependencies, so it can be
+     * exercised from a JVM unit test. [lines] is consumed lazily; the parser
+     * stops reading on the first row whose rank yields a zero weight, so
+     * passing a giant sequence with the cutoff far away is fine.
+     *
+     * Contract:
+     *  - Skips the first non-numeric row as a header.
+     *  - Ignores blank lines and rows with fewer than two columns.
+     *  - Returns `floor(SEED_NUMERATOR / rank)` per row.
+     *  - Stops at the first `weight == 0` row (the CSV is sorted by ascending
+     *    rank, so every following row is also zero).
+     *  - On duplicate keys, keeps the highest weight (i.e. the lowest rank).
+     */
+    internal fun parseLines(lines: Sequence<String>): Map<String, Int> {
+        val out = HashMap<String, Int>(8192)
+        var skippedHeader = false
+        for (raw in lines) {
+            val line = raw.trim()
+            if (line.isEmpty()) continue
+            val cols = line.split(',')
+            if (cols.size < 2) continue
+            val first = cols[0].trim()
+            val rank = first.toIntOrNull()
+            if (rank == null) {
+                // Header row begins with non-numeric "序號" / "字頻序號".
+                if (!skippedHeader) {
                     skippedHeader = true
-                    val key = cols[1].trim()
-                    if (key.isEmpty()) continue
-                    val weight = if (rank > 0) SEED_NUMERATOR / rank else 0
-                    if (weight == 0) {
-                        // Past the cutoff (rank > SEED_NUMERATOR). The CSV is
-                        // sorted by ascending rank, so every following row is
-                        // also zero — stop reading.
-                        break
-                    }
-                    // Lowest-rank wins on duplicate keys (shouldn't happen in
-                    // a well-formed corpus but documented for safety).
-                    val existing = out[key]
-                    if (existing == null || weight > existing) {
-                        out[key] = weight
-                    }
+                    continue
                 }
+                // Stray non-numeric data row — ignore.
+                continue
+            }
+            skippedHeader = true
+            val key = cols[1].trim()
+            if (key.isEmpty()) continue
+            val weight = if (rank > 0) SEED_NUMERATOR / rank else 0
+            if (weight == 0) {
+                // Past the cutoff (rank > SEED_NUMERATOR). The CSV is
+                // sorted by ascending rank, so every following row is
+                // also zero — stop reading.
+                break
+            }
+            // Lowest-rank wins on duplicate keys (shouldn't happen in
+            // a well-formed corpus but documented for safety).
+            val existing = out[key]
+            if (existing == null || weight > existing) {
+                out[key] = weight
             }
         }
         return out

@@ -26,7 +26,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.ghostsinthelab.app.rakurakuime.ui.theme.ThemeMode
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+// `internal` so the instrumented test can reset the singleton between
+// runs and write raw values for the ThemeMode-fallback case. The
+// extension still lives at file level — `preferencesDataStore`
+// enforces one binding per name per process, so exposing a second
+// accessor would crash at runtime.
+internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 class UserPreferences(private val context: Context) {
 

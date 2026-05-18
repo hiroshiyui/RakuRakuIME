@@ -31,11 +31,31 @@ out — see `git log` for the full history of what's landed.
       user-novel phrases the char-by-char rule still runs as
       before.
 
-- [ ] **Backup / Restore manager**
-    - **What:** export the full dictionary state (bundled entries +
-      user phrases + learned frequencies) to a file the user can save
-      off-device, and import a previously-exported file to restore
-      that state on a new install or another device.
+- [x] **Backup / Restore manager** — landed. Gzipped-JSON archive
+      (`*.rkbak.gz`) with `schema`/`applicationId`/`createdAt` header,
+      `userPhrases` (full rows + learned `frequency` + `createdAt`),
+      and `dictionaryFrequencies` (only the dictionary rows with
+      `frequency > 0` — the static corpus comes back from the bundled
+      asset DB on the next install). `BackupArchive` does all I/O via
+      `OutputStream` / `InputStream` so SAF owns the file lifetime.
+
+      Import enforces every constraint listed below (strict
+      top-level + nested decode, 50 MiB uncompressed cap to defeat
+      gzip bombs, per-row length and Unicode-control rejection,
+      EZ keystroke validation via the same `CinParser` validator
+      the CRUD UI uses, parameterised Room DAO inserts, no
+      reflection / class loading). Errors surface the first
+      offending row to the user and abort the whole import.
+
+      Restore merges into the existing DB: user phrases via
+      `OR IGNORE` against the unique `(character, keystroke)`
+      index, dictionary frequencies via `incrementFrequencyExactBy`
+      (delta-add) so a partial restore doesn't clobber recent
+      learning. UI lives under a new "Backup & Restore" section in
+      Settings next to "Re-import Dictionary" / "Reset Learning".
+
+      Full design retained below for posterity in case the format
+      ever needs a v2:
     - **Why:** learned frequencies are the single most valuable piece
       of per-user state this IME accumulates; reinstall / phone swap
       currently loses it. User phrases (once the feature above

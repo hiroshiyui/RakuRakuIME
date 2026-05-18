@@ -139,6 +139,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
+    // Android ships `org.json` at runtime, but it is stubbed-out on the
+    // JVM host classpath used by `testDebugUnitTest`. Pull in the
+    // reference implementation so BackupArchive (which uses
+    // org.json.JSONObject) can be exercised from plain JVM unit tests.
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.uiautomator)

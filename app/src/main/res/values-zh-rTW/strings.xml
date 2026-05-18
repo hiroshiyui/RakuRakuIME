@@ -88,6 +88,26 @@
     <string name="user_phrases_restore_malformed_row">第 %1$d 列之格式錯誤。</string>
     <string name="user_phrases_restore_invalid_keystroke">第 %1$d 列含有不合規則之輕鬆字根。</string>
 
+    <!-- Backup / Restore manager -->
+    <string name="settings_backup_section">備份與還原</string>
+    <string name="settings_backup_summary">將您的使用者詞語與學習頻率備份至檔案，或由先前的備份檔案還原。</string>
+    <string name="settings_backup_export">備份至檔案</string>
+    <string name="settings_backup_import">由檔案還原</string>
+    <string name="settings_backup_filename">rakuraku_backup.rkbak.gz</string>
+    <string name="settings_backup_export_success">已備份 %1$d 筆使用者詞語與 %2$d 筆學習頻率紀錄。</string>
+    <string name="settings_backup_export_empty">目前尚無可備份之資料——無使用者詞語亦無學習頻率紀錄。</string>
+    <string name="settings_backup_export_failed">備份失敗。</string>
+    <string name="settings_backup_import_confirm">將由此檔案合併匯入 %1$d 筆使用者詞語與 %2$d 筆學習頻率紀錄，是否繼續？</string>
+    <string name="settings_backup_import_success">已合併 %1$d 筆使用者詞語並套用 %2$d 筆學習頻率紀錄。</string>
+    <string name="settings_backup_import_failed_invalid">所選檔案非有效之 RakuRaku 備份檔。</string>
+    <string name="settings_backup_import_failed_schema">此備份檔之格式版本不受支援，請更新應用程式後再試。</string>
+    <string name="settings_backup_import_failed_application">此備份檔由其他應用程式所建立。</string>
+    <string name="settings_backup_import_failed_unknown_field">備份檔含有無法辨識之欄位：%1$s</string>
+    <string name="settings_backup_import_failed_invalid_phrase">第 %1$d 筆使用者詞語之內容不合規則。</string>
+    <string name="settings_backup_import_failed_invalid_frequency">第 %1$d 筆學習頻率紀錄之內容不合規則。</string>
+    <string name="settings_backup_import_failed_too_many_rows">備份檔之資料筆數過多。</string>
+    <string name="settings_backup_import_failed_generic">還原失敗。</string>
+
     <string name="settings_about">關於</string>
     <string name="settings_about_inventor">輸入法發明人：高衡緒</string>
     <string name="settings_about_org">機構：輕鬆資訊企業社（已停止營運）</string>

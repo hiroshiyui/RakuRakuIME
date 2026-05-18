@@ -65,6 +65,35 @@ interface DictionaryDao {
     @Query("UPDATE dictionary SET frequency = frequency + 1 WHERE character = :character AND keystroke = :keystroke")
     suspend fun incrementFrequencyExact(character: String, keystroke: String)
 
+    /**
+     * Restore-time bump: add [delta] to an existing row's frequency. Used by
+     * the Backup / Restore manager so a restored archive merges into the
+     * current learned state instead of replacing it.
+     *
+     * No-op if the `(character, keystroke)` pair doesn't exist in the
+     * bundled corpus (which is the expected case after the archive was
+     * created — the corpus is static, so any backed-up row was present at
+     * export time and is present now).
+     */
+    @Query(
+        "UPDATE dictionary SET frequency = frequency + :delta " +
+            "WHERE character = :character AND keystroke = :keystroke"
+    )
+    suspend fun incrementFrequencyExactBy(character: String, keystroke: String, delta: Int): Int
+
+    /**
+     * Snapshot every dictionary row with a non-zero learned frequency.
+     * The Backup / Restore manager uses this as the dictionary-frequency
+     * payload — the bundled corpus rows with `frequency = 0` are static
+     * and ship in the asset DB, so backing them up would just bloat the
+     * archive.
+     */
+    @Query(
+        "SELECT keystroke, character, frequency FROM dictionary " +
+            "WHERE frequency > 0 ORDER BY id ASC"
+    )
+    suspend fun snapshotNonZeroFrequencies(): List<FrequencySnapshotRow>
+
     /** Bump the frequency of the given character for every keystroke matching the given prefix. */
     @Query("UPDATE dictionary SET frequency = frequency + 1 WHERE character = :character AND keystroke LIKE :prefix || '%'")
     suspend fun incrementFrequencyByPrefix(character: String, prefix: String)

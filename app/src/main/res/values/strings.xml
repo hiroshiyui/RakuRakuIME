@@ -70,6 +70,26 @@
     <string name="user_phrases_restore_malformed_row">Row %1$d is malformed.</string>
     <string name="user_phrases_restore_invalid_keystroke">Row %1$d has invalid EZ keystrokes.</string>
 
+    <!-- Backup / Restore manager -->
+    <string name="settings_backup_section">Backup &amp; Restore</string>
+    <string name="settings_backup_summary">Save your user phrases and learned frequencies to a file, or restore them from a previous backup.</string>
+    <string name="settings_backup_export">Back Up to File</string>
+    <string name="settings_backup_import">Restore from File</string>
+    <string name="settings_backup_filename">rakuraku_backup.rkbak.gz</string>
+    <string name="settings_backup_export_success">Backed up %1$d user phrase(s) and %2$d learned frequency record(s).</string>
+    <string name="settings_backup_export_empty">Nothing to back up yet — no user phrases and no learned frequencies.</string>
+    <string name="settings_backup_export_failed">Backup failed.</string>
+    <string name="settings_backup_import_confirm">Merge %1$d user phrase(s) and %2$d learned frequency record(s) from this file?</string>
+    <string name="settings_backup_import_success">Merged %1$d user phrase(s) and applied %2$d learned frequency record(s).</string>
+    <string name="settings_backup_import_failed_invalid">Selected file is not a valid RakuRaku backup.</string>
+    <string name="settings_backup_import_failed_schema">Backup uses an unsupported format version. Update the app and try again.</string>
+    <string name="settings_backup_import_failed_application">Backup was created by a different app.</string>
+    <string name="settings_backup_import_failed_unknown_field">Backup contains an unrecognised field: %1$s</string>
+    <string name="settings_backup_import_failed_invalid_phrase">User phrase row #%1$d is invalid.</string>
+    <string name="settings_backup_import_failed_invalid_frequency">Learned-frequency row #%1$d is invalid.</string>
+    <string name="settings_backup_import_failed_too_many_rows">Backup contains too many rows.</string>
+    <string name="settings_backup_import_failed_generic">Restore failed.</string>
+
     <string name="settings_about">About</string>
     <string name="settings_about_inventor">Input Method Inventor: 高衡緒</string>
     <string name="settings_about_org">Organization: 輕鬆資訊企業社 (Inactive)</string>
